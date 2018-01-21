@@ -1,0 +1,68 @@
+   /*
+            pitchrad = DEG2RAD(i);
+            rollrad = DEG2RAD(-i);
+
+            priv.pitch_deg = RAD2DEG (pitchrad * SCALE);
+            priv.roll_deg = RAD2DEG (rollrad);
+            priv.cos_roll = cos (rollrad);
+            priv.sin_roll = -1 * sin (rollrad);
+            priv.heading = 87;
+            tw_osd_fill_region (50, 78, 130, 205, COLOR_NONE, OSD_work_field, OSD_PATH_DISP);
+            render_horizon ();
+            //render_roll_indicator();
+
+    */
+
+
+
+ 
+
+    /*
+    OSD_work_field = !OSD_work_field;
+     while(1)
+     {
+        for (int a=0;a<20;a++)
+        {
+
+        TW2823_OSD_fill_region(60,36,132,206,0xff,OSD_work_field);
+        for (int i=40+a;i<=200;i=i+20)
+        {
+          TW2823_OSD_fill_region(100,i,131,i,COLOR_RED,OSD_work_field);
+          tw_printf(16,i-4,"%u",i);
+        }
+        for (int i=40+a%5;i<=200;i=i+5)
+        {
+          TW2823_OSD_fill_region(124,i,132,i,COLOR_GREEN,OSD_work_field);
+        }
+        TW2823_OSD_display_on(OSD_work_field);
+    OSD_work_field = !OSD_work_field;
+
+
+*/
+
+/*
+cnt = 0;
+char val = 0, new_up, new_down, val_up, val_down;
+for (int i=0;i<sizeof(fontxx); i++)
+{
+  val = fontxx[i];
+
+  val_up = val & 0xf0;
+  val_down = val & 0x0f;
+
+  if (val_up == 0xf0) new_up = 0x10;
+  if (val_up == 0x80) new_up = 0xf0;
+  if (val_up == 0x00) new_up = 0x00;
+
+  if (val_down == 0x0f) new_down = 0x01;
+  if (val_down == 0x08) new_down = 0x0f;
+  if (val_down == 0x00) new_down = 0x00;
+
+  val = new_up + new_down;
+
+  debug("0x%02x,",val);
+  cnt++;
+  if (cnt>32) { debug("\n"); cnt =0;}
+
+}
+*/
