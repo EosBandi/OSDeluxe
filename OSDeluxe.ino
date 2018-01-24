@@ -79,19 +79,17 @@ void loop ()
 
     digitalWrite (13, HIGH);
 
-    color = COLOR_WHITE;
 
     unsigned long t, tl;
 
-    font_type = FONT_SHADOW_16x8;
-
-    rec_shadow_color = COLOR_REC_BLACK;
+    
+    rec_color_shadow = COLOR_REC_BLACK;
     rec_color = COLOR_REC_WHITE;
-    rec_back_color = COLOR_REC_BLACK | REC_MIX;
+    rec_color_background = COLOR_REC_RED | REC_MIX;
 
-    color = COLOR_YELLOW;
-    back_color = COLOR_BLACK | MIX;
-
+    disp_color = COLOR_YELLOW;
+    disp_color_background = COLOR_BLACK | MIX;
+    disp_color_shadow = COLOR_BLACK;
 
     // Clear OSD on display path both fields
     tw_osd_fill_region (0, 0, 179, 287, 0xff, FLD_EVEN, OSD_PATH_DISP);
@@ -107,7 +105,7 @@ void loop ()
     OSD_path = OSD_PATH_DISP;
     OSD_work_field = FLD_EVEN;
 
-    tw_osd_set_display (0, FLD_EVEN, FLD_ODD);
+    tw_osd_set_display (0, FLD_EVEN, FLD_EVEN);
 
     // OSD_path = OSD_PATH_REC;
     // OSD_work_field = FLD_ODD;
@@ -133,16 +131,26 @@ void loop ()
     // tw_switch_display_field();
     
             t = millis ();
-            tw_set_osd_buf (COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
-            draw_polygon (&ils);
-            transform_polygon(&ils,1,1,0);
-            tw_set_osd_buf (COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
-            draw_polygon (&ils);
+            tw_set_osd_buf (COLOR_BLACK, COLOR_NONE, COLOR_NONE, COLOR_WHITE);
             
 
             tl = millis () - t;
 
-            tw_printf (10, 220, "Ellapsed Time : %u  ", tl);
+            OSD_path = OSD_PATH_REC;
+            font_type = FONT_OUTLINE_16x12;
+            OSD_path = OSD_PATH_DISP;
+            tw_printf (10, 40, "DSP:  Ellapsed time 1234567890 : %u", tl);
+            OSD_path = OSD_PATH_REC;
+            tw_printf (5, 60,  "REC:  Ellapsed time 1234567890 : %u", tl);
+            OSD_path = OSD_PATH_DISP;
+            
+
+
+
+
+
+
+
 
             delay (100);
 

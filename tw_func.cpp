@@ -14,10 +14,12 @@
 
 unsigned char cnt, count, data_buf[20];
 unsigned int ADDR_buf, count_TW2835;
-unsigned char color, back_color;
 unsigned char OSD_work_field, OSD_display_field;
 unsigned char OSD_path = 0;
-unsigned char rec_shadow_color, rec_color, rec_back_color;
+unsigned char rec_color_shadow, rec_color, rec_color_background;
+unsigned char disp_color_shadow, disp_color, disp_color_background;
+
+
 
 FontType font_type; // Global variable to hold current font_type
 
@@ -148,7 +150,7 @@ void tw_init ()
     tw_write_register (0x02d, 0x03);
     tw_write_register (0x03d, 0x03);
 
-    // tw_write_register(0x047,0b01100010); //Reduce color noise
+    // tw_write_register(0x047,0b01100010); //Reduce disp_color noise
 
     // tw_write_register(0x1aa,0b10001000); //Output bandwith Narrow filter
     tw_write_register(0x1aa,0b10101010); //Output bandwith Middle filter
@@ -159,47 +161,53 @@ void tw_init ()
 //    OSD_work_field = 1;
 //    TW2823_OSD_fill_region (0, 0, 719, 287, 0xff, 1); // work
 
-//    color = COLOR_YELLOW;
-//    back_color = COLOR_BLACK | MIX;
+//    disp_color = COLOR_YELLOW;
+//    disp_color_background = COLOR_BLACK | MIX;
 }
 
 void tw_set_attrib (char _color, char _bgcolor, char _fontsize)
 {
-    color = _color;
-    back_color = _bgcolor;
+    disp_color = _color;
+    disp_color_background = _bgcolor;
     font_type = (FontType)_fontsize;
 }
 
 void tw_puts (char *str, char posx, unsigned short posy)
 {
 
-    char inc;
-
+    char inc  = 0; //Character width in posx units (OSD PATH:4pixel, REC PATH:8pixel)
+    char kf_a = 0; //Addtional krening in posx units (see above);
     char _posX = posx;
-    char kf_a;
+
+
+
 
     switch (font_type)
     {
     case FONT_8x8:
     case FONT_SHADOW_8x8:
-        if (OSD_path == 0) kf_a = 2; else kf_a = 1;
-        inc = 0;
+    case FONT_OUTLINE_8x12:
+        if (OSD_path == 0) inc = 2; else inc = 1;
         break;
     case FONT_16x8:
     case FONT_SHADOW_16x8:
-        kf_a = 2;
-        if (OSD_path == 0) inc = 2; else inc = 0;
+    case FONT_OUTLINE_16x12:
+        if (OSD_path == 0) inc = 4; else inc = 2;
         break;
     case FONT_16x16:
     case FONT_SHADOW_16x16:
-        kf_a = 2;
-        if (OSD_path == 0) inc = 2; else inc = 0;
+        if (OSD_path == 0) inc = 4; else inc = 2;
+        break;
+    case FONT_OUTLINE_16x12c:
+        if (OSD_path == 0) inc = 3; else inc = 2;
+        break;
+    
     }
 
     for (char a = 0; a < strlen (str); a++)
     {
         tw_osd_out_char (_posX, posy, str[a]);
-        _posX = _posX + (inc + kf_a);
+        _posX = _posX + inc;
     }
 }
 
@@ -448,16 +456,16 @@ void tw_osd_drawline (int x, int y, int x2, int y2)
     }
 }
 
-void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char color, unsigned char _field, unsigned char path)
+void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char disp_color, unsigned char _field, unsigned char path)
 {
 
     unsigned char reg209;
 
     cnt = 0;
-    data_buf[cnt++] = color;
-    data_buf[cnt++] = color;
-    data_buf[cnt++] = color;
-    data_buf[cnt++] = color;
+    data_buf[cnt++] = disp_color;
+    data_buf[cnt++] = disp_color;
+    data_buf[cnt++] = disp_color;
+    data_buf[cnt++] = disp_color;
     data_buf[cnt++] = 0x80;
     tw_write_buf (0x200, data_buf, cnt);
 
@@ -505,6 +513,91 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
     char col, row;
     char ch;
     char tmp;
+    unsigned char lo, hi;
+
+
+    if (font_type == FONT_OUTLINE_8x12)
+    {
+
+        ch = _chr-32; // Get char from translation map //First char is space
+        row = ch / 16; // First line (16x6 table)
+        col = ch % 16;
+
+        for (_i = 0; _i < 12; _i++) //12 line per character
+        {
+            s[0] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4)];
+            s[1] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4) + 1];
+            s[2] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4) + 2];
+            s[3] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4) + 3];
+            if (OSD_path == OSD_PATH_DISP)
+            {
+                _buf[0] = (s[0] >> 4) & 0x0f;
+                _buf[1] = (s[0]) & 0x0f;
+                _buf[2] = (s[1] >> 4) & 0x0f;
+                _buf[3] = (s[1]) & 0x0f;
+                for (i = 0; i < 4; i++)
+                {
+                    switch (_buf[i])
+                    {
+                    case 0x00:
+                        _buf[i] = disp_color_shadow;
+                        break;
+                    case 0x0d:
+                        _buf[i] = disp_color_background;
+                        break;
+                    case 0x0f:
+                        _buf[i] = disp_color;
+                        break;
+                    }
+                }
+                tw_wr_osd_buffer (_buf, 0);
+
+                _buf[0] = (s[2] >> 4) & 0x0f;
+                _buf[1] = (s[2]) & 0x0f;
+                _buf[2] = (s[3] >> 4) & 0x0f;
+                _buf[3] = (s[3]) & 0x0f;
+                for (i = 0; i < 4; i++)
+                {
+                    switch (_buf[i])
+                    {
+                    case 0x00:
+                        _buf[i] = disp_color_shadow;
+                        break;
+                    case 0x0d:
+                        _buf[i] = disp_color_background;
+                        break;
+                    case 0x0f:
+                        _buf[i] = disp_color;
+                        break;
+                    }
+                }
+                tw_wr_osd_buffer (_buf, 1);
+                tw_wr_display_from_buffer (_pos_X, _y_line, 1); // 0 is 4 bytes, 1 is 8 bytes
+            } 
+            else 
+            {
+                for (i=0;i<4;i++)
+                {
+                    
+                    tmp = 0;
+                    if ( (s[i] & 0xf0) == 0x00) tmp = rec_color_shadow<<4;
+                    if ( (s[i] & 0xf0) == 0xf0) tmp = rec_color<<4;
+                    if ( (s[i] & 0xf0) == 0xd0) tmp = rec_color_background <<4 ;
+
+                    if ( (s[i] & 0x0f) == 0x00) tmp += rec_color_shadow;
+                    if ( (s[i] & 0x0f) == 0x0f) tmp += rec_color;
+                    if ( (s[i] & 0x0f) == 0x0d) tmp += rec_color_background;
+
+                    s[i]=tmp;
+                }              
+                tw_wr_osd_buffer (s, 0);
+                tw_wr_display_from_buffer (_pos_X, _y_line, 0); // 0 is 4 bytes, 1 is 8 bytes
+            }
+            _y_line++;
+        }
+        return;
+
+    }
 
 
     if (font_type == FONT_SHADOW_8x8)
@@ -520,55 +613,37 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             s[1] = fontxx[  (row*64*8) + ( _i* 64) + (col * 4) + 1];
             s[2] = fontxx[  (row*64*8) + ( _i* 64) + (col * 4) + 2];
             s[3] = fontxx[  (row*64*8) + ( _i* 64) + (col * 4) + 3];
+
             if (OSD_path == OSD_PATH_DISP)
             {
                 _buf[0] = (s[0] >> 4) & 0x0f;
                 _buf[1] = (s[0]) & 0x0f;
                 _buf[2] = (s[1] >> 4) & 0x0f;
                 _buf[3] = (s[1]) & 0x0f;
+                _buf[4] = (s[2] >> 4) & 0x0f;
+                _buf[5] = (s[2]) & 0x0f;
+                _buf[6] = (s[3] >> 4) & 0x0f;
+                _buf[7] = (s[3]) & 0x0f;
 
-
-                for (i = 0; i < 4; i++)
+                for (i = 0; i < 8; i++)
                 {
                     switch (_buf[i])
                     {
                     case 0x00:
-                        _buf[i] = COLOR_BLACK;
+                        _buf[i] = disp_color_shadow;
                         break;
                     case 0x0f:
-                        _buf[i] = 0xff;
+                        _buf[i] = disp_color_background;
                         break;
                     case 0x01:
-                        _buf[i] = COLOR_WHITE;
+                        _buf[i] = disp_color;
                         break;
                     }
                 }
 
 
                 tw_wr_osd_buffer (_buf, 0);
-
-                _buf[0] = (s[2] >> 4) & 0x0f;
-                _buf[1] = (s[2]) & 0x0f;
-                _buf[2] = (s[3] >> 4) & 0x0f;
-                _buf[3] = (s[3]) & 0x0f;
-
-                for (i = 0; i < 4; i++)
-                {
-                    switch (_buf[i])
-                    {
-                    case 0x00:
-                        _buf[i] = COLOR_BLACK;
-                        break;
-                    case 0x0f:
-                        _buf[i] = 0xff;
-                        break;
-                    case 0x01:
-                        _buf[i] = COLOR_WHITE;
-                        break;
-                    }
-                }
-
-                tw_wr_osd_buffer (_buf, 1);
+                tw_wr_osd_buffer (&_buf[4], 1);
                 tw_wr_display_from_buffer (_pos_X, _y_line, 1); // 0 is 4 bytes, 1 is 8 bytes
             } 
             else 
@@ -577,13 +652,13 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
                 {
                     
                     tmp = 0;
-                    if ( (s[i] & 0xf0) == 0x00) tmp = rec_shadow_color<<4;
+                    if ( (s[i] & 0xf0) == 0x00) tmp = rec_color_shadow<<4;
                     if ( (s[i] & 0xf0) == 0x10) tmp = rec_color<<4;
-                    if ( (s[i] & 0xf0) == 0xf0) tmp = rec_back_color <<4 ;
+                    if ( (s[i] & 0xf0) == 0xf0) tmp = rec_color_background <<4 ;
 
-                    if ( (s[i] & 0x0f) == 0x00) tmp += rec_shadow_color;
+                    if ( (s[i] & 0x0f) == 0x00) tmp += rec_color_shadow;
                     if ( (s[i] & 0x0f) == 0x01) tmp += rec_color;
-                    if ( (s[i] & 0x0f) == 0xf) tmp += rec_back_color;
+                    if ( (s[i] & 0x0f) == 0xf) tmp += rec_color_background;
 
                     s[i]=tmp;
                     
@@ -618,6 +693,93 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             _buf[1] = (s[0]) & 0x0f;
             _buf[2] = (s[1] >> 4) & 0x0f;
             _buf[3] = (s[1]) & 0x0f;
+            _buf[4] = (s[2] >> 4) & 0x0f;
+            _buf[5] = (s[2]) & 0x0f;
+            _buf[6] = (s[3] >> 4) & 0x0f;
+            _buf[7] = (s[3]) & 0x0f;
+
+            for (i = 8; i > 0; i--)
+            {
+                switch (_buf[i-1])
+                {
+                case 0x00:
+                    _buf[i-1] = disp_color_shadow;
+                    break;
+                case 0x0f:
+                    _buf[i-1] = disp_color_background;
+                    break;
+                case 0x01:
+                    _buf[i-1] = disp_color;
+                    break;
+                }
+                _buf[(i-1)*2+1] = _buf[i-1];
+                _buf[(i-1)*2]   = _buf[i-1];
+
+            }
+
+            tw_wr_osd_buffer (_buf, 0);
+            tw_wr_osd_buffer (&_buf[4], 1);
+            tw_wr_osd_buffer (&_buf[8], 2);
+            tw_wr_osd_buffer (&_buf[12], 3);
+            tw_wr_display_from_buffer (_pos_X, _y_line, 3); // 0 is 4 bytes, 1 is 8 bytes
+        }
+        else
+        {
+
+            for (i = 0; i < 4; i++)
+            {
+                tmp = 0;
+                if ((s[i] & 0xf0) == 0x00) tmp = rec_color_shadow << 4;
+                if ((s[i] & 0xf0) == 0x10) tmp = rec_color << 4;
+                if ((s[i] & 0xf0) == 0xf0) tmp = rec_color_background << 4;
+
+                if ((s[i] & 0x0f) == 0x00) tmp += rec_color_shadow;
+                if ((s[i] & 0x0f) == 0x01) tmp += rec_color;
+                if ((s[i] & 0x0f) == 0xf) tmp += rec_color_background;
+
+                s[i] = tmp;
+            }
+
+            for (i=0;i<8;i=i+2)
+            {
+
+            _buf[i] = s[i/2] & 0xf0;
+            _buf[i] = _buf[i] + (s[i/2] >> 4);
+
+            _buf[i+1] = s[i/2] << 4;
+            _buf[i+1] = _buf[i+1] + (s[i/2] & 0x0f);
+
+            }
+            tw_wr_osd_buffer(_buf, 0);
+            tw_wr_osd_buffer(&_buf[4],1);
+            tw_wr_display_from_buffer (_pos_X, _y_line, 1); // 0 is 4 bytes, 1 is 8 bytes
+            
+        }
+            _y_line++;
+        }
+        return;
+    }
+
+ if ((font_type == FONT_OUTLINE_16x12) || (font_type == FONT_OUTLINE_16x12c) )
+    {
+        ch = _chr - 32; // First char is space
+        row = ch / 16; // First line (16x6 table)
+        col = ch % 16;
+
+        for (_i = 0; _i < 12; _i++)
+        {
+
+            s[0] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4)];
+            s[1] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4) + 1];
+            s[2] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4) + 2];
+            s[3] = fontoutline[  (row*64*12) + ( _i* 64) + (col * 4) + 3];
+
+        if (OSD_path == OSD_PATH_DISP)
+        {
+            _buf[0] = (s[0] >> 4) & 0x0f;
+            _buf[1] = (s[0]) & 0x0f;
+            _buf[2] = (s[1] >> 4) & 0x0f;
+            _buf[3] = (s[1]) & 0x0f;
 
 
             for (i = 0; i < 4; i++)
@@ -625,13 +787,13 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
                 switch (_buf[i])
                 {
                 case 0x00:
-                    _buf[i] = COLOR_BLACK;
+                    _buf[i] = disp_color_shadow;
+                    break;
+                case 0x0d:
+                    _buf[i] = disp_color_background;
                     break;
                 case 0x0f:
-                    _buf[i] = 0xff;
-                    break;
-                case 0x01:
-                    _buf[i] = COLOR_WHITE;
+                    _buf[i] = disp_color;
                     break;
                 }
             }
@@ -657,13 +819,13 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
                 switch (_buf[i])
                 {
                 case 0x00:
-                    _buf[i] = COLOR_BLACK;
+                    _buf[i] = disp_color_shadow;
+                    break;
+                case 0x0d:
+                    _buf[i] = disp_color_background;
                     break;
                 case 0x0f:
-                    _buf[i] = 0xff;
-                    break;
-                case 0x01:
-                    _buf[i] = COLOR_WHITE;
+                    _buf[i] = disp_color;
                     break;
                 }
             }
@@ -682,7 +844,23 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
         else
         {
 
-            for (i=0;i<8;i=i+2)
+            // Redo values in s for colors
+
+            for (i = 0; i < 4; i++)
+            {
+
+                tmp = 0;
+                if ((s[i] & 0xf0) == 0x00) tmp = rec_color_shadow << 4;
+                if ((s[i] & 0xf0) == 0xf0) tmp = rec_color << 4;
+                if ((s[i] & 0xf0) == 0xd0) tmp = rec_color_background << 4;
+
+                if ((s[i] & 0x0f) == 0x00) tmp += rec_color_shadow;
+                if ((s[i] & 0x0f) == 0x0f) tmp += rec_color;
+                if ((s[i] & 0x0f) == 0x0d) tmp += rec_color_background;
+
+                s[i] = tmp;
+            }
+            for (i = 0; i < 8; i = i + 2)
             {
 
             _buf[i] = s[i/2] & 0xf0;
@@ -702,7 +880,6 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
         return;
     }
 
-
     if (font_type == FONT_8x8)
     {
         for (_i = 0; _i < 8; _i++)
@@ -712,9 +889,9 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             for (i = 0; i < 8; i++)
             {
                 if (_uch & (1 << i))
-                    s[i] = color;
+                    s[i] = disp_color;
                 else
-                    s[i] = back_color;
+                    s[i] = disp_color_background;
             }
             if (OSD_path == OSD_PATH_DISP)
             {
@@ -726,15 +903,15 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             {
                 for (i = 0; i < 4; i++)
                 {
-                    if (s[i*2] == color)
+                    if (s[i*2] == disp_color)
                         _buf[i] = rec_color << 4;
                     else
-                        _buf[i] = rec_back_color << 4;
+                        _buf[i] = rec_color_background << 4;
 
-                    if (s[i*2+1] == color)
+                    if (s[i*2+1] == disp_color)
                         _buf[i] += rec_color;
                     else
-                        _buf[i] += rec_back_color;
+                        _buf[i] += rec_color_background;
                 }
                 tw_wr_osd_buffer (_buf, 0);
                 tw_wr_display_from_buffer (_pos_X, _y_line, 0); // 0 is 4 bytes, 1 is 8 bytes
@@ -755,13 +932,13 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             {
                 if (_uch & (0x80 >> i))
                 {
-                    s[i * 2] = color;
-                    s[i * 2 + 1] = color;
+                    s[i * 2] = disp_color;
+                    s[i * 2 + 1] = disp_color;
                 }
                 else
                 {
-                    s[i * 2] = back_color;
-                    s[i * 2 + 1] = back_color;
+                    s[i * 2] = disp_color_background;
+                    s[i * 2 + 1] = disp_color_background;
                 }
             }
             if (OSD_path == OSD_PATH_DISP)
@@ -776,15 +953,15 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             {
                 for (i = 0; i < 8; i++)
                 {
-                    if (s[i * 2] == color)
+                    if (s[i * 2] == disp_color)
                         _buf[i] = rec_color << 4;
                     else
-                        _buf[i] = rec_back_color << 4;
+                        _buf[i] = rec_color_background << 4;
 
-                    if (s[i * 2 + 1] == color)
+                    if (s[i * 2 + 1] == disp_color)
                         _buf[i] += rec_color;
                     else
-                        _buf[i] += rec_back_color;
+                        _buf[i] += rec_color_background;
                 }
                 tw_wr_osd_buffer (_buf, 0);
                 tw_wr_osd_buffer (&_buf[4], 1);
@@ -805,13 +982,13 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             {
                 if (_uch & (0x80 >> i))
                 {
-                    s[i * 2] = color;
-                    s[i * 2 + 1] = color;
+                    s[i * 2] = disp_color;
+                    s[i * 2 + 1] = disp_color;
                 }
                 else
                 {
-                    s[i * 2] = back_color;
-                    s[i * 2 + 1] = back_color;
+                    s[i * 2] = disp_color_background;
+                    s[i * 2 + 1] = disp_color_background;
                 }
             }
             if (OSD_path == OSD_PATH_DISP)
@@ -831,15 +1008,15 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
             {
                 for (i = 0; i < 8; i++)
                 {
-                    if (s[i * 2] == color)
+                    if (s[i * 2] == disp_color)
                         _buf[i] = rec_color << 4;
                     else
-                        _buf[i] = rec_back_color << 4;
+                        _buf[i] = rec_color_background << 4;
 
-                    if (s[i * 2 + 1] == color)
+                    if (s[i * 2 + 1] == disp_color)
                         _buf[i] += rec_color;
                     else
-                        _buf[i] += rec_back_color;
+                        _buf[i] += rec_color_background;
                 }
                 tw_wr_osd_buffer (_buf, 0);
                 tw_wr_osd_buffer (&_buf[4], 1);

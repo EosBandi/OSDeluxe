@@ -63,16 +63,19 @@ enum FontType {
     FONT_SHADOW_8x8       = 0x04,
     FONT_SHADOW_16x8      = 0x05,
     FONT_SHADOW_16x16     = 0x06,
+    FONT_OUTLINE_8x12     = 0x07,
+    FONT_OUTLINE_16x12    = 0x08,
+    FONT_OUTLINE_16x12c   = 0x09
 };
 
 extern FontType font_type;      //Global variable to hold current font type
 
 extern unsigned char cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
-extern unsigned char color, back_color;
 extern unsigned char OSD_work_field;
 extern unsigned char OSD_path; //0-display, 1-record
-extern unsigned char rec_shadow_color, rec_color, rec_back_color;
+extern unsigned char rec_color_shadow, rec_color, rec_color_background;
+extern unsigned char disp_color, disp_color_background, disp_color_shadow;
 
 
 const unsigned char colortable[13][3] = {
