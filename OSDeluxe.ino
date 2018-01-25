@@ -1,24 +1,5 @@
-#include <Arduino.h>
-#include <stdlib.h>
-#include "i2c_t3.h"
 
-#include "tw_func.h"
-#include "graphics.h"
-
-void debug (const char *format, ...)
-{
-    char buf[128];
-    va_list args;
-    va_start (args, format);
-    vsniprintf (buf, sizeof (buf), format,
-                args); // does not overrun sizeof(buf) including null terminator
-    va_end (args);
-    // the below assumes that the new data will fit into the I/O buffer. If not, Serial may drop it.
-    // if Serial had a get free buffer count, we could delay and retry. Such does exist at the
-    // device class level, but not at this level.
-    Serial.write (buf); // move chars to I/O buffer, freeing up local buf
-    return;
-}
+#include "OSDeluxe.h"
 
 
 void setup ()
@@ -88,7 +69,7 @@ void loop ()
     rec_color_background = COLOR_REC_RED | REC_MIX;
 
     disp_color = COLOR_YELLOW;
-    disp_color_background = COLOR_BLACK | MIX;
+    disp_color_background = COLOR_NONE;
     disp_color_shadow = COLOR_BLACK;
 
     // Clear OSD on display path both fields
@@ -118,41 +99,44 @@ void loop ()
 
     #define SCALE 5
     float pitchrad, rollrad;
-    tw_set_osd_buf (COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK);
-
+  
     struct point ils_points[5] = { { 0, -10 }, { +10, +20 }, { 0, 5 }, { -10, +20 } };
     struct polygon ils;
 
     ils.len = 4;
     ils.points = ils_points;
     
-    transform_polygon(&ils,50,70,0);
-    
-    // tw_switch_display_field();
-    
-            t = millis ();
-            tw_set_osd_buf (COLOR_BLACK, COLOR_NONE, COLOR_NONE, COLOR_WHITE);
-            
 
-            tl = millis () - t;
-
-            OSD_path = OSD_PATH_REC;
-            font_type = FONT_OUTLINE_16x12;
-            OSD_path = OSD_PATH_DISP;
-            tw_printf (10, 40, "DSP:  Ellapsed time 1234567890 : %u", tl);
-            OSD_path = OSD_PATH_REC;
-            tw_printf (5, 60,  "REC:  Ellapsed time 1234567890 : %u", tl);
-            OSD_path = OSD_PATH_DISP;
-            
+ #define X_POS 40
+ #define Y_POS 100
+ #define Y_HEIGHT 15
+ #define X_WIDTH  20
 
 
+b.x = 10;
+b.y = 5;
+b.w = 30;
+b.h = 8;
+b.max = 25.2;
+b.min = 20.0;
+b.val = 22.6;
+b.warn = 21.0;
+b.mix = true;
+
+g.x = 40;
+g.y = 100;
+g.sat = 8;
+g.sat_warn = 5;
+g.hdop = 12.33;
+g.color = COLOR_YELLOW;
+
+bw.x = 30;
+bw.y = 100;
+
+osd_battery_prerender( &bw );
+osd_battery_render( & bw );
 
 
-
-
-
-
-            delay (100);
 
 
     while (1)

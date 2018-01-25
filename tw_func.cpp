@@ -1,15 +1,4 @@
-#include "tw_func.h"
-#include "tw_font.h"
-
-
-#include <arduino.h>
-#include <stdlib.h>
-#include "i2c_t3.h"
-
-#include "s1debug.h"
-
-
-
+#include "OSDeluxe.h"
 
 
 unsigned char cnt, count, data_buf[20];
@@ -216,7 +205,7 @@ void tw_printf (char posx, unsigned short posy, const char *format, ...)
     char buf[128];
     va_list args;
     va_start (args, format);
-    vsniprintf (buf, sizeof (buf), format,
+    vsnprintf (buf, sizeof (buf), format,
                 args); // does not overrun sizeof(buf) including null terminator
     va_end (args);
 
@@ -456,10 +445,35 @@ void tw_osd_drawline (int x, int y, int x2, int y2)
     }
 }
 
-void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char disp_color, unsigned char _field, unsigned char path)
+
+void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color)
 {
 
+    unsigned char m16;
+
+    m16 = w % 16;
+
+          /*
+          if (OSD_path == OSD_PATH_REC)
+          {
+              x = x / 2;
+              w = w / 2;
+          }
+
+      */
+
+    if ((m16 == 10) || (m16 == 12) || (m16 == 13))
+    {
+        tw_osd_fill_region(x, y, x + w - 5, y + h, color, OSD_work_field, OSD_path);
+        tw_osd_fill_region(x + w - 5, y, x + w, y + h, color, OSD_work_field, OSD_path);
+    }
+    else { tw_osd_fill_region(x, y, x + w, y + h, color, OSD_work_field, OSD_path); }
+}
+
+void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char disp_color, unsigned char _field, unsigned char path)
+{
     unsigned char reg209;
+    unsigned char m16;
 
     cnt = 0;
     data_buf[cnt++] = disp_color;
@@ -467,19 +481,19 @@ void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsi
     data_buf[cnt++] = disp_color;
     data_buf[cnt++] = disp_color;
     data_buf[cnt++] = 0x80;
-    tw_write_buf (0x200, data_buf, cnt);
+    tw_write_buf(0x200, data_buf, cnt);
 
     cnt = 0;
-    data_buf[cnt++] = x1;      // start HPOS
-    data_buf[cnt++] = x2;      // end   HPOS
+    data_buf[cnt++] = x1; // start HPOS
+    data_buf[cnt++] = x2; // end   HPOS
     data_buf[cnt++] = y1; // start VPOS
     data_buf[cnt++] = y2; // end VPOS
 
     reg209 = 0x00;
 
     if (_field == FLD_EVEN) reg209 = 0b00001000;
-    if (y1 > 255) reg209 = reg209 +  0b00000100;
-    if (y2 > 255) reg209 = reg209 +  0b00000001;
+    if (y1 > 255) reg209 = reg209 + 0b00000100;
+    if (y2 > 255) reg209 = reg209 + 0b00000001;
 
     data_buf[cnt++] = reg209;
 
@@ -488,10 +502,9 @@ void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsi
     else
         data_buf[cnt++] = 0b11000000;
 
-    tw_write_buf (0x205, data_buf, cnt);
+    tw_write_buf(0x205, data_buf, cnt);
 
-tw_wait_for_osd_write(10);
-
+    tw_wait_for_osd_write(50);
 }
 
 void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _chr)

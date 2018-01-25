@@ -1,8 +1,6 @@
-#ifndef _TW_FUNC_H_
-#define _TW_FUNC_H_
+#ifndef _S1DEBUG_H_
+#define _S1DEBUG_H_
 
 void debug (const char *format, ...);
-
-
 
 #endif

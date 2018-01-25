@@ -1,3 +1,5 @@
+#ifndef _TW_FUNC_H_
+#define _TW_FUNC_H_
 
 
 #define RAD2DEG(x) ((x) * (180.0 / PI))
@@ -109,6 +111,42 @@ const unsigned char colortable_rec[4][3] = {
 #define REC_MIX         0x8
 #define REC_BLINK       0x4
 
+ struct bar {
+     unsigned char  x;
+     unsigned short y;
+     unsigned char  w;
+     unsigned short h;
+     float max;
+     float min;
+     float val;
+     float warn;
+     bool mix;
+ };
+
+struct gps_widget {
+    unsigned short x;
+    unsigned short y;
+    unsigned char sat;
+    unsigned char sat_warn;
+    float         hdop;
+    float         hdop_warn;
+    unsigned char color;
+};
+
+struct battery_widget {
+    unsigned short x;
+    unsigned short y;
+    struct bar volt;
+    struct bar cap;
+    float  current;
+    float  voltage;
+    unsigned char cells;
+};
+
+extern struct battery_widget bw;
+extern struct gps_widget g;
+extern struct bar b;
+
 void tw_init();
 void tw_write_buf(unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT);
 
@@ -143,7 +181,6 @@ struct widget_priv {
 extern widget_priv priv;
 
 
-
 void render_horizon();
 void render_roll_indicator();
 
@@ -163,8 +200,9 @@ void tw_switch_display_field();
 void tw_osd_qsetpixel(unsigned int x, unsigned int y);
 void tw_osd_setpixel(unsigned int x, unsigned int y, unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4);
 
-void tw_osd_fill_region_rec (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char color, unsigned char _field);
 void tw_osd_fill_region(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2, unsigned char color, unsigned char _field, unsigned char path);
 
+void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
 
 
+#endif

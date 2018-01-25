@@ -1,8 +1,4 @@
-#include <Arduino.h>
-#include <stdlib.h>
-#include "tw_func.h"
-#include "s1debug.h"
-#include "graphics.h"
+#include "OSDeluxe.h"
 
 
 void draw_circle(int xm, int ym, int r)
