@@ -4,6 +4,8 @@ struct bar b;
 struct gps_widget g;
 struct battery_widget bw;
 
+
+
 void osd_bar_prerender(struct bar *b)
 {
     //Nothing ?
@@ -12,35 +14,51 @@ void osd_bar_prerender(struct bar *b)
 void osd_bar_render(struct bar *b)
 {
 
-    float val;
-    unsigned char mix;
+    float val;      //value to display, constrained to max and min
+    
+    unsigned char mix; // Transparent background value
+    int iw, rw, yw, tw;
+
+
+    val = b->val;
+    if (b->val > b->max) val = b->max;
+    if (b->val < b->min) val = b->min;
+
+    iw = b->w - 4;              //internal width in pixels(quartets)
+    rw = (float)iw * ((b->warn_red - b->min) / (b->max - b->min));
+    yw = (float)iw * ((b->warn_yellow - b->min) / (b->max - b->min));
+    tw = (float)iw * ((val - b->min) / (b->max - b->min));
 
     if (b->mix)
         mix = MIX;
     else
         mix = 0;
-    val = b->val;
-    if (b->val > b->max) val = b->max;
-    if (b->val < b->min) val = b->min;
+
 
     OSD_path = OSD_PATH_DISP;
+    //Outside
     tw_osd_rectangle(b->x, b->y, b->w, b->h + 10, COLOR_BLACK | MIX);
     tw_osd_rectangle(b->x + 1, b->y + 1, b->w - 2, b->h - 2, COLOR_WHITE | mix);
-    int iw = b->w - 4;
-    int rw = (float)iw * 0.2f;
-    int yw = (float)iw * 0.2f;
 
-    tw_osd_rectangle(b->x + 2, b->y + 2, b->w - 4, b->h - 4, COLOR_GREEN | mix);
-    tw_osd_rectangle(b->x + 2, b->y + 2, rw, b->h - 4, COLOR_RED | mix);
-    tw_osd_rectangle(b->x + 2 + rw, b->y + 2, yw, b->h - 4, COLOR_YELLOW | mix);
-
-    float range = b->max - b->min;
-    float tick = (b->w - 4) / range;
-    float tw = (b->max - val) * tick;
-    if (tw > 0) tw_osd_rectangle(b->x + 2 + b->w - 4 - tw, b->y + 2, tw + 1, b->h - 4, COLOR_BLACK | mix);
+    if (b->bar_type == BAR_MULTICOLOR)
+    {
+        // Colored markers;
+        tw_osd_rectangle(b->x + 2, b->y + 2, iw, b->h - 4, COLOR_GREEN | mix);
+        tw_osd_rectangle(b->x + 2, b->y + 2, yw, b->h - 4, COLOR_YELLOW | mix);
+        tw_osd_rectangle(b->x + 2, b->y + 2, rw, b->h - 4, COLOR_RED | mix);
+        if (tw > 0) tw_osd_rectangle(b->x + 2 + tw, b->y + 2, iw - tw, b->h - 4, COLOR_BLACK | mix);
+    }
+    else
+    {
+        unsigned char bar_color = COLOR_GREEN;
+        if (val <= b->warn_yellow) bar_color = COLOR_YELLOW | mix;
+        if (val <= b->warn_red) bar_color = COLOR_RED | mix | BLINK;
+        tw_osd_rectangle(b->x + 2, b->y + 2, b->w - 4, b->h - 4, COLOR_BLACK | mix);
+        tw_osd_rectangle(b->x + 2, b->y + 2, tw, b->h - 4, bar_color | mix);
+    }
 
     disp_color_background = COLOR_BLACK | MIX;
-    if (b->val <= b->warn)
+    if (b->val <= b->warn_red)
         disp_color = COLOR_RED | BLINK;
     else
         disp_color = COLOR_YELLOW;
@@ -111,9 +129,11 @@ bw->volt.h = 10;
 
 bw->volt.max = 25.2;
 bw->volt.min = 20.0;
-bw->volt.val = 22.5;
-bw->volt.warn = 21.0;
+bw->volt.val = 20.9;
+bw->volt.warn_red = 21.0;
+bw->volt.warn_yellow = 22.0;
 bw->volt.mix = true;
+bw->volt.bar_type = BAR_SINGLE_COLOR;
 
 bw->cap.x = bw->x;
 bw->cap.y = bw->y + 20;
@@ -123,7 +143,7 @@ bw->cap.h = 10;
 bw->cap.max = 12000;
 bw->cap.min = 1000;
 bw->cap.val = 8976;
-bw->cap.warn = 3000;
+//bw->cap.warn = 3000;
 bw->cap.mix = true;
  
 
@@ -135,7 +155,7 @@ void osd_battery_render( struct battery_widget *bw)
 {
 
   osd_bar_render( &bw->volt);
-  osd_bar_render( &bw->cap);
+  //osd_bar_render( &bw->cap);
 
 
 }

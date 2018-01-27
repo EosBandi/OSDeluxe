@@ -113,22 +113,6 @@ void loop ()
  #define X_WIDTH  20
 
 
-b.x = 10;
-b.y = 5;
-b.w = 30;
-b.h = 8;
-b.max = 25.2;
-b.min = 20.0;
-b.val = 22.6;
-b.warn = 21.0;
-b.mix = true;
-
-g.x = 40;
-g.y = 100;
-g.sat = 8;
-g.sat_warn = 5;
-g.hdop = 12.33;
-g.color = COLOR_YELLOW;
 
 bw.x = 30;
 bw.y = 100;

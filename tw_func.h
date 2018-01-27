@@ -111,42 +111,6 @@ const unsigned char colortable_rec[4][3] = {
 #define REC_MIX         0x8
 #define REC_BLINK       0x4
 
- struct bar {
-     unsigned char  x;
-     unsigned short y;
-     unsigned char  w;
-     unsigned short h;
-     float max;
-     float min;
-     float val;
-     float warn;
-     bool mix;
- };
-
-struct gps_widget {
-    unsigned short x;
-    unsigned short y;
-    unsigned char sat;
-    unsigned char sat_warn;
-    float         hdop;
-    float         hdop_warn;
-    unsigned char color;
-};
-
-struct battery_widget {
-    unsigned short x;
-    unsigned short y;
-    struct bar volt;
-    struct bar cap;
-    float  current;
-    float  voltage;
-    unsigned char cells;
-};
-
-extern struct battery_widget bw;
-extern struct gps_widget g;
-extern struct bar b;
-
 void tw_init();
 void tw_write_buf(unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT);
 
