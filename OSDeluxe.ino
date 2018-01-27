@@ -97,32 +97,68 @@ void loop ()
     OSD_work_field = FLD_EVEN;
 
 
-    #define SCALE 5
-    float pitchrad, rollrad;
-  
-    struct point ils_points[5] = { { 0, -10 }, { +10, +20 }, { 0, 5 }, { -10, +20 } };
-    struct polygon ils;
-
-    ils.len = 4;
-    ils.points = ils_points;
-    
-
- #define X_POS 40
- #define Y_POS 100
- #define Y_HEIGHT 15
- #define X_WIDTH  20
 
 
 
-bw.x = 30;
-bw.y = 100;
+bw.x = 143;
+bw.y = 10;
+bw.min_cell_voltage = 3.3;
+bw.max_cell_voltage = 4.2;
+bw.red_cell_voltage    = 3.5;
+bw.yellow_cell_voltage = 3.7;
+bw.bar_type = BAR_MULTICOLOR;
+bw.mix = 0;
+bw.cells = 6;
+bw.voltage = 23.4;
+bw.current = 0.0;
+bw.max_capacity = 12000;
+bw.remaining_capacity = 7262;
 
+g.x = 7;
+g.y = 10;
+g.sat = 10;
+g.hdop = 0.7;
+g.sat_warn = 5;
+g.color = COLOR_YELLOW;
+
+status.x = 7;
+status.y = 31;
+status.mix = 0;
+status.gps_status = STATUS_OK;
+status.ekf_status = STATUS_WARNING;
+status.vibe_status = STATUS_CRITICAL;
+
+
+aw.x = 7;
+aw.y = 48;
+aw.mix = 0;
+aw.altitude = 45;
+
+vw.x = 165;
+vw.y = 80;
+vw.h = 100;
+vw.w = 4;
+vw.vario = 5.5f;
+vw.vario_max = 15.0f;
+vw.mix = 0;
+vw.num_pos = POS_BELOW;
+
+hw.x = 90;
+hw.y = 245;
+hw.orientation = 45;
+hw.home_distance = 100;
+
+
+osd_gps_render( &g );
 osd_battery_prerender( &bw );
-osd_battery_render( & bw );
+osd_battery_render( &bw );
+osd_status_render( &status);
+osd_altitude_render( &aw);
+osd_vario_render(&vw);
 
-
-
-
+osd_home_prerender( &hw);
+osd_home_render(&hw);
+osd_center_marker();
     while (1)
         ;
 }

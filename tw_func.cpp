@@ -86,7 +86,7 @@ void tw_init ()
 
     tw_write_register (0x20F, 0x0F);
 
-    for (char i = 0; i < 13; i++)
+    for (char i = 0; i < 14; i++)
     {
         ADDR_buf = 0x20B;
         cnt = 0;
@@ -176,6 +176,7 @@ void tw_puts (char *str, char posx, unsigned short posy)
     case FONT_8x8:
     case FONT_SHADOW_8x8:
     case FONT_OUTLINE_8x12:
+    case FONT_8x8b:
         if (OSD_path == 0) inc = 2; else inc = 1;
         break;
     case FONT_16x8:
@@ -893,18 +894,34 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
         return;
     }
 
-    if (font_type == FONT_8x8)
+    if (font_type == FONT_8x8 || font_type == FONT_8x8b)
     {
         for (_i = 0; _i < 8; _i++)
         {
-            _uch = font8x8_basic[_chr][_i];
+            if (font_type == FONT_8x8)
+                _uch = font8x8_basic[_chr][_i];
+            else
+            {
+                _shift = _i << 8;
+                _uch = font_8x8[_chr + _shift];
+            }
 
             for (i = 0; i < 8; i++)
             {
-                if (_uch & (1 << i))
-                    s[i] = disp_color;
+                if (font_type == FONT_8x8)
+                {
+                    if (_uch & (1 << i))
+                        s[i] = disp_color;
+                    else
+                        s[i] = disp_color_background;
+                }
                 else
-                    s[i] = disp_color_background;
+                {
+                    if (_uch & (0x80 >> i))
+                        s[i] = disp_color;
+                    else
+                        s[i] = disp_color_background;
+                }
             }
             if (OSD_path == OSD_PATH_DISP)
             {
@@ -940,10 +957,12 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
         for (_i = 0; _i < 8; _i++)
         {
             _shift = _i << 8;
-            _uch = font_8x8[_chr + _shift];
+//            _uch = font_8x8[_chr + _shift];
+            _uch = font8x8_basic[_chr][_i];
             for (i = 0; i < 8; i++)
             {
-                if (_uch & (0x80 >> i))
+                //if (_uch & (0x80 >> i))
+                if (_uch & (1 << i))
                 {
                     s[i * 2] = disp_color;
                     s[i * 2 + 1] = disp_color;

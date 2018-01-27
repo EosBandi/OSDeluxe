@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include <stdlib.h>
 #include <math.h>
+//#include <string.h>
 #include "i2c_t3.h"
 
 #include "tw_func.h"

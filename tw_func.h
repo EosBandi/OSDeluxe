@@ -18,6 +18,7 @@
 #define COLOR_GREEN      10
 #define COLOR_OCEAN      11
 #define COLOR_YELLOW     12
+#define COLOR_DARK_YELLOW 13
 #define COLOR_NONE       0xff
 
 
@@ -67,7 +68,8 @@ enum FontType {
     FONT_SHADOW_16x16     = 0x06,
     FONT_OUTLINE_8x12     = 0x07,
     FONT_OUTLINE_16x12    = 0x08,
-    FONT_OUTLINE_16x12c   = 0x09
+    FONT_OUTLINE_16x12c   = 0x09,
+    FONT_8x8b             = 0x0A
 };
 
 extern FontType font_type;      //Global variable to hold current font type
@@ -80,7 +82,7 @@ extern unsigned char rec_color_shadow, rec_color, rec_color_background;
 extern unsigned char disp_color, disp_color_background, disp_color_shadow;
 
 
-const unsigned char colortable[13][3] = {
+const unsigned char colortable[14][3] = {
 {0x00, 0x80, 0x80},							//Black         0
 {0x3f, 0x80, 0x80},							//25%white      1
 {0x7f, 0x80, 0x80},							//50%white      2
@@ -93,7 +95,8 @@ const unsigned char colortable[13][3] = {
 {0x69, 0xd4, 0xea},							//Magenta       9
 {0x4b, 0x55, 0x4a},							//Green         10
 {0x61, 0xb5, 0x3a},							//Ocean ??      11
-{0xe1, 0x00, 0x94}							//Yellow        12
+{0xe1, 0x00, 0x94},							//Yellow        12
+{190, 32, 168}                              //Dark Yellow   13
 };
 
 const unsigned char colortable_rec[4][3] = {

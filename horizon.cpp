@@ -18,6 +18,13 @@
 #define MINOR_ROLL_TICK  5
 #define MAJOR_ROLL_TICK  15
 
+#define SCALE 5
+float pitchrad, rollrad;
+  
+ #define X_POS 40
+ #define Y_POS 100
+ #define Y_HEIGHT 15
+ #define X_WIDTH  20
 
 widget_priv priv;
 
