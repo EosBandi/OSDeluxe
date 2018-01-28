@@ -74,13 +74,36 @@ enum FontType {
 
 extern FontType font_type;      //Global variable to hold current font type
 
+enum input_channel {
+    INPUT_CH_1 = 0x00,
+    INPUT_CH_2 = 0x40,
+    INPUT_CH_3 = 0x80,
+    INPUT_CH_4 = 0xC0
+};
+
+
+
+struct channel_setting
+{
+    unsigned int pos_h;
+    unsigned int pos_v;
+    unsigned int len_h;
+    char input;
+    char enable;
+    char popup;
+
+};
+
+
+
+
 extern unsigned char cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
 extern unsigned char OSD_work_field;
 extern unsigned char OSD_path; //0-display, 1-record
 extern unsigned char rec_color_shadow, rec_color, rec_color_background;
 extern unsigned char disp_color, disp_color_background, disp_color_shadow;
-
+extern struct osd_settings osd;  
 
 const unsigned char colortable[14][3] = {
 {0x00, 0x80, 0x80},							//Black         0
@@ -137,29 +160,13 @@ void tw_set_osd_buf(char b1, char b2, char b3, char b4);
 void tw_osd_drawline(int x, int y, int x2, int y2);
 void tw_osd_drawline256(int x, int y, int x2, int y2);
 
-
-struct widget_priv {
-    int pitch_deg, roll_deg;
-    float cos_roll, sin_roll;
-    int heading;
-};
-
-
-extern widget_priv priv;
-
-
-void render_horizon();
-void render_roll_indicator();
-
-/**************************** REdo */
-
-
 void tw_write_register(unsigned int wrADDR, unsigned char content);
 unsigned char tw_read_register(unsigned int rdADDR);
 void tw_wait_for_osd_write(int timeout);
 
 void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H);
 void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _popup);
+void tw_set_ch_input(char ch, input_channel input);
 
 void tw_osd_set_display(char rd_page, char dp_field, char rec_field );
 void tw_switch_display_field();

@@ -8,8 +8,6 @@ unsigned char OSD_path = 0;
 unsigned char rec_color_shadow, rec_color, rec_color_background;
 unsigned char disp_color_shadow, disp_color, disp_color_background;
 
-
-
 FontType font_type; // Global variable to hold current font_type
 
 void tw_init ()
@@ -64,14 +62,14 @@ void tw_init ()
     tw_write_register (0x116, 0x00);
 
     tw_write_register (0x011, 0x08);
-    tw_write_register (0x090, 0x00);    //input was 0x40
+    tw_write_register (0x090, 0x40);    //input was 0x40
     tw_write_register (0x118, 0x01);
     tw_write_register (0x119, 0x00);
     tw_write_register (0x11A, 0x00);
     tw_write_register (0x11e, 0x01);
 
     tw_write_register (0x021, 0x08);
-    tw_write_register (0x0a0, 0x00);   //inpur was 0x80
+    tw_write_register (0x0a0, 0x80);   //inpur was 0x80
     tw_write_register (0x120, 0x02);
     tw_write_register (0x121, 0x00);
     tw_write_register (0x122, 0x00);
@@ -143,6 +141,12 @@ void tw_init ()
 
     // tw_write_register(0x1aa,0b10001000); //Output bandwith Narrow filter
     tw_write_register(0x1aa,0b10101010); //Output bandwith Middle filter
+
+
+
+    // Enable overlays dual mode high priority
+    tw_write_register (0x238, 0b00000101);
+
 
     // tw_write_register(0x1ab,0b00001010);
 //    OSD_display_field = 1;
@@ -1130,3 +1134,21 @@ void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _po
     tw_write_register (0x110 + (_ch - 1) * 0x08, value);
 }
 
+void tw_set_ch_input(char ch, input_channel input)
+{
+    switch (ch)
+    {
+    case 1:
+        tw_write_register(0x080, input);
+        break;
+    case 2:
+        tw_write_register(0x090, input);
+        break;
+    case 3:
+        tw_write_register(0x0a0, input);
+        break;
+    case 4:
+        tw_write_register(0x0b0, input);
+        break;
+    }
+}

@@ -26,6 +26,13 @@ float pitchrad, rollrad;
  #define Y_HEIGHT 15
  #define X_WIDTH  20
 
+struct widget_priv {
+    int pitch_deg, roll_deg;
+    float cos_roll, sin_roll;
+    int heading;
+};
+
+
 widget_priv priv;
 
 void render_horizon()
