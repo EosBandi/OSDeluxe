@@ -5,7 +5,7 @@
   modifications to suit mavlink headers
  */
 /*
- * Copyright (c) 1995 - 2001 Kungliga Tekniska Högskolan
+ * Copyright (c) 1995 - 2001 Kungliga Tekniska Hï¿½gskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
  * All rights reserved.
  * 
@@ -74,7 +74,7 @@ typedef struct {
 #define C m->counter[2]
 #define D m->counter[3]
 #define E m->counter[4]
-#define F m->counter[5]
+#define Fa m->counter[5]
 #define G m->counter[6]
 #define H m->counter[7]
 
@@ -106,7 +106,7 @@ MAVLINK_HELPER void mavlink_sha256_init(mavlink_sha256_ctx *m)
     C = 0x3c6ef372;
     D = 0xa54ff53a;
     E = 0x510e527f;
-    F = 0x9b05688c;
+    Fa = 0x9b05688c;
     G = 0x1f83d9ab;
     H = 0x5be0cd19;
 }
@@ -122,7 +122,7 @@ static inline void mavlink_sha256_calc(mavlink_sha256_ctx *m, uint32_t *in)
     CC = C;
     DD = D;
     EE = E;
-    FF = F;
+    FF = Fa;
     GG = G;
     HH = H;
 
@@ -153,7 +153,7 @@ static inline void mavlink_sha256_calc(mavlink_sha256_ctx *m, uint32_t *in)
     C += CC;
     D += DD;
     E += EE;
-    F += FF;
+    Fa += FF;
     G += GG;
     H += HH;
 }

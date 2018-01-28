@@ -1152,3 +1152,20 @@ void tw_set_ch_input(char ch, input_channel input)
         break;
     }
 }
+
+void tw_display_logo()
+{
+
+    int a = 0;
+
+    for (int y = 0; y < 100; y++)
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            tw_set_osd_buf(logo[a++], logo[a++], logo[a++], logo[a++]);
+            tw_wr_display_from_buffer(50 + i, y+50, 0);
+            
+
+        }
+    }
+}

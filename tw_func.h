@@ -178,5 +178,5 @@ void tw_osd_fill_region(unsigned int x1,unsigned int y1,unsigned int x2,unsigned
 
 void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
 
-
+void tw_display_logo();
 #endif

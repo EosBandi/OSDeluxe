@@ -85,7 +85,6 @@ void loop ()
 
 
 
-
 osd_gps_render( &osd.gps );
 osd_battery_prerender( &osd.bat );
 osd_battery_render( &osd.bat );
