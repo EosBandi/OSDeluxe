@@ -33,6 +33,7 @@ struct osd_settings {
     int           rcin8;
     int           rc_rssi;
 
+    char         system_status;   //Se MAVLINK_STATE enum 
 
     char          message_buffer[MESSAGE_BUFFER_LINES][52];               //20 line of 52 character message_buffer
     char          message_severity[MESSAGE_BUFFER_LINES];

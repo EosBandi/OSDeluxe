@@ -328,7 +328,7 @@ void osd_vario_render(struct vario_widget_t *vw)
         mix = 0;
 
     tw_osd_rectangle(vw->x, vw->y, vw->w, vw->h, COLOR_WHITE | mix);
-    tw_osd_rectangle(vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 1, COLOR_BLACK | mix);
+    tw_osd_rectangle(vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 2, COLOR_BLACK | mix);
 
     f = vw->h / 2;
     fh = abs(f * vw->vario / vw->vario_max);
@@ -674,5 +674,15 @@ unsigned char mix;
  int l = (float)strlen(mode) * 1.5f;
 
  tw_printf(mw->x-(l), mw->y, "%s", mode);
+
+if (osd.system_status == MAV_STATE_CRITICAL)
+{
+ disp_color = COLOR_RED | BLINK;
+ disp_color_background = COLOR_NONE;
+ disp_color_shadow = COLOR_BLACK;
+ tw_printf(mw->x-(13), mw->y+13, "FAILSAFE!");
+    
+}
+
 
 } 

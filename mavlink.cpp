@@ -150,6 +150,7 @@ void read_mavlink(){
                     osd.mav_type = mavlink_msg_heartbeat_get_type(&msg);
                     osd.mode.mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
                     base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
+                    osd.system_status = mavlink_msg_heartbeat_get_system_status(&msg);
                     if (getBit(base_mode, 7))
                         motor_armed = 1;
                     else
