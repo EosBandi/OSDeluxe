@@ -85,7 +85,7 @@ void default_settings()
     osd.stat.mix = 0;
     osd.stat.gps_status = STATUS_OK;
     osd.stat.ekf_status = STATUS_CRITICAL;
-    osd.stat.vibe_status = STATUS_WARNING;
+    osd.stat.vibe_status = STATUS_NONE;
 
     osd.alt.x = 7;
     osd.alt.y = 270;

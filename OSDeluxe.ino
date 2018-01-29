@@ -116,9 +116,11 @@ memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
 osd.message_buffer_line = 0;
 osd.message_buffer_display_time = 0;
 
+long t, l;
 
 while (1)
 {
+
     tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP);
     render_horizon(&osd.horizon);
 
@@ -134,7 +136,6 @@ while (1)
     osd_mode_render(&osd.mode);
     message_buffer_render();
  
-
     if (OSD_work_field == FLD_ODD){
         OSD_work_field = FLD_EVEN;
         OSD_display_field = FLD_ODD;
@@ -142,8 +143,9 @@ while (1)
         OSD_work_field = FLD_ODD;
         OSD_display_field = FLD_EVEN;
     }
+
     tw_osd_set_display(0,OSD_display_field,FLD_EVEN);
     read_mavlink();
-    //debug("Free mem:%u\n", FreeRam());    
+
 }
 }

@@ -66,6 +66,9 @@ uint32_t total_armed_time = 0;
 float osd_pitch = 0.0;
 float osd_roll  = 0.0;
 
+
+float vibex, vibey, vibez;
+
 uint8_t mavlink_requested = 0;
 uint32_t osd_mode = 0;
 bool motor_armed = false;
@@ -79,7 +82,7 @@ static uint8_t crlf_count = 0;
 static int packet_drops = 0;
 static int parse_error = 0;
 
-#define MAX_STREAMS 6
+#define MAX_STREAMS 7
 
 
 bool getBit(unsigned char byte, int position) // position in range 0-7
@@ -94,9 +97,10 @@ void request_mavlink_rates(void)
         MAV_DATA_STREAM_RC_CHANNELS,
         MAV_DATA_STREAM_POSITION,
         MAV_DATA_STREAM_EXTRA1, 
-        MAV_DATA_STREAM_EXTRA2};
+        MAV_DATA_STREAM_EXTRA2,
+        MAV_DATA_STREAM_EXTRA3};
     //uint16_t MAVRates[MAX_STREAMS] = {0x01, 0x02, 0x05, 0x02, 0x05, 0x02};
-	uint16_t MAVRates[MAX_STREAMS] = {0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A};
+	uint16_t MAVRates[MAX_STREAMS] = {0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x02};
 
 //	if(apm_mav_component == 0x32) //pixhawk origin FW
 //	{
@@ -145,7 +149,7 @@ void read_mavlink(){
                     mavbeat = 1;
                     osd.mav_type = mavlink_msg_heartbeat_get_type(&msg);
                     osd.mode.mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
-                    //base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
+                    base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
                     if (getBit(base_mode, 7))
                         motor_armed = 1;
                     else
@@ -205,9 +209,32 @@ void read_mavlink(){
                     mav_message[len] = 0; // add trail
                     //}
                     message_buffer_add_line((char*)mav_message, mav_msg_severity);
-                    debug("%u - %s\n",mav_msg_severity, mav_message);
+                    //debug("%u - %s\n",mav_msg_severity, mav_message);
                 }
                 break;
+
+                case MAVLINK_MSG_ID_GPS_RAW_INT:
+                {
+                    osd.gps.hdop = (float)mavlink_msg_gps_raw_int_get_eph(&msg)/100.0;
+                    osd.gps.sat  = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
+                }
+                break;
+                case MAVLINK_MSG_ID_VIBRATION:
+                {
+                    vibex = mavlink_msg_vibration_get_vibration_x(&msg);  
+                    vibey = mavlink_msg_vibration_get_vibration_y(&msg);  
+                    vibez = mavlink_msg_vibration_get_vibration_z(&msg);  
+
+                    osd.stat.vibe_status = STATUS_OK;
+                    if (vibex > 29 || vibey > 29 || vibez >29) osd.stat.vibe_status = STATUS_WARNING;
+                    if (vibex > 59 || vibey > 59 || vibez >59) osd.stat.vibe_status = STATUS_CRITICAL;
+                    
+
+
+                }
+                break;
+
+
                 /*
                             case MAVLINK_MSG_ID_GPS_RAW_INT:
                                 {
