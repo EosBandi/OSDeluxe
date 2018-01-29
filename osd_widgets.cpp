@@ -679,7 +679,7 @@ if (osd.system_status == MAV_STATE_CRITICAL)
 {
  disp_color = COLOR_RED | BLINK;
  disp_color_background = COLOR_NONE;
- disp_color_shadow = COLOR_BLACK;
+ disp_color_shadow = COLOR_BLACK | BLINK;
  tw_printf(mw->x-(13), mw->y+13, "FAILSAFE!");
     
 }
