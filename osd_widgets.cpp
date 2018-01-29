@@ -1,12 +1,13 @@
 #include "OSDeluxe.h"
 
 struct bar b;
-struct gps_widget g;
-struct battery_widget bw;
-struct status_widget status;
-struct alt_widget aw;
-struct vario_widget vw;
-struct home_widget hw;
+struct gps_widget_t g;
+struct battery_widget_t bw;
+struct status_widget_t status;
+struct alt_widget_t aw;
+struct vario_widget_t vw;
+struct home_widget_t hw;
+struct horizon_t hor;
 
 char sVoltFormat[] = "%5.1f\x82\x83";
 char sCapFormat[] =  "%5.0f\x80\x81";
@@ -73,9 +74,9 @@ void osd_bar_render(struct bar *b)
     tw_printf(b->x + 2, b->y + b->h + 2, b->format, b->val);
 }
 
-void osd_gps_prerender(struct gps_widget *g) {}
+void osd_gps_prerender(struct gps_widget_t *g) {}
 
-void osd_gps_render(struct gps_widget *g)
+void osd_gps_render(struct gps_widget_t *g)
 {
 
     char q;
@@ -126,7 +127,7 @@ void osd_gps_render(struct gps_widget *g)
     tw_printf(g->x + 9, g->y + 12, "%2.2f", g->hdop);
 }
 
-void osd_battery_prerender( struct battery_widget *bw)
+void osd_battery_prerender( struct battery_widget_t *bw)
 {
 
 bw->volt.x = bw->x;
@@ -149,8 +150,11 @@ bw->cap.w = 30;
 bw->cap.h = 10;
 
 bw->cap.max = bw->max_capacity;
-bw->cap.min = 500;
-bw->cap.val = bw->remaining_capacity;
+bw->cap.min = 0;
+if (bw->remaining_capacity >= 0)
+    bw->cap.val = bw->max_capacity * ((float)bw->remaining_capacity / 100);
+else 
+    bw->cap.val = 0;
 bw->cap.warn_yellow = bw->max_capacity * 0.2f;      //Yellow warning at 20%
 bw->cap.warn_red = bw->max_capacity * 0.1f;         //Red warning at 10%
 bw->cap.mix = bw->mix;
@@ -159,7 +163,7 @@ bw->cap.format = sCapFormat;
 
 }
 
-void osd_battery_render( struct battery_widget *bw)
+void osd_battery_render( struct battery_widget_t *bw)
 {
 
   osd_bar_render( &bw->volt);
@@ -170,9 +174,9 @@ void osd_battery_render( struct battery_widget *bw)
 }
 
 
-void osd_status_prerender( struct status_widget *s) {}
+void osd_status_prerender( struct status_widget_t *s) {}
 
-void osd_status_render( struct status_widget *s)
+void osd_status_render( struct status_widget_t *s)
 {
 
 #define BAR_W 7
@@ -285,9 +289,9 @@ switch (s->vibe_status)
  
 }
 
-void osd_altitude_prerender( struct alt_widget *aw){}
+void osd_altitude_prerender( struct alt_widget_t *aw){}
 
-void osd_altitude_render( struct alt_widget *aw)
+void osd_altitude_render( struct alt_widget_t *aw)
 {
 
 unsigned char mix;
@@ -307,9 +311,9 @@ unsigned char mix;
 
 } 
 
-void osd_vario_prerender(struct vario_widget *vw){}
+void osd_vario_prerender(struct vario_widget_t *vw){}
 
-void osd_vario_render(struct vario_widget *vw)
+void osd_vario_render(struct vario_widget_t *vw)
 {
 
     unsigned char mix;
@@ -323,7 +327,7 @@ void osd_vario_render(struct vario_widget *vw)
     else
         mix = 0;
 
-    // tw_osd_rectangle(vw->x, vw->y, vw->w, vw->h, COLOR_WHITE | mix);
+    tw_osd_rectangle(vw->x, vw->y, vw->w, vw->h, COLOR_WHITE | mix);
     tw_osd_rectangle(vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 1, COLOR_BLACK | mix);
 
     f = vw->h / 2;
@@ -357,9 +361,9 @@ void osd_vario_render(struct vario_widget *vw)
 }
 
 
-void osd_home_prerender(struct home_widget *hw){}
+void osd_home_prerender(struct home_widget_t *hw){}
 
-void osd_home_render(struct home_widget *hw)
+void osd_home_render(struct home_widget_t *hw)
 {
 
     struct polygon home_arrow;
@@ -368,7 +372,7 @@ void osd_home_render(struct home_widget *hw)
     home_arrow.points = home_arrow_points;
 
     transform_polygon(&home_arrow, hw->x*SCREEN_SCALE , hw->y, hw->orientation);
-    tw_osd_rectangle(hw->x-10, hw->y-20 ,20 ,40 , COLOR_NONE);
+    //tw_osd_rectangle(hw->x-10, hw->y-20 ,20 ,40 , COLOR_NONE);
     tw_set_osd_buf(COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE);
     draw_polygon(&home_arrow);
 
@@ -437,3 +441,238 @@ void osd_center_marker()
 
 
 }
+
+#define RANGE 120
+#define SCALE 3
+#define MINOR_TICK  5
+#define MAJOR_TICK  10
+
+void render_horizon(struct horizon_t *h)
+{
+    int y, i, j;
+    int x0, x1, y0, y1;
+    unsigned char size, gap;
+    char buf[10];
+    float offset;
+    float cx, cy;
+    float pitchrad, rollrad;
+    float cos_roll, sin_roll;
+
+    FontType ft_temp;
+
+    unsigned char c1, c2, c3, c4;
+
+    pitchrad = DEG2RAD(h->pitch);
+    rollrad  = DEG2RAD(h->roll);
+    cos_roll = cos (rollrad);
+    sin_roll = -1 * sin (rollrad);
+
+
+    if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
+    {
+        c1 = COLOR_RED; c2= COLOR_YELLOW; c3= c1; c4= c2;
+    }
+    else{
+        c1 = COLOR_WHITE; c2 = COLOR_BLACK; c3 = c1; c4 = c2;
+    }
+
+
+    //tw_osd_fill_region (50, 78, 130, 205, COLOR_NONE, OSD_work_field, OSD_PATH_DISP);
+    //tw_osd_rectangle(38,60,100,160, COLOR_NONE);
+
+    tw_set_osd_buf (c1, c2, c3, c4);
+    //tw_set_osd_buf (COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+
+    for (i = -RANGE / 2; i <= RANGE / 2; i++)
+    {
+        y = h->y - i;
+        j = (h->pitch*SCALE) + i;
+
+        if (j % (MINOR_TICK * SCALE) == 0)
+        {
+            if (j == 0)
+            {
+                size = 50; // Zero line
+                gap = 8;
+            }
+            else
+            {
+                if (j % (MAJOR_TICK * SCALE) == 0)
+                    size = 20; // tick
+                else
+                    size = 10; // small tick
+                gap = 10;
+            }
+
+            cx = h->x + (i * sin_roll);
+            cy = y + i - (i * cos_roll);
+
+            offset = (gap * cos_roll);
+            x0 = cx + offset;
+            offset = (size * cos_roll);
+            x1 = x0 + offset;
+
+            offset = (gap * sin_roll);
+            y0 = cy + offset;
+            offset = (size * sin_roll);
+            y1 = y0 + offset;
+
+            if (size == 50)
+            {
+                tw_set_osd_buf(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
+                tw_osd_drawline(x0, y0-1, x1, y1-1);
+                tw_osd_drawline(x0, y0+1, x1, y1+1);
+                tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+                tw_osd_drawline(x0, y0, x1, y1);
+                tw_set_osd_buf (c1, c2, c3, c4);
+            }
+            else
+            {
+                tw_osd_drawline(x0, y0, x1, y1);
+            }
+            offset = (gap * cos_roll);
+            x0 = cx - offset;
+            offset = (size * cos_roll);
+            x1 = x0 - offset;
+
+            offset = (gap * sin_roll);
+            y0 = cy - offset;
+            offset = (size * sin_roll);
+            y1 = y0 - offset;
+
+            if (size == 50)
+            {
+                tw_set_osd_buf(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
+                tw_osd_drawline(x0, y0-1, x1, y1-1);
+                tw_osd_drawline(x0, y0+1, x1, y1+1);
+                tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+                tw_osd_drawline(x0, y0, x1, y1);
+                tw_set_osd_buf (c1, c2, c3, c4);
+            }
+            else
+            {
+                tw_osd_drawline(x0, y0, x1, y1);
+            }
+            if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
+            {
+                ft_temp = font_type;
+                disp_color = c1;
+                disp_color_background = COLOR_NONE;
+                disp_color_shadow = COLOR_BLACK;
+                font_type = FONT_OUTLINE_8x12;
+                tw_printf ((cx-6)/SCREEN_SCALE, cy  - 6, "% 03d", j / SCALE);
+                font_type = ft_temp;
+                tw_set_osd_buf (c1, c2, c3, c4);
+                //tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+                
+            }
+        }
+    }
+}
+
+
+void osd_mode_render( struct mode_widget_t *mw)
+{
+
+char mode[17];
+unsigned char mix;
+
+  if (mw->mix)
+        mix = MIX;
+    else
+        mix = 0;
+
+
+    unsigned int cust_mode;
+
+    cust_mode = mw->mode;
+    if (osd.mav_type !=  MAV_TYPE_FIXED_WING)
+        cust_mode += 100;
+
+    switch (cust_mode) {
+    case PLANE_MODE_MANUAL:
+        strcpy(mode, "Manual");
+        break;
+    case PLANE_MODE_CIRCLE:
+    case COPTER_MODE_CIRCLE:
+        strcpy(mode, "Circle");
+        break;
+    case PLANE_MODE_STABILIZE:
+    case COPTER_MODE_STABILIZE:
+        strcpy(mode, "Stabilize");
+        break;
+    case PLANE_MODE_TRAINING:
+        strcpy(mode, "Training");
+        break;
+    case PLANE_MODE_ACRO:
+    case COPTER_MODE_ACRO:
+        strcpy(mode, "Acro");
+        break;
+    case PLANE_MODE_FBWA:
+        strcpy(mode, "Fly-By-Wire A");
+        break;
+    case PLANE_MODE_FBWB:
+        strcpy(mode, "Fly-By-Wire B");
+        break;
+    case PLANE_MODE_CRUISE:
+        strcpy(mode, "Cruise");
+        break;
+    case PLANE_MODE_AUTOTUNE:
+    case COPTER_MODE_AUTOTUNE:
+        strcpy(mode, "Auto tune");
+        break;
+    case PLANE_MODE_AUTO:
+    case COPTER_MODE_AUTO:
+        strcpy(mode, "Auto");
+        break;
+    case PLANE_MODE_RTL:
+    case COPTER_MODE_RTL:
+        strcpy(mode, "RTL");
+        break;
+    case PLANE_MODE_LOITER:
+    case COPTER_MODE_LOITER:
+        strcpy(mode, "Loiter");
+        break;
+    case PLANE_MODE_INIT:
+        strcpy(mode, "Initializing");
+        break;
+    case PLANE_MODE_GUIDED:
+    case COPTER_MODE_GUIDED:
+        strcpy(mode, "Guided");
+        break;
+    case COPTER_MODE_ALTHOLD:
+        strcpy(mode, "Altitude hold");
+        break;
+    case COPTER_MODE_LAND:
+        strcpy(mode, "Land");
+        break;
+    case COPTER_MODE_OF_LOITER:
+        strcpy(mode, "OF Loiter");
+        break;
+    case COPTER_MODE_DRIFT:
+        strcpy(mode, "Drift");
+        break;
+    case COPTER_MODE_SPORT:
+        strcpy(mode, "Sport");
+        break;
+    case COPTER_MODE_FLIP:
+        strcpy(mode, "Flip");
+        break;
+    case COPTER_MODE_POSHOLD:
+        strcpy(mode, "Position hold");
+        break;
+    default:
+        strcpy(mode, "Unknown Mode");
+        break;
+}
+
+
+ font_type = FONT_OUTLINE_16x12c;
+ disp_color = COLOR_YELLOW | mix;
+ disp_color_background = COLOR_NONE | MIX;
+ disp_color_shadow = COLOR_BLACK | mix;
+ int l = (float)strlen(mode) * 1.5f;
+
+ tw_printf(mw->x-(l), mw->y, "%s", mode);
+
+} 

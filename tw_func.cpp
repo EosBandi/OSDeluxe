@@ -57,28 +57,29 @@ void tw_init ()
     tw_write_register (0x001, 0x00);
     tw_write_register (0x080, 0x00);
     tw_write_register (0x110, 0x00);
-    tw_write_register (0x111, 0x00);
-    tw_write_register (0x112, 0x00);
+    //tw_write_register (0x111, 0x00);
+    tw_write_register (0x111, 0b00001010);
+    tw_write_register (0x112, 0x00); //00
     tw_write_register (0x116, 0x00);
 
     tw_write_register (0x011, 0x08);
     tw_write_register (0x090, 0x40);    //input was 0x40
     tw_write_register (0x118, 0x01);
-    tw_write_register (0x119, 0x00);
+    tw_write_register (0x119, 0x0a);
     tw_write_register (0x11A, 0x00);
     tw_write_register (0x11e, 0x01);
 
     tw_write_register (0x021, 0x08);
     tw_write_register (0x0a0, 0x80);   //inpur was 0x80
     tw_write_register (0x120, 0x02);
-    tw_write_register (0x121, 0x00);
+    tw_write_register (0x121, 0x0a);
     tw_write_register (0x122, 0x00);
     tw_write_register (0x126, 0x02);
 
     tw_write_register (0x031, 0x08);
     tw_write_register (0x0b0, 0xc0);   //input was 0xc0
     tw_write_register (0x128, 0x03);
-    tw_write_register (0x129, 0x00);
+    tw_write_register (0x129, 0x0a);
     tw_write_register (0x12a, 0x00);
     tw_write_register (0x12e, 0x03);
 

@@ -5,6 +5,22 @@
 #define TW_RESET_PIN 14
 #define LED_PIN 13
 
+uint32_t FreeRam(){ // for Teensy 3.0
+    uint32_t stackTop;
+    uint32_t heapTop;
+
+    // current position of the stack.
+    stackTop = (uint32_t) &stackTop;
+
+    // current position of heap.
+    void* hTop = malloc(1);
+    heapTop = (uint32_t) hTop;
+    free(hTop);
+
+    // The difference is the free, available ram.
+    return stackTop - heapTop;
+}
+
 void setup ()
 {
 
@@ -22,6 +38,10 @@ void setup ()
     Wire.setDefaultTimeout (10000); // 10ms
 
     Serial.begin (115200);
+
+    Serial1.begin(57600);
+    request_mavlink_rates();
+    request_mavlink_rates();
 }
 
 void loop ()
@@ -83,18 +103,47 @@ void loop ()
     //save_settings();
     //load_settings();
 
+// Prerender 
 
 
-osd_gps_render( &osd.gps );
-osd_battery_prerender( &osd.bat );
-osd_battery_render( &osd.bat );
-osd_status_render( &osd.stat );
-osd_altitude_render( &osd.alt);
-osd_vario_render(&osd.vario);
-
-osd_home_prerender( &osd.home);
-osd_home_render(&osd.home);
 osd_center_marker();
-    while (1)
-        ;
+
+
+OSD_work_field = FLD_ODD;
+OSD_display_field = FLD_EVEN;
+
+memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
+osd.message_buffer_line = 0;
+osd.message_buffer_display_time = 0;
+
+
+while (1)
+{
+    tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP);
+    render_horizon(&osd.horizon);
+
+
+    osd_gps_render( &osd.gps );
+    osd_battery_prerender(&osd.bat);
+    osd_home_prerender(&osd.home);
+    osd_battery_render(&osd.bat);
+    osd_status_render(&osd.stat);
+    osd_altitude_render(&osd.alt);
+    osd_vario_render(&osd.vario);
+    osd_home_render(&osd.home);
+    osd_mode_render(&osd.mode);
+    message_buffer_render();
+ 
+
+    if (OSD_work_field == FLD_ODD){
+        OSD_work_field = FLD_EVEN;
+        OSD_display_field = FLD_ODD;
+    } else {
+        OSD_work_field = FLD_ODD;
+        OSD_display_field = FLD_EVEN;
+    }
+    tw_osd_set_display(0,OSD_display_field,FLD_EVEN);
+    read_mavlink();
+    //debug("Free mem:%u\n", FreeRam());    
+}
 }

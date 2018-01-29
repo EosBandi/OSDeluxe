@@ -14,4 +14,9 @@ void comm_send_ch(mavlink_channel_t chan, uint8_t ch);
 #include "./mavlink_gen/ardupilotmega/version.h"
 
 
+void read_mavlink();
+void request_mavlink_rates(void);
+
+
+void message_buffer_add_line(char *message);
 #endif

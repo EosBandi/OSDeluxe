@@ -99,7 +99,7 @@ struct channel_setting
 
 extern unsigned char cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
-extern unsigned char OSD_work_field;
+extern unsigned char OSD_work_field, OSD_display_field;
 extern unsigned char OSD_path; //0-display, 1-record
 extern unsigned char rec_color_shadow, rec_color, rec_color_background;
 extern unsigned char disp_color, disp_color_background, disp_color_shadow;
@@ -112,11 +112,13 @@ const unsigned char colortable[14][3] = {
 {0xc0, 0x80, 0x80},							//75%white      3
 {0xf0, 0x80, 0x80},							//100%white     4
 {0x1d, 0xff, 0x6b},							//Blue          5
-{0x4c, 0x54, 0xff},							//Red           6   
+//{0x4c, 0x54, 0xff},							//Red           6   
+{128, 97, 218},							//Red           6   
 {0x75, 0x4f, 0xb5},							//Orange        7
 {0xb2, 0xaa, 0x00},							//Cyan          8
 {0x69, 0xd4, 0xea},							//Magenta       9
-{0x4b, 0x55, 0x4a},							//Green         10
+//{0x4b, 0x55, 0x4a},							//Green         10
+{181,70,52},
 {0x61, 0xb5, 0x3a},							//Ocean ??      11
 {0xe1, 0x00, 0x94},							//Yellow        12
 {190, 32, 168}                              //Dark Yellow   13

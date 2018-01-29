@@ -78,14 +78,14 @@ void default_settings()
     osd.bat.voltage = 23.4;
     osd.bat.current = 0.0;
     osd.bat.max_capacity = 12000;
-    osd.bat.remaining_capacity = 7262;
+    osd.bat.remaining_capacity = 50;
 
     osd.stat.x = 7;
     osd.stat.y = 253;
     osd.stat.mix = 0;
-    osd.stat.gps_status = STATUS_NONE;
-    osd.stat.ekf_status = STATUS_NONE;
-    osd.stat.vibe_status = STATUS_NONE;
+    osd.stat.gps_status = STATUS_OK;
+    osd.stat.ekf_status = STATUS_CRITICAL;
+    osd.stat.vibe_status = STATUS_WARNING;
 
     osd.alt.x = 7;
     osd.alt.y = 270;
@@ -105,4 +105,16 @@ void default_settings()
     osd.home.y = 245;
     osd.home.orientation = 0;
     osd.home.home_distance = 0;
+
+
+    osd.horizon.x = 146;
+    osd.horizon.y = 145;
+
+
+    osd.mode.x =  90;
+    osd.mode.y = 10;
+    osd.mode.mix = 0;
+    osd.mode.mode = 0;
+
+
 }
