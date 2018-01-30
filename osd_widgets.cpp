@@ -307,7 +307,7 @@ unsigned char mix;
  disp_color_shadow = COLOR_BLACK | mix;
 
  tw_osd_rectangle(aw->x, aw->y, 29,10, COLOR_BLACK|MIX);
- tw_printf(aw->x+1, aw->y+2, "\x86\x87%4um", (int)aw->altitude);
+ tw_printf(aw->x+1, aw->y+2, "\x86\x87%4dm", (int)aw->altitude);
 
 } 
 
@@ -373,7 +373,7 @@ void osd_home_render(struct home_widget_t *hw)
 
     transform_polygon(&home_arrow, hw->x*SCREEN_SCALE , hw->y, hw->orientation);
     //tw_osd_rectangle(hw->x-10, hw->y-20 ,20 ,40 , COLOR_NONE);
-    tw_set_osd_buf(COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE);
+    tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
     draw_polygon(&home_arrow);
 
     font_type = FONT_16x8;

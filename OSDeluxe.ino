@@ -39,7 +39,7 @@ void setup ()
 
     Serial.begin (115200);
 
-    Serial1.begin(57600);
+    Serial1.begin(115200);
     request_mavlink_rates();
     request_mavlink_rates();
 }
@@ -49,7 +49,7 @@ void loop ()
 
     tw_init ();
 
-    tw_ch_set_window (1, 0, 0, 180);
+    //tw_ch_set_window (1, 0, 0, 180);
     tw_ch_set_window (2, 0, 0, 180);
     tw_ch_set_window (3, 0, 0, 180);
     tw_ch_set_window (4, 0, 0, 180);
@@ -64,11 +64,27 @@ void loop ()
     tw_ch_set_window (2, 4, 0 , 64);
     tw_ch_set_window (3, 116, 0, 64);
     tw_ch_set_window (4, 90, 72, 90);
+/*
+    tw_write_register(0x081,0xff);
+    tw_write_register(0x082,0xff);
+
+    tw_write_register(0x083,0xff);
+    tw_write_register(0x084,0xff);
+
+    tw_write_register(0x130,0x00);
+    tw_write_register(0x131,0xb4);
+    tw_write_register(0x132,0x00);
+    tw_write_register(0x133,0x90);
+    
+*/
 
 
     tw_set_ch_input(2,INPUT_CH_1);
     tw_set_ch_input(3,INPUT_CH_1);
 
+
+    tw_write_register(0x0c8,0x03);
+            
 
     digitalWrite (LED_PIN, HIGH);
 
@@ -122,6 +138,7 @@ while (1)
 {
 
     tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP);
+    tw_wait_for_osd_write(20);
     render_horizon(&osd.horizon);
 
 
