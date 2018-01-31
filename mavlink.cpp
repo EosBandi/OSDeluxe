@@ -450,7 +450,8 @@ void message_buffer_render()
             rec_color_shadow = COLOR_REC_BLACK;
         }
 
-        rec_color_background = COLOR_REC_NONE | REC_MIX; 
+
+        rec_color_background = COLOR_REC_GREEN | REC_MIX; 
         font_type = FONT_OUTLINE_16x12; 
 
         OSD_path = OSD_PATH_REC;

@@ -124,7 +124,7 @@ const unsigned char colortable_rec[4][3] = {
 {0x00, 0x80, 0x80},							//Black         0
 {0xf0, 0x80, 0x80},							//100%white     4
 {110, 97, 218},							//Red           6   
-{181,70,52}							//Green         10
+{0x3f, 0x80, 0x80}							//Green         10
 };
 
 #define COLOR_REC_BLACK 0
