@@ -64,7 +64,7 @@ void default_settings()
     osd.gps.color = COLOR_YELLOW;
     osd.gps.sat = 10;
     osd.gps.hdop = 0.21;
-
+    
     osd.bat.x = 143;
     osd.bat.y = 230;
     osd.bat.min_cell_voltage = 3.3;
@@ -101,10 +101,10 @@ void default_settings()
     osd.vario.mix = 1;
     osd.vario.num_pos = POS_BELOW;
 
-    osd.home.x = 90;
-    osd.home.y = 245;
-    osd.home.orientation = 0;
-    osd.home.home_distance = 0;
+    osd.home_w.x = 90;
+    osd.home_w.y = 250;
+    osd.home_w.orientation = 0;
+    osd.home_w.home_distance = 0;
 
 
     osd.horizon.x = 146;

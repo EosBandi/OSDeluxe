@@ -1,10 +1,6 @@
 #ifndef _TW_FUNC_H_
 #define _TW_FUNC_H_
 
-
-#define RAD2DEG(x) ((x) * (180.0 / PI))
-#define DEG2RAD(x) ((x) * (PI / 180.0))
-
 #define COLOR_BLACK      0
 #define COLOR_25_WHITE   1
 #define COLOR_50_WHITE   2
@@ -113,7 +109,7 @@ const unsigned char colortable[14][3] = {
 {0xf0, 0x80, 0x80},							//100%white     4
 {0x1d, 0xff, 0x6b},							//Blue          5
 //{0x4c, 0x54, 0xff},							//Red           6   
-{128, 97, 218},							//Red           6   
+{110, 97, 218},							//Red           6   
 {0x75, 0x4f, 0xb5},							//Orange        7
 {0xb2, 0xaa, 0x00},							//Cyan          8
 {0x69, 0xd4, 0xea},							//Magenta       9
@@ -127,8 +123,8 @@ const unsigned char colortable[14][3] = {
 const unsigned char colortable_rec[4][3] = {
 {0x00, 0x80, 0x80},							//Black         0
 {0xf0, 0x80, 0x80},							//100%white     4
-{0x4c, 0x54, 0xff},							//Red           6   
-{0x4b, 0x55, 0x4a}							//Green         10
+{110, 97, 218},							//Red           6   
+{181,70,52}							//Green         10
 };
 
 #define COLOR_REC_BLACK 0

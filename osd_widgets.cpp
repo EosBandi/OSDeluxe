@@ -13,7 +13,6 @@ char sVoltFormat[] = "%5.1f\x82\x83";
 char sCapFormat[] =  "%5.0f\x80\x81";
 
 
-
 void osd_bar_prerender(struct bar *b)
 {
     //Nothing ?
@@ -45,7 +44,7 @@ void osd_bar_render(struct bar *b)
 
     OSD_path = OSD_PATH_DISP;
     //Outside
-    tw_osd_rectangle(b->x, b->y, b->w, b->h + 10, COLOR_BLACK | MIX);
+    tw_osd_rectangle(b->x, b->y, b->w, b->h + 10, BACKROUND);
     tw_osd_rectangle(b->x + 1, b->y + 1, b->w - 2, b->h - 2, COLOR_WHITE | mix);
 
     if (b->bar_type == BAR_MULTICOLOR)
@@ -65,7 +64,7 @@ void osd_bar_render(struct bar *b)
         tw_osd_rectangle(b->x + 2, b->y + 2, tw, b->h - 4, bar_color | mix);
     }
 
-    disp_color_background = COLOR_BLACK | MIX;
+    disp_color_background = BACKROUND;
     if (b->val <= b->warn_red)
         disp_color = COLOR_RED | BLINK;
     else
@@ -83,13 +82,13 @@ void osd_gps_render(struct gps_widget_t *g)
 
     char _buf[32];
 
-    disp_color_background = COLOR_BLACK | MIX;
+    disp_color_background = BACKROUND;
     if (g->sat <= g->sat_warn || g->hdop < g->hdop_warn)
         disp_color = COLOR_RED | BLINK;
     else
         disp_color = g->color;
 
-    tw_osd_rectangle(g->x, g->y, 22, 22, COLOR_BLACK | MIX);
+    tw_osd_rectangle(g->x, g->y, 22, 22, BACKROUND);
 
     for (int y = 0; y < 32; y = y + 2)
     {
@@ -168,7 +167,7 @@ void osd_battery_render( struct battery_widget_t *bw)
 
   osd_bar_render( &bw->volt);
   osd_bar_render( &bw->cap);
-  tw_osd_rectangle(bw->x, bw->y+40,30,10,COLOR_BLACK|MIX);
+  tw_osd_rectangle(bw->x, bw->y+40,30,10,BACKROUND);
   disp_color = COLOR_YELLOW;
   tw_printf(bw->x + 2, bw->y+42,"%5.1f\x84\x85", &bw->current);
 }
@@ -190,7 +189,7 @@ unsigned char mix;
     else
         mix = 0;
 
- tw_osd_rectangle(s->x,s->y, 3*BAR_W + 8 , BAR_H, COLOR_BLACK| MIX); //background
+ tw_osd_rectangle(s->x,s->y, 3*BAR_W + 8 , BAR_H, BACKROUND); //background
  tw_osd_rectangle(s->x+1, s->y+1, 3*BAR_W + 6,BAR_H-2, COLOR_WHITE | mix); //White border
 
  font_type = FONT_SHADOW_8x8;
@@ -303,10 +302,10 @@ unsigned char mix;
 
  font_type = FONT_16x8;
  disp_color = COLOR_YELLOW | mix;
- disp_color_background = COLOR_BLACK | MIX;
+ disp_color_background = BACKROUND;
  disp_color_shadow = COLOR_BLACK | mix;
 
- tw_osd_rectangle(aw->x, aw->y, 29,10, COLOR_BLACK|MIX);
+ tw_osd_rectangle(aw->x, aw->y, 29,10, BACKROUND);
  tw_printf(aw->x+1, aw->y+2, "\x86\x87%4dm", (int)aw->altitude);
 
 } 
@@ -328,7 +327,7 @@ void osd_vario_render(struct vario_widget_t *vw)
         mix = 0;
 
     tw_osd_rectangle(vw->x, vw->y, vw->w, vw->h, COLOR_WHITE | mix);
-    tw_osd_rectangle(vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 2, COLOR_BLACK | mix);
+    tw_osd_rectangle(vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 2, BACKROUND);
 
     f = vw->h / 2;
     fh = abs(f * vw->vario / vw->vario_max);
@@ -342,7 +341,9 @@ void osd_vario_render(struct vario_widget_t *vw)
         tw_osd_rectangle(vw->x + 1, vw->y + f, vw->w - 2, fh, COLOR_RED);
     }
     font_type = FONT_8x8;
-
+    disp_color_background = BACKROUND;
+    disp_color = COLOR_YELLOW;
+    
     switch (vw->num_pos)
     {
     case POS_RIGHT:
@@ -378,9 +379,13 @@ void osd_home_render(struct home_widget_t *hw)
 
     font_type = FONT_16x8;
     disp_color = COLOR_YELLOW;
-    disp_color_background = COLOR_BLACK | MIX;
+    disp_color_background = BACKROUND;
     disp_color_shadow = COLOR_BLACK;
-    tw_printf(hw->x-12, hw->y+21,"% 4u m", hw->home_distance);
+
+    if (osd.home.lock == HOME_LOCKED)
+        tw_printf(hw->x-12, hw->y+21,"% 4u m", hw->home_distance);
+    else
+        tw_printf(hw->x-12, hw->y+21,"no home");
 
 }
 

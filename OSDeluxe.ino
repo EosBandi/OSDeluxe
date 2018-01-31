@@ -34,14 +34,12 @@ void setup ()
     delay (500);
 
     // Setup for Master mode, pins 18/19, external pullups, 400kHz, 10ms default timeout
-    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 3000000, I2C_OP_MODE_DMA);
+    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 3000000, I2C_OP_MODE_IMM);
     Wire.setDefaultTimeout (10000); // 10ms
 
     Serial.begin (115200);
 
     Serial1.begin(115200);
-    request_mavlink_rates();
-    request_mavlink_rates();
 }
 
 void loop ()
@@ -132,6 +130,8 @@ memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
 osd.message_buffer_line = 0;
 osd.message_buffer_display_time = 0;
 
+init_home();
+
 long t, l;
 
 while (1)
@@ -144,12 +144,12 @@ while (1)
 
     osd_gps_render( &osd.gps );
     osd_battery_prerender(&osd.bat);
-    osd_home_prerender(&osd.home);
+    osd_home_prerender(&osd.home_w);
     osd_battery_render(&osd.bat);
     osd_status_render(&osd.stat);
     osd_altitude_render(&osd.alt);
     osd_vario_render(&osd.vario);
-    osd_home_render(&osd.home);
+    osd_home_render(&osd.home_w);
     osd_mode_render(&osd.mode);
     message_buffer_render();
  
@@ -163,6 +163,10 @@ while (1)
 
     tw_osd_set_display(0,OSD_display_field,FLD_EVEN);
     read_mavlink();
+
+    //check heartbeat
+    heartbeat_validation();
+    if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
 
 }
 }

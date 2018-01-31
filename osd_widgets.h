@@ -1,6 +1,11 @@
 #ifndef _OSD_WIDGETS_H_
 #define _OSD_WIDGETS_H_
 
+
+#define BACKROUND COLOR_25_WHITE | MIX
+
+
+
 enum bartype {
 BAR_MULTICOLOR = 0,
 BAR_SINGLE_COLOR = 1,
@@ -51,7 +56,6 @@ enum flight_mode {
     COPTER_MODE_AUTOTUNE  = 115,
     COPTER_MODE_POSHOLD   = 116,
 };
-
 
 
  struct bar {
