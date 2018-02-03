@@ -384,9 +384,9 @@ void osd_home_render(struct home_widget_t *hw)
     disp_color_shadow = COLOR_BLACK;
 
     if (osd.home.lock == HOME_LOCKED)
-        tw_printf(hw->x-12, hw->y+21,"% 4u m", hw->home_distance);
+        tw_printf(hw->x-12, hw->y+19,"% 4u m", hw->home_distance);
     else
-        tw_printf(hw->x-12, hw->y+21,"no home");
+        tw_printf(hw->x-12, hw->y+19,"no home");
 
 }
 
