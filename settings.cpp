@@ -73,10 +73,10 @@ void default_settings()
     osd.bat.yellow_cell_voltage = 3.7;
     osd.bat.bar_type = BAR_SINGLE_COLOR;
     osd.bat.mix = 0;
-    osd.bat.cells = 6;
+    osd.bat.cells = 3;
 
     osd.bat.voltage = 23.4;
-    osd.bat.current = 0.0;
+    osd.bat.current = 10.0;
     osd.bat.max_capacity = 12000;
     osd.bat.remaining_capacity = 50;
 
@@ -97,7 +97,7 @@ void default_settings()
     osd.vario.h = 100;
     osd.vario.w = 4;
     osd.vario.vario = 5.5f;
-    osd.vario.vario_max = 10.0f;
+    osd.vario.vario_max = 5.0f;
     osd.vario.mix = 1;
     osd.vario.num_pos = POS_BELOW;
 
@@ -115,6 +115,11 @@ void default_settings()
     osd.mode.y = 10;
     osd.mode.mix = 0;
     osd.mode.mode = 0;
+
+
+    osd.arming_status = false;
+    osd.displayed_arming_status = true;
+    osd.armed_start_time = 0;
 
 
 }

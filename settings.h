@@ -26,9 +26,14 @@ struct osd_settings {
     int           airspeed;
     int           groundspeed;
     int           throttle;
-    //bool          motor_armed;
+    bool          arming_status;
     home_data_t     home;
 
+    int           ekfvel;
+    int           ekfposh; 
+    int           ekfposv;
+    int           ekfcompass;
+    int           ekfterrain;
 
 
     int           rcin5;
@@ -48,6 +53,10 @@ struct osd_settings {
     long          message_buffer_display_time;
     bool          message_display; //we have message to display in the buffer
     bool          clear_req;
+
+    bool          displayed_arming_status;
+    unsigned long armed_start_time;
+    //unsigned long 
    
 };
 

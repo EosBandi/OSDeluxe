@@ -76,8 +76,8 @@ void loop ()
     
 */
 
-
-    tw_set_ch_input(2,INPUT_CH_1);
+    tw_set_ch_input(1, INPUT_CH_3);
+    tw_set_ch_input(2,INPUT_CH_2);
     tw_set_ch_input(3,INPUT_CH_1);
 
 

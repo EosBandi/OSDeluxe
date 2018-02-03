@@ -184,12 +184,12 @@ void read_mavlink()
                 osd.mode.mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
                 osd.base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
                 osd.system_status = mavlink_msg_heartbeat_get_system_status(&msg);
-/*
-                if (getBit(base_mode, 7))
-                    osd.motor_armed = true;
+
+                if (getBit(osd.base_mode, 7))
+                    osd.arming_status = true;
                 else
-                    osd.motor_armed = 0;
-*/
+                    osd.arming_status = false;
+
                 if (waitingMAVBeats == 1)
                 {
                     enable_mav_request = 1;
@@ -222,8 +222,9 @@ void read_mavlink()
             {
 
                 osd.bat.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
-                osd.bat.current = mavlink_msg_sys_status_get_current_battery(&msg); // Battery current, in 10*milliamperes (1 = 10 milliampere)
+                osd.bat.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
                 osd.bat.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
+                //debug("%5.1f\n",osd.bat.current);
             }
             break;
 
@@ -262,8 +263,8 @@ void read_mavlink()
                 vibez = mavlink_msg_vibration_get_vibration_z(&msg);
 
                 osd.stat.vibe_status = STATUS_OK;
-                if (vibex > 29 || vibey > 29 || vibez > 29) osd.stat.vibe_status = STATUS_WARNING;
-                if (vibex > 59 || vibey > 59 || vibez > 59) osd.stat.vibe_status = STATUS_CRITICAL;
+                if (vibex > 15 || vibey > 15 || vibez > 15) osd.stat.vibe_status = STATUS_WARNING;
+                if (vibex >= 30 || vibey >= 30 || vibez >= 30) osd.stat.vibe_status = STATUS_CRITICAL;
             }
             break;
 
@@ -272,8 +273,8 @@ void read_mavlink()
                 osd.home.home_coord.lat = DEG2RAD(mavlink_msg_mission_item_get_x(&msg));
                 osd.home.home_coord.lon = DEG2RAD(mavlink_msg_mission_item_get_y(&msg));
                 osd.home.home_alt = (int)mavlink_msg_mission_item_get_z(&msg);
-                break;
             }
+                break;
 
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
             {
@@ -298,6 +299,31 @@ void read_mavlink()
 
 
                 }
+            }
+            break;
+
+            case MAVLINK_MSG_ID_EKF_STATUS_REPORT:
+            {
+                osd.ekfvel = (int)(mavlink_msg_ekf_status_report_get_velocity_variance(&msg) * 100);
+                osd.ekfposh = (int)(mavlink_msg_ekf_status_report_get_pos_horiz_variance(&msg) * 100);
+                osd.ekfposv = (int)(mavlink_msg_ekf_status_report_get_pos_vert_variance(&msg) * 100);
+                osd.ekfcompass = (int)(mavlink_msg_ekf_status_report_get_compass_variance(&msg) * 100);
+                osd.ekfterrain = (int)(mavlink_msg_ekf_status_report_get_terrain_alt_variance(&msg) * 100);
+
+                osd.stat.ekf_status = STATUS_OK;
+                if (osd.ekfvel > 50 ||
+                    osd.ekfposh > 50 ||
+                    osd.ekfposv > 50 ||
+                    osd.ekfcompass > 50 ||
+                    osd.ekfterrain > 50) osd.stat.ekf_status = STATUS_WARNING;
+
+                if (osd.ekfvel > 80 ||
+                    osd.ekfposh > 80 ||
+                    osd.ekfposv > 80 ||
+                    osd.ekfcompass > 80 ||
+                    osd.ekfterrain > 80) osd.stat.ekf_status = STATUS_CRITICAL;
+                    
+
             }
             break;
 

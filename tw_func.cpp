@@ -8,6 +8,8 @@ unsigned char OSD_path = 0;
 unsigned char rec_color_shadow, rec_color, rec_color_background;
 unsigned char disp_color_shadow, disp_color, disp_color_background;
 
+
+
 FontType font_type; // Global variable to hold current font_type
 
 void tw_init ()

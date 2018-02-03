@@ -169,7 +169,7 @@ void osd_battery_render( struct battery_widget_t *bw)
   osd_bar_render( &bw->cap);
   tw_osd_rectangle(bw->x, bw->y+40,30,10,BACKROUND);
   disp_color = COLOR_YELLOW;
-  tw_printf(bw->x + 2, bw->y+42,"%5.1f\x84\x85", &bw->current);
+  tw_printf(bw->x + 2, bw->y+42,"%5.1f\x84\x85", bw->current);
 }
 
 
@@ -581,6 +581,7 @@ void osd_mode_render( struct mode_widget_t *mw)
 
 char mode[17];
 unsigned char mix;
+unsigned char tmp_field;
 
   if (mw->mix)
         mix = MIX;
@@ -689,5 +690,46 @@ if (osd.system_status == MAV_STATE_CRITICAL)
     
 }
 
+if (osd.displayed_arming_status != osd.arming_status)
+{
+    osd.displayed_arming_status = osd.arming_status;
 
+    tmp_field = OSD_work_field;
+    OSD_path = OSD_PATH_REC;
+    OSD_work_field = FLD_EVEN;
+
+    rec_color = COLOR_REC_RED;
+    rec_color_background = COLOR_REC_NONE;
+    rec_color_shadow = COLOR_REC_BLACK;
+    tw_osd_rectangle(mw->x / 2 - 7, mw->y + 26, 20, 13, 0xff);
+
+    if (osd.arming_status)
+    {
+        rec_color = COLOR_REC_RED | REC_BLINK;
+        rec_color_shadow = COLOR_REC_BLACK | REC_BLINK;
+        tw_printf(mw->x / 2 - 4, mw->y + 26, "ARMED");
+        osd.armed_start_time = millis();
+    }
+    else
+    {
+        tw_printf(mw->x / 2 - 7, mw->y + 26, "Disarmed");
+    }
+
+    OSD_path = OSD_PATH_DISP;
+    OSD_work_field = tmp_field;
+}
+
+if (osd.armed_start_time != 0)
+{
+    if (millis() > (osd.armed_start_time + 10000) )
+    {
+        tmp_field = OSD_work_field;
+        OSD_path = OSD_PATH_REC;
+        OSD_work_field = FLD_EVEN;
+        tw_osd_rectangle(mw->x / 2 - 7, mw->y + 26, 20, 13, 0xff);
+        OSD_path = OSD_PATH_DISP;
+        OSD_work_field = tmp_field;
+        osd.armed_start_time = 0;
+    }
+}
 } 
