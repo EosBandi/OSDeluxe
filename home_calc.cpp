@@ -24,7 +24,7 @@ void calc_home(void)
         if (mavdata_age(MAVLINK_MSG_ID_MISSION_ITEM) > 2000)
         {
             /* when UAV is armed, home is WP0 */
-            mavlink_msg_mission_request_pack(OSD_SYS_ID, MAV_COMP_ID_OSD, &this_msg, mavlink_system.sysid, MAV_COMP_ID_ALL,mav_seq++,0);
+            mavlink_msg_mission_request_pack(OSD_SYS_ID, MAV_COMP_ID_OSD, &this_msg, 0, MAV_COMP_ID_ALL,0,0);
             mavlink_send_msg(&this_msg);
         }
         else

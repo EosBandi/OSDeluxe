@@ -30,7 +30,7 @@ unsigned long mavdata_age(unsigned int id);
 void mavlink_send_msg(mavlink_message_t *msg);
 
 void message_buffer_add_line(char *message);
-
+void heartbeat_out(void);
 
 
 

@@ -49,21 +49,17 @@ void loop ()
 
     tw_init ();
 
-    //tw_ch_set_window (1, 0, 0, 180);
-    tw_ch_set_window (2, 0, 0, 180);
-    tw_ch_set_window (3, 0, 0, 180);
-    tw_ch_set_window (4, 0, 0, 180);
-
+    
     tw_ch_settings (1, 1, 0);
     tw_ch_settings (2, 1, 1);
     tw_ch_settings (3, 1, 1);
-    tw_ch_settings (4, 0, 0);
+    tw_ch_settings (4, 0, 1);
 
 
     tw_ch_set_window (1, 0, 0, 180);
     tw_ch_set_window (2, 4, 0 , 64);
     tw_ch_set_window (3, 116, 0, 64);
-    tw_ch_set_window (4, 90, 72, 90);
+    tw_ch_set_window (4, 68, 0, 48);
 /*
     tw_write_register(0x081,0xff);
     tw_write_register(0x082,0xff);
@@ -78,9 +74,10 @@ void loop ()
     
 */
 
-    tw_set_ch_input(1, INPUT_CH_3);
+    tw_set_ch_input(1,INPUT_CH_1);
     tw_set_ch_input(2,INPUT_CH_2);
-    tw_set_ch_input(3,INPUT_CH_1);
+    tw_set_ch_input(3,INPUT_CH_3);
+    tw_set_ch_input(4,INPUT_CH_4);
 
 
     tw_write_register(0x0c8,0x03);
@@ -96,6 +93,9 @@ void loop ()
     disp_color_background = COLOR_NONE;
     disp_color_shadow = COLOR_BLACK;
 
+
+    tw_clear_all_pages();
+    /*
     // Clear OSD on display path both fields
     tw_osd_fill_region (0, 0, 179, 287, 0xff, FLD_EVEN, OSD_PATH_DISP);
     tw_wait_for_osd_write (100);
@@ -106,11 +106,13 @@ void loop ()
     tw_wait_for_osd_write (100);
     tw_osd_fill_region (0, 0, 89, 287, 0xff, FLD_ODD, OSD_PATH_REC);
     tw_wait_for_osd_write (100);
-
+*/
     OSD_path = OSD_PATH_DISP;
     OSD_work_field = FLD_EVEN;
 
-    tw_osd_set_display (0, FLD_EVEN, FLD_EVEN);
+    tw_osd_set_display_field(FLD_EVEN);
+    tw_osd_set_rec_field(FLD_EVEN);
+    tw_osd_set_display_page(0);
 
     OSD_path = OSD_PATH_DISP;
     OSD_work_field = FLD_EVEN;
@@ -121,7 +123,7 @@ void loop ()
 
 // Prerender 
 
-
+osd.displayed_mode = -1;        // Signal startup
 osd_center_marker();
 
 
@@ -139,7 +141,7 @@ long t, l;
 while (1)
 {
 
-    tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP);
+    tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
     tw_wait_for_osd_write(20);
     render_horizon(&osd.horizon);
 
@@ -154,7 +156,83 @@ while (1)
     osd_home_render(&osd.home_w);
     osd_mode_render(&osd.mode);
     message_buffer_render();
- 
+
+    //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
+
+    if (osd.ctr_saved_state[0] != osd.ctr_state[0])
+    {
+        // There is a change in ctr1 state
+        osd.ctr_saved_state[0] = osd.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
+        switch (osd.ctr_state[0])
+        {
+        case 0:
+            tw_set_ch_input(1, INPUT_CH_1);
+            tw_set_ch_input(2, INPUT_CH_2);
+            tw_set_ch_input(3, INPUT_CH_3);
+            tw_set_ch_input(4, INPUT_CH_4);
+            break;
+        case 1:
+            tw_set_ch_input(1, INPUT_CH_2);
+            tw_set_ch_input(2, INPUT_CH_3);
+            tw_set_ch_input(3, INPUT_CH_1);
+            tw_set_ch_input(4, INPUT_CH_4);
+            break;
+        case 2:
+            tw_set_ch_input(1, INPUT_CH_3);
+            tw_set_ch_input(2, INPUT_CH_1);
+            tw_set_ch_input(3, INPUT_CH_2);
+            tw_set_ch_input(4, INPUT_CH_4);
+            break;
+        }
+    }
+
+    if (osd.ctr_saved_state[1] != osd.ctr_state[1])
+    {
+        // There is a change in ctr1 state
+        osd.ctr_saved_state[1] = osd.ctr_state[1]; // Save it, to prevent unneccessary state changes in the main loop
+        switch (osd.ctr_state[1])
+        {
+        case 0:
+            tw_ch_settings(1, 1, 0);
+            tw_ch_settings(2, 1, 1);
+            tw_ch_settings(3, 1, 1);
+            tw_ch_settings(4, 0, 1);
+            break;
+        case 1:
+            tw_ch_settings(1, 1, 0);
+            tw_ch_settings(2, 0, 1);
+            tw_ch_settings(3, 0, 1);
+            tw_ch_settings(4, 0, 1);
+            break;
+        case 2:
+            tw_ch_settings(1, 1, 0);
+            tw_ch_settings(2, 1, 1);
+            tw_ch_settings(3, 1, 1);
+            tw_ch_settings(4, 1, 1);
+            break;
+        }
+    }
+
+    if (osd.ctr_saved_state[2] != osd.ctr_state[2])
+    {
+        // There is a change in ctr1 state
+        osd.ctr_saved_state[2] = osd.ctr_state[2]; // Save it, to prevent unneccessary state changes in the main loop
+        switch (osd.ctr_state[2])
+        {
+        case 0:
+            tw_osd_set_display_page(0);
+            tw_osd_set_rec_field(FLD_EVEN);
+            break;
+        case 1:
+            tw_osd_set_display_page(1);
+            tw_osd_set_rec_field(FLD_ODD);
+            break;
+        case 2:
+            break;
+        }
+    }
+
+    //Switch OSD_work_field for smooth redraw
     if (OSD_work_field == FLD_ODD){
         OSD_work_field = FLD_EVEN;
         OSD_display_field = FLD_ODD;
@@ -163,18 +241,17 @@ while (1)
         OSD_display_field = FLD_EVEN;
     }
 
-    tw_osd_set_display(0,OSD_display_field,FLD_EVEN);
+    tw_osd_set_display_field(OSD_display_field);
+
     read_mavlink();
 
     //check heartbeat
     heartbeat_validation();
-    if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
 
-    if ( (osd.bat.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) )
-    {
-      request_mavlink_battery_capacity();
-      debug("Requested Battery capacity\n");  
-    }
+    if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
+    if ( (osd.bat.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
+
+
 
 }
 }

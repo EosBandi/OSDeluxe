@@ -318,8 +318,9 @@ void osd_vario_render(struct vario_widget_t *vw)
     unsigned char mix;
     float val, f, fh;
 
-    if (vw->vario > vw->vario_max) val = vw->vario_max;
-    if (vw->vario < -vw->vario_max) val = -vw->vario_max;
+    val = vw->vario;
+    if (val > vw->vario_max) val = vw->vario_max;
+    if (val < -vw->vario_max) val = -vw->vario_max;
 
     if (vw->mix)
         mix = MIX;
@@ -330,7 +331,7 @@ void osd_vario_render(struct vario_widget_t *vw)
     tw_osd_rectangle(vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 2, BACKROUND);
 
     f = vw->h / 2;
-    fh = abs(f * vw->vario / vw->vario_max);
+    fh = abs(f * val / vw->vario_max);
 
     if (vw->vario >= 0)
     {
@@ -397,9 +398,9 @@ void osd_center_marker()
     temp_path = OSD_path;
     OSD_path = OSD_PATH_REC;
 
-    //tw_osd_rectangle(40,140,10,3,COLOR_REC_WHITE);
 
-    tw_set_osd_buf(0xff,0x01,0x10,0xff);
+    //tw_set_osd_buf(0xff,0x01,0x10,0xff);
+    tw_set_osd_buf(0xff,0x89,0x98,0xff);
     cnt = 0;
     data_buf[cnt++] = 45; // start HPOS
     data_buf[cnt++] = 45; // end   HPOS
@@ -412,7 +413,8 @@ void osd_center_marker()
     tw_write_buf(0x205, data_buf, cnt);
     tw_wait_for_osd_write(50);
     
-    tw_set_osd_buf(0x00,0x00,0x00,0x00);
+    //tw_set_osd_buf(0x00,0x00,0x00,0x00);
+    tw_set_osd_buf(0x88,0x88,0x88,0x88);
     cnt = 0;
     data_buf[cnt++] = 43; // start HPOS
     data_buf[cnt++] = 47; // end   HPOS
@@ -425,7 +427,8 @@ void osd_center_marker()
     tw_write_buf(0x205, data_buf, cnt);
     tw_wait_for_osd_write(50);
 
-    tw_set_osd_buf(0x11,0x11,0x11,0x11);
+    //tw_set_osd_buf(0x11,0x11,0x11,0x11);
+    tw_set_osd_buf(0x99,0x99,0x99,0x99);
     cnt = 0;
     data_buf[cnt++] = 43; // start HPOS
     data_buf[cnt++] = 47; // end   HPOS
@@ -438,10 +441,14 @@ void osd_center_marker()
     tw_write_buf(0x205, data_buf, cnt);
     tw_wait_for_osd_write(50);
 
-    tw_osd_setpixel(45 * SCREEN_SCALE,144,0x00,0x01,0x10,0x00);
-    tw_osd_setpixel(45 * SCREEN_SCALE,146,0x00,0x01,0x10,0x00);
-    tw_osd_setpixel(45 * SCREEN_SCALE,145,0x11,0x11,0x11,0x11);
+    //tw_osd_setpixel(45 * SCREEN_SCALE,144,0x00,0x01,0x10,0x00);
+    //tw_osd_setpixel(45 * SCREEN_SCALE,146,0x00,0x01,0x10,0x00);
+    //tw_osd_setpixel(45 * SCREEN_SCALE,145,0x11,0x11,0x11,0x11);
     
+    tw_osd_setpixel(45 * SCREEN_SCALE,144,0x88,0x89,0x98,0x88);
+    tw_osd_setpixel(45 * SCREEN_SCALE,146,0x88,0x89,0x98,0x88);
+    tw_osd_setpixel(45 * SCREEN_SCALE,145,0x99,0x99,0x99,0x99);
+
     OSD_path = temp_path;
 
 
@@ -463,6 +470,8 @@ void render_horizon(struct horizon_t *h)
     float pitchrad, rollrad;
     float cos_roll, sin_roll;
 
+    char mix = MIX;
+
     FontType ft_temp;
 
     unsigned char c1, c2, c3, c4;
@@ -475,10 +484,10 @@ void render_horizon(struct horizon_t *h)
 
     if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
     {
-        c1 = COLOR_RED; c2= COLOR_YELLOW; c3= c1; c4= c2;
+        c1 = COLOR_RED | mix; c2= COLOR_YELLOW | mix; c3= c1; c4= c2;
     }
     else{
-        c1 = COLOR_WHITE; c2 = COLOR_BLACK; c3 = c1; c4 = c2;
+        c1 = COLOR_WHITE | mix; c2 = COLOR_BLACK | mix; c3 = c1; c4 = c2;
     }
 
 
@@ -524,10 +533,10 @@ void render_horizon(struct horizon_t *h)
 
             if (size == 50)
             {
-                tw_set_osd_buf(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
+                tw_set_osd_buf(COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix);
                 tw_osd_drawline(x0, y0-1, x1, y1-1);
                 tw_osd_drawline(x0, y0+1, x1, y1+1);
-                tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+                tw_set_osd_buf(COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix);
                 tw_osd_drawline(x0, y0, x1, y1);
                 tw_set_osd_buf (c1, c2, c3, c4);
             }
@@ -547,10 +556,10 @@ void render_horizon(struct horizon_t *h)
 
             if (size == 50)
             {
-                tw_set_osd_buf(COLOR_BLACK, COLOR_BLACK, COLOR_BLACK, COLOR_BLACK);
+                tw_set_osd_buf(COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix);
                 tw_osd_drawline(x0, y0-1, x1, y1-1);
                 tw_osd_drawline(x0, y0+1, x1, y1+1);
-                tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+                tw_set_osd_buf(COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix);
                 tw_osd_drawline(x0, y0, x1, y1);
                 tw_set_osd_buf (c1, c2, c3, c4);
             }
@@ -563,7 +572,7 @@ void render_horizon(struct horizon_t *h)
                 ft_temp = font_type;
                 disp_color = c1;
                 disp_color_background = COLOR_NONE;
-                disp_color_shadow = COLOR_BLACK;
+                disp_color_shadow = COLOR_BLACK | mix ;
                 font_type = FONT_OUTLINE_8x12;
                 tw_printf ((cx-6)/SCREEN_SCALE, cy  - 6, "% 03d", j / SCALE);
                 font_type = ft_temp;
@@ -575,161 +584,175 @@ void render_horizon(struct horizon_t *h)
     }
 }
 
-
-void osd_mode_render( struct mode_widget_t *mw)
+void osd_mode_render(struct mode_widget_t *mw)
 {
 
-char mode[17];
-unsigned char mix;
-unsigned char tmp_field;
-
-  if (mw->mix)
-        mix = MIX;
-    else
-        mix = 0;
-
-
+    char mode[17];
+    unsigned char mix = 0;
+    unsigned char tmp_field;
     unsigned int cust_mode;
 
-    cust_mode = mw->mode;
-    if (osd.mav_type !=  MAV_TYPE_FIXED_WING)
-        cust_mode += 100;
-
-    switch (cust_mode) {
-    case PLANE_MODE_MANUAL:
-        strcpy(mode, "Manual");
-        break;
-    case PLANE_MODE_CIRCLE:
-    case COPTER_MODE_CIRCLE:
-        strcpy(mode, "Circle");
-        break;
-    case PLANE_MODE_STABILIZE:
-    case COPTER_MODE_STABILIZE:
-        strcpy(mode, "Stabilize");
-        break;
-    case PLANE_MODE_TRAINING:
-        strcpy(mode, "Training");
-        break;
-    case PLANE_MODE_ACRO:
-    case COPTER_MODE_ACRO:
-        strcpy(mode, "Acro");
-        break;
-    case PLANE_MODE_FBWA:
-        strcpy(mode, "Fly-By-Wire A");
-        break;
-    case PLANE_MODE_FBWB:
-        strcpy(mode, "Fly-By-Wire B");
-        break;
-    case PLANE_MODE_CRUISE:
-        strcpy(mode, "Cruise");
-        break;
-    case PLANE_MODE_AUTOTUNE:
-    case COPTER_MODE_AUTOTUNE:
-        strcpy(mode, "Auto tune");
-        break;
-    case PLANE_MODE_AUTO:
-    case COPTER_MODE_AUTO:
-        strcpy(mode, "Auto");
-        break;
-    case PLANE_MODE_RTL:
-    case COPTER_MODE_RTL:
-        strcpy(mode, "RTL");
-        break;
-    case PLANE_MODE_LOITER:
-    case COPTER_MODE_LOITER:
-        strcpy(mode, "Loiter");
-        break;
-    case PLANE_MODE_INIT:
-        strcpy(mode, "Initializing");
-        break;
-    case PLANE_MODE_GUIDED:
-    case COPTER_MODE_GUIDED:
-        strcpy(mode, "Guided");
-        break;
-    case COPTER_MODE_ALTHOLD:
-        strcpy(mode, "Altitude hold");
-        break;
-    case COPTER_MODE_LAND:
-        strcpy(mode, "Land");
-        break;
-    case COPTER_MODE_OF_LOITER:
-        strcpy(mode, "OF Loiter");
-        break;
-    case COPTER_MODE_DRIFT:
-        strcpy(mode, "Drift");
-        break;
-    case COPTER_MODE_SPORT:
-        strcpy(mode, "Sport");
-        break;
-    case COPTER_MODE_FLIP:
-        strcpy(mode, "Flip");
-        break;
-    case COPTER_MODE_POSHOLD:
-        strcpy(mode, "Position hold");
-        break;
-    default:
-        strcpy(mode, "Unknown Mode");
-        break;
-}
-
-
- font_type = FONT_OUTLINE_16x12c;
- disp_color = COLOR_YELLOW | mix;
- disp_color_background = COLOR_NONE | MIX;
- disp_color_shadow = COLOR_BLACK | mix;
- int l = (float)strlen(mode) * 1.5f;
-
- tw_printf(mw->x-(l), mw->y, "%s", mode);
-
-if (osd.system_status == MAV_STATE_CRITICAL)
-{
- disp_color = COLOR_RED | BLINK;
- disp_color_background = COLOR_NONE;
- disp_color_shadow = COLOR_BLACK | BLINK;
- tw_printf(mw->x-(13), mw->y+13, "FAILSAFE!");
-    
-}
-
-if (osd.displayed_arming_status != osd.arming_status)
-{
-    osd.displayed_arming_status = osd.arming_status;
-
-    tmp_field = OSD_work_field;
-    OSD_path = OSD_PATH_REC;
-    OSD_work_field = FLD_EVEN;
-
-    rec_color = COLOR_REC_RED;
-    rec_color_background = COLOR_REC_NONE;
-    rec_color_shadow = COLOR_REC_BLACK;
-    tw_osd_rectangle(mw->x / 2 - 7, mw->y + 26, 20, 13, 0xff);
-
-    if (osd.arming_status)
+    if (osd.displayed_mode != mw->mode)
     {
-        rec_color = COLOR_REC_RED | REC_BLINK;
-        rec_color_shadow = COLOR_REC_BLACK | REC_BLINK;
-        tw_printf(mw->x / 2 - 4, mw->y + 26, "ARMED");
-        osd.armed_start_time = millis();
-    }
-    else
-    {
-        tw_printf(mw->x / 2 - 7, mw->y + 26, "Disarmed");
-    }
+        osd.displayed_mode = mw->mode;
 
-    OSD_path = OSD_PATH_DISP;
-    OSD_work_field = tmp_field;
-}
+        if (mw->mix) mix = MIX;
 
-if (osd.armed_start_time != 0)
-{
-    if (millis() > (osd.armed_start_time + 10000) )
-    {
+        cust_mode = mw->mode;
+
+        if (osd.mav_type != MAV_TYPE_FIXED_WING) cust_mode += 100;
+
+        switch (cust_mode)
+        {
+        case PLANE_MODE_MANUAL:
+            strcpy(mode, "Manual");
+            break;
+        case PLANE_MODE_CIRCLE:
+        case COPTER_MODE_CIRCLE:
+            strcpy(mode, "Circle");
+            break;
+        case PLANE_MODE_STABILIZE:
+        case COPTER_MODE_STABILIZE:
+            strcpy(mode, "Stabilize");
+            break;
+        case PLANE_MODE_TRAINING:
+            strcpy(mode, "Training");
+            break;
+        case PLANE_MODE_ACRO:
+        case COPTER_MODE_ACRO:
+            strcpy(mode, "Acro");
+            break;
+        case PLANE_MODE_FBWA:
+            strcpy(mode, "Fly-By-Wire A");
+            break;
+        case PLANE_MODE_FBWB:
+            strcpy(mode, "Fly-By-Wire B");
+            break;
+        case PLANE_MODE_CRUISE:
+            strcpy(mode, "Cruise");
+            break;
+        case PLANE_MODE_AUTOTUNE:
+        case COPTER_MODE_AUTOTUNE:
+            strcpy(mode, "Auto tune");
+            break;
+        case PLANE_MODE_AUTO:
+        case COPTER_MODE_AUTO:
+            strcpy(mode, "Auto");
+            break;
+        case PLANE_MODE_RTL:
+        case COPTER_MODE_RTL:
+            strcpy(mode, "RTL");
+            break;
+        case PLANE_MODE_LOITER:
+        case COPTER_MODE_LOITER:
+            strcpy(mode, "Loiter");
+            break;
+        case PLANE_MODE_INIT:
+            strcpy(mode, "Initializing");
+            break;
+        case PLANE_MODE_GUIDED:
+        case COPTER_MODE_GUIDED:
+            strcpy(mode, "Guided");
+            break;
+        case COPTER_MODE_ALTHOLD:
+            strcpy(mode, "Altitude hold");
+            break;
+        case COPTER_MODE_LAND:
+            strcpy(mode, "Land");
+            break;
+        case COPTER_MODE_OF_LOITER:
+            strcpy(mode, "OF Loiter");
+            break;
+        case COPTER_MODE_DRIFT:
+            strcpy(mode, "Drift");
+            break;
+        case COPTER_MODE_SPORT:
+            strcpy(mode, "Sport");
+            break;
+        case COPTER_MODE_FLIP:
+            strcpy(mode, "Flip");
+            break;
+        case COPTER_MODE_POSHOLD:
+            strcpy(mode, "Position hold");
+            break;
+        default:
+            strcpy(mode, "Unknown Mode");
+            break;
+        }
+
         tmp_field = OSD_work_field;
         OSD_path = OSD_PATH_REC;
         OSD_work_field = FLD_EVEN;
-        tw_osd_rectangle(mw->x / 2 - 7, mw->y + 26, 20, 13, 0xff);
+
+        tw_osd_rectangle(mw->mode_x / 2 - 10, mw->mode_y, 20, 13, 0xff);
+        font_type = FONT_OUTLINE_16x12;
+        rec_color = COLOR_REC_WHITE;
+        rec_color_background = COLOR_REC_NONE;
+        rec_color_shadow = COLOR_REC_BLACK;
+        int l = (float)strlen(mode);
+        tw_printf(mw->mode_x/2 -l+1, mw->mode_y, "%s", mode);
+
         OSD_path = OSD_PATH_DISP;
         OSD_work_field = tmp_field;
-        osd.armed_start_time = 0;
+    }
+
+    if (osd.system_status == MAV_STATE_CRITICAL)
+    {
+        disp_color = COLOR_RED | BLINK;
+        disp_color_background = COLOR_NONE;
+        disp_color_shadow = COLOR_BLACK | BLINK;
+        tw_printf(mw->fs_x - (13), mw->fs_y + 13, "FAILSAFE!");
+    }
+
+    if (osd.displayed_arming_status != osd.arming_status)
+    {
+        osd.displayed_arming_status = osd.arming_status;
+        font_type = FONT_OUTLINE_16x12;
+        tmp_field = OSD_work_field;
+        OSD_path = OSD_PATH_REC;
+        OSD_work_field = FLD_EVEN;
+
+        rec_color = COLOR_REC_RED;
+        rec_color_background = COLOR_REC_NONE;
+        rec_color_shadow = COLOR_REC_BLACK;
+        tw_osd_rectangle(mw->arm_x / 2 - 7, mw->arm_y + 26, 20, 13, 0xff);
+
+        if (osd.arming_status)
+        {
+            rec_color = COLOR_REC_RED | REC_BLINK;
+            rec_color_shadow = COLOR_REC_BLACK | REC_BLINK;
+            tw_printf(mw->arm_x / 2 - 4, mw->arm_y + 26, "ARMED");
+            osd.armed_start_time = millis();
+            osd.home.lock = HOME_WAIT;
+            mavlink_seen[MAVLINK_MSG_ID_MISSION_ITEM] = 0xffff;
+        }
+        else
+        {
+            tw_printf(mw->arm_x / 2 - 7, mw->arm_y + 26, "Disarmed");
+        }
+
+        OSD_path = OSD_PATH_DISP;
+        OSD_work_field = tmp_field;
+    }
+
+    if (osd.armed_start_time != 0 && osd.arming_status)
+    {
+        if (millis() > (osd.armed_start_time + 10000))
+        {
+            tmp_field = OSD_work_field;
+            OSD_path = OSD_PATH_REC;
+            OSD_work_field = FLD_EVEN;
+            tw_osd_rectangle(mw->arm_x / 2 - 7, mw->arm_y + 26, 20, 13, 0xff);
+            OSD_path = OSD_PATH_DISP;
+            OSD_work_field = tmp_field;
+            osd.armed_start_time = 0;
+        }
     }
 }
-} 
+
+void rc_control()
+{
+
+
+
+}

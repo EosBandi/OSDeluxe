@@ -1,6 +1,6 @@
 #include "osdeluxe.h"
 
-extern mavlink_system_t mavlink_system = { 0, 0 }; // Ardupilot:7,1  Pixhawk:100,50
+extern mavlink_system_t mavlink_system = { OSD_SYS_ID, 111 }; // Ardupilot:7,1  Pixhawk:100,50
 extern mavlink_message_t msg;
 extern mavlink_status_t mv_status;
 
@@ -137,13 +137,15 @@ void request_mavlink_rates(void)
 
     for (uint32_t i = 0; i < MAX_STREAMS; i++)
     {
-        mavlink_msg_request_data_stream_send(MAVLINK_COMM_0, mavlink_system.sysid, mavlink_system.compid, MAVStreams[i], MAVRates[i], 1);
+//        mavlink_msg_request_data_stream_send(MAVLINK_COMM_0, mavlink_system.sysid, mavlink_system.compid, MAVStreams[i], MAVRates[i], 1);
+        mavlink_msg_request_data_stream_send(MAVLINK_COMM_0, 0, 0, MAVStreams[i], MAVRates[i], 1);
     }
 }
 
 void request_mavlink_battery_capacity(void)
 {
-    mavlink_msg_param_request_read_send(MAVLINK_COMM_0,mavlink_system.sysid, mavlink_system.compid, "BATT_CAPACITY",-1);
+//    mavlink_msg_param_request_read_send(MAVLINK_COMM_0,mavlink_system.sysid, mavlink_system.compid, "BATT_CAPACITY",-1);
+    mavlink_msg_param_request_read_send(MAVLINK_COMM_0,0, 0, "BATT_CAPACITY",-1);
 }
 
 
@@ -178,6 +180,7 @@ void read_mavlink()
                     break;
                 }
                 mav_type = mavlink_msg_heartbeat_get_type(&msg);
+       
                 if (mav_type == MAV_TYPE_GCS)
                 {
                     // Message is from a GCS, ignore it 
@@ -235,13 +238,38 @@ void read_mavlink()
             }
             break;
 
-            case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
+            case MAVLINK_MSG_ID_RC_CHANNELS:
             {
-                osd.rcin5 = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
-                osd.rcin6 = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
-                osd.rcin7 = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
-                osd.rcin8 = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
-                osd.rc_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
+
+                osd.rcin[1] = mavlink_msg_rc_channels_get_chan1_raw(&msg);
+                osd.rcin[2] = mavlink_msg_rc_channels_get_chan2_raw(&msg);
+                osd.rcin[3] = mavlink_msg_rc_channels_get_chan3_raw(&msg);
+                osd.rcin[4] = mavlink_msg_rc_channels_get_chan4_raw(&msg);
+                osd.rcin[5] = mavlink_msg_rc_channels_get_chan5_raw(&msg);
+                osd.rcin[6] = mavlink_msg_rc_channels_get_chan6_raw(&msg);
+                osd.rcin[7] = mavlink_msg_rc_channels_get_chan7_raw(&msg);
+                osd.rcin[8] = mavlink_msg_rc_channels_get_chan8_raw(&msg);
+                osd.rcin[9] = mavlink_msg_rc_channels_get_chan9_raw(&msg);
+                osd.rcin[10] = mavlink_msg_rc_channels_get_chan10_raw(&msg);
+                osd.rcin[11] = mavlink_msg_rc_channels_get_chan11_raw(&msg);
+                osd.rcin[12] = mavlink_msg_rc_channels_get_chan12_raw(&msg);
+                osd.rcin[13] = mavlink_msg_rc_channels_get_chan13_raw(&msg);
+                osd.rcin[14] = mavlink_msg_rc_channels_get_chan14_raw(&msg);
+                osd.rcin[15] = mavlink_msg_rc_channels_get_chan15_raw(&msg);
+                osd.rcin[16] = mavlink_msg_rc_channels_get_chan16_raw(&msg);
+                osd.rc_rssi = mavlink_msg_rc_channels_get_rssi(&msg);
+
+                //set up ctr_state1 variables
+                for (int i=0;i<4;i++)
+                {
+                    if (osd.rcin[osd.ctr_ch[i]] <= RC_STATE0) osd.ctr_state[i] = 0;
+                    else if (osd.rcin[osd.ctr_ch[i]] <= RC_STATE1) osd.ctr_state[i] = 1;
+                    else osd.ctr_state[i] = 2;
+                }
+
+
+
+
             }
             break;
             case MAVLINK_MSG_ID_STATUSTEXT:
@@ -297,9 +325,13 @@ void read_mavlink()
 
             case MAVLINK_MSG_ID_MISSION_ITEM:
             {
-                osd.home.home_coord.lat = DEG2RAD(mavlink_msg_mission_item_get_x(&msg));
-                osd.home.home_coord.lon = DEG2RAD(mavlink_msg_mission_item_get_y(&msg));
-                osd.home.home_alt = (int)mavlink_msg_mission_item_get_z(&msg);
+                if (mavlink_msg_mission_item_get_seq(&msg) == 0)
+                {
+                    osd.home.home_coord.lat = DEG2RAD(mavlink_msg_mission_item_get_x(&msg));
+                    osd.home.home_coord.lon = DEG2RAD(mavlink_msg_mission_item_get_y(&msg));
+                    osd.home.home_alt = (int)mavlink_msg_mission_item_get_z(&msg);
+                    // debug("Mission item received:%f, %f\n",osd.home.home_coord.lat, osd.home.home_coord.lon );
+                }
             }
                 break;
 
@@ -358,57 +390,13 @@ void read_mavlink()
             {
                 char param_name[17];
                 mavlink_msg_param_value_get_param_id(&msg,(char *)param_name);
-                debug("%s :",param_name);
+                //debug("%s :",param_name);
                 if ( strcmp(param_name,"BATT_CAPACITY") == 0 )
                 {
                     osd.bat.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
-                    debug("%i\n", osd.bat.max_capacity);
+                    //debug("%i\n", osd.bat.max_capacity);
                 }
             }
-
-            /*
-                        case MAVLINK_MSG_ID_GPS_RAW_INT:
-                            {
-                                osd_lat = mavlink_msg_gps_raw_int_get_lat(&msg) / 10000000.0f;
-                                osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg) / 10000000.0f;
-                                osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
-                                osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
-                                osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg);
-                            }
-                            break;
-                        case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
-                            {
-            //                  nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
-            //                  nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
-            //                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
-                              wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
-                              wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
-            //                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
-            //                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
-                              xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
-                            }
-                            break;
-                        case MAVLINK_MSG_ID_MISSION_CURRENT:
-                            {
-                                wp_number = (uint8_t)mavlink_msg_mission_current_get_seq(&msg);
-                            }
-                            break;
-
-                        case MAVLINK_MSG_ID_WIND:
-                            {
-                              if (osd_climb < 1.66 && osd_climb > -1.66){
-                              osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
-                              osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
-            //                  osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
-                              }
-                            }
-                            break;
-                        case MAVLINK_MSG_ID_SCALED_PRESSURE:
-                            {
-                                temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
-                            }
-                            break;
-            */
             default:
                 // Do nothing
                 break;
@@ -486,7 +474,7 @@ void message_buffer_render()
     if (osd.clear_req)
     {
         OSD_path = OSD_PATH_REC;
-        tw_osd_rectangle(5, 218, 85, 11, 0xff);
+        tw_osd_rectangle(4, 218, 85, 11, 0xff);
         OSD_path = OSD_PATH_DISP;
         osd.clear_req = false;
     }
@@ -521,7 +509,7 @@ void message_buffer_render()
 
         OSD_path = OSD_PATH_REC;
         //tw_osd_rectangle(5,218,75,10,0xff);
-        tw_printf(5, 218, "%s", osd.message_buffer[0]);
+        tw_printf(4, 218, "%s", osd.message_buffer[0]);
         OSD_path = OSD_PATH_DISP;
         
         osd.clear_req = true;
@@ -533,60 +521,24 @@ void message_buffer_render()
 
 }
 
-
-/*
-
-void message_buffer_render()
-{
-
-    long display_time = 5000;
-    long now;
-
-    now = millis();
-    
-    if (osd.message_buffer_line > 0) display_time = 3000; // 3sec if there are more messages in the buffer
-
-    if (now < (osd.message_buffer_display_time + display_time))
-    {
-        disp_color = COLOR_YELLOW;
-        disp_color_shadow = COLOR_BLACK;
-        if (osd.message_severity[0] <= 3)
-        {
-            disp_color = COLOR_RED;
-            disp_color_shadow = COLOR_BLACK;
-        }
-        if (osd.message_severity[0] <= 2)
-        {
-            disp_color = COLOR_RED;
-            disp_color_shadow = COLOR_BLACK;
-        }
-
-        disp_color_background = COLOR_25_WHITE | MIX;
-        font_type = FONT_OUTLINE_16x12c; 
-
-
-        tw_printf(10, 218, "%s", osd.message_buffer[0]);
-        return;
-    }
-
-    if (osd.message_buffer_line > 0)
-    {
-        osd.message_buffer_display_time = millis();
-        for (int i = 1; i < MESSAGE_BUFFER_LINES; i++)
-        {
-            strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 0
-            osd.message_severity[i - 1] = osd.message_severity[i];
-        }
-        osd.message_buffer_line--;
-        return;
-    }
-}
-*/
-
 unsigned long mavdata_age(unsigned int id)
 {
     if (mavlink_seen[id] != 0)
         return millis() - mavlink_seen[id];
     else
         return 99999999;
+}
+
+void heartbeat_out(void)
+{
+    mavlink_message_t msg;
+   
+    mavlink_msg_heartbeat_pack(OSD_SYS_ID,
+            MAV_COMP_ID_OSD, &msg, MAV_TYPE_ONBOARD_CONTROLLER,
+            MAV_AUTOPILOT_INVALID,
+            MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, // base_mode
+            0, //custom_mode
+            MAV_STATE_ACTIVE);
+
+    mavlink_send_msg(&msg);
 }

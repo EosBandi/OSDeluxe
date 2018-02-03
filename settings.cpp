@@ -65,7 +65,7 @@ void default_settings()
     osd.gps.sat = 10;
     osd.gps.hdop = 0.21;
     
-    osd.bat.x = 143;
+    osd.bat.x = 145;
     osd.bat.y = 230;
     osd.bat.min_cell_voltage = 3.3;
     osd.bat.max_cell_voltage = 4.2;
@@ -92,17 +92,17 @@ void default_settings()
     osd.alt.mix = 0;
     osd.alt.altitude = 0;
 
-    osd.vario.x = 160;
+    osd.vario.x = 165;
     osd.vario.y = 110;
     osd.vario.h = 100;
     osd.vario.w = 4;
-    osd.vario.vario = 5.5f;
+    osd.vario.vario = 0;
     osd.vario.vario_max = 5.0f;
     osd.vario.mix = 1;
     osd.vario.num_pos = POS_BELOW;
 
     osd.home_w.x = 90;
-    osd.home_w.y = 250;
+    osd.home_w.y = 252;
     osd.home_w.orientation = 0;
     osd.home_w.home_distance = 0;
 
@@ -111,8 +111,20 @@ void default_settings()
     osd.horizon.y = 145;
 
 
-    osd.mode.x =  90;
-    osd.mode.y = 10;
+    //osd.mode.mode_x =  57;
+    //osd.mode.mode_y = 270;
+
+   osd.mode.mode_x =  90;
+   osd.mode.mode_y = 5;
+
+    osd.mode.fs_x =  90;
+    osd.mode.fs_y = 23;
+
+    osd.mode.arm_x =  90;
+    osd.mode.arm_y = 36;
+
+
+    
     osd.mode.mix = 0;
     osd.mode.mode = 0;
 
@@ -121,7 +133,15 @@ void default_settings()
     osd.displayed_arming_status = true;
     osd.armed_start_time = 0;
 
+
     osd.last_capacity_query = 0;
+
+
+    osd.ctr_ch[0] = 10;
+    osd.ctr_ch[1] = 11;
+    osd.ctr_ch[2] = 12;
+    osd.ctr_ch[3] = 13;
+    
 
 
 

@@ -148,8 +148,16 @@ struct horizon_t {
 };
 
 struct mode_widget_t {
-    unsigned short x;
-    unsigned short y;
+    unsigned short mode_x;
+    unsigned short mode_y;
+
+    unsigned short fs_x;
+    unsigned short fs_y;
+
+    unsigned short arm_x;
+    unsigned short arm_y;
+
+
     bool mix;
     unsigned char mode; //from mavlink
 };
@@ -187,5 +195,8 @@ void osd_center_marker();
 
 void render_horizon(struct horizon_t *horizon);
 void osd_mode_render( struct mode_widget_t *mw);
+
+
+void rc_control(void);
 
 #endif

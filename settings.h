@@ -4,10 +4,14 @@
 #define CHANNEL_MODES 6
 #define MESSAGE_BUFFER_LINES 20
 
+#define RC_STATE0 1300
+#define RC_STATE1 1700
+
+
 
 struct osd_settings {
 
-    channel_setting video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero)
+    channel_setting video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero) ???
     gps_widget_t gps;
     battery_widget_t bat;
     status_widget_t stat;
@@ -36,11 +40,12 @@ struct osd_settings {
     int           ekfterrain;
 
 
-    int           rcin5;
-    int           rcin6;
-    int           rcin7;
-    int           rcin8;
-    int           rc_rssi;
+    unsigned char ctr_ch[4];
+    unsigned char ctr_state[4];
+    unsigned char ctr_saved_state[4];
+
+    unsigned int           rcin[17];
+    unsigned int           rc_rssi;
 
     char         system_status;   //Se MAVLINK_STATE enum 
 
@@ -57,7 +62,10 @@ struct osd_settings {
     bool          displayed_arming_status;
     unsigned long armed_start_time;
 
+    int displayed_mode;
+
     unsigned long last_capacity_query;
+    unsigned long last_outgoing_heartbeat;
     //unsigned long 
    
 };

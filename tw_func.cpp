@@ -289,16 +289,54 @@ _rep:
 }
 
 
-void tw_osd_set_display(char rd_page, char dp_field, char rec_field )
+void tw_osd_set_display_field( char dp_field)
+{
+  char reg20f;
+  
+  reg20f = tw_read_register(0x20f);
+  reg20f = reg20f & 0b11110011;
+  reg20f = reg20f + (dp_field << 2);
+  //reg20f = reg20f + (rec_field);
+  tw_write_register(0x20f,reg20f);
+
+}
+
+void tw_osd_set_rec_field(char rec_field)
+{
+  char reg20f;
+  
+  reg20f = tw_read_register(0x20f);
+  reg20f = reg20f & 0b11111100;
+//  reg20f = reg20f + (dp_field << 2);
+  reg20f = reg20f + (rec_field);
+  tw_write_register(0x20f,reg20f);
+
+}
+
+/*
+void tw_osd_set_display( char dp_field, char rec_field )
 {
  
   char reg20f;
   
-  reg20f = rd_page << 4;
+  reg20f = tw_read_register(0x20f);
+
+  reg20f = reg20f & 0xf0;
   reg20f = reg20f + (dp_field << 2);
   reg20f = reg20f + (rec_field);
   tw_write_register(0x20f,reg20f);
 
+}
+*/
+
+void tw_osd_set_display_page(char rd_page)
+{
+ char reg20f = 0;
+
+ reg20f = tw_read_register(0x20f);
+ reg20f = reg20f & 0x0f;
+ reg20f = reg20f + (rd_page << 4);
+ tw_write_register(0x20f,reg20f);
 }
 
 void tw_switch_display_field()
@@ -472,15 +510,16 @@ void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsi
 
     if ((m16 == 10) || (m16 == 12) || (m16 == 13))
     {
-        tw_osd_fill_region(x, y, x + w - 5, y + h, color, OSD_work_field, OSD_path);
-        tw_osd_fill_region(x + w - 5, y, x + w, y + h, color, OSD_work_field, OSD_path);
+        tw_osd_fill_region(x, y, x + w - 5, y + h, color, OSD_work_field, OSD_path,0);
+        tw_osd_fill_region(x + w - 5, y, x + w, y + h, color, OSD_work_field, OSD_path,0);
     }
-    else { tw_osd_fill_region(x, y, x + w, y + h, color, OSD_work_field, OSD_path); }
+    else { tw_osd_fill_region(x, y, x + w, y + h, color, OSD_work_field, OSD_path,0); }
 }
 
-void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char disp_color, unsigned char _field, unsigned char path)
+void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char disp_color, unsigned char _field, unsigned char path, unsigned char rd_page)
 {
     unsigned char reg209;
+    unsigned char reg20a;
     unsigned char m16;
 
     cnt = 0;
@@ -506,9 +545,15 @@ void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsi
     data_buf[cnt++] = reg209;
 
     if (path == OSD_PATH_REC)
-        data_buf[cnt++] = 0b11100000;
+        reg20a = 0b11100000;
     else
-        data_buf[cnt++] = 0b11000000;
+        reg20a = 0b11000000;
+
+    rd_page = rd_page << 2;
+    rd_page = rd_page & 0b00011100;
+    reg20a = reg20a + rd_page;
+
+    data_buf[cnt++] = reg20a;
 
     tw_write_buf(0x205, data_buf, cnt);
 
@@ -1171,4 +1216,26 @@ void tw_display_logo()
 
         }
     }
+}
+
+
+void tw_clear_all_pages(void)
+{
+    // Clear OSD on record path both fields
+    tw_osd_fill_region(0, 0, 89, 287, 0xff, FLD_EVEN, OSD_PATH_REC,0);
+    tw_wait_for_osd_write(100);
+    tw_osd_fill_region(0, 0, 89, 287, 0xff, FLD_ODD, OSD_PATH_REC,0);
+    tw_wait_for_osd_write(100);
+
+    for (unsigned char i = 0; i < 6; i++)
+    {
+        tw_osd_set_display_page(i);
+        // Clear OSD on display path both fields
+        tw_osd_fill_region(0, 0, 179, 287, 0xff, FLD_EVEN, OSD_PATH_DISP,i);
+        tw_wait_for_osd_write(100);
+        tw_osd_fill_region(0, 0, 179, 287, 0xff, FLD_ODD, OSD_PATH_DISP,i);
+        tw_wait_for_osd_write(100);
+    }
+
+    tw_osd_set_display_page(0);
 }

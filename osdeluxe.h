@@ -16,6 +16,7 @@
 #include "home_calc.h"
 #include "settings.h"
 #include "mavlink.h"
+#include "params.h"
 
 
 

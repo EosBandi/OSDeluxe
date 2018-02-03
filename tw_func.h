@@ -166,13 +166,18 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
 void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _popup);
 void tw_set_ch_input(char ch, input_channel input);
 
-void tw_osd_set_display(char rd_page, char dp_field, char rec_field );
+void tw_osd_set_display_field( char dp_field);
+void tw_osd_set_rec_field( char rec_field);
+void tw_osd_set_display_page(char rd_page);
 void tw_switch_display_field();
+
+
+void tw_clear_all_pages(void);
 
 void tw_osd_qsetpixel(unsigned int x, unsigned int y);
 void tw_osd_setpixel(unsigned int x, unsigned int y, unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4);
 
-void tw_osd_fill_region(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2, unsigned char color, unsigned char _field, unsigned char path);
+void tw_osd_fill_region(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2, unsigned char color, unsigned char _field, unsigned char path, unsigned char rd_page);
 
 void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
 
