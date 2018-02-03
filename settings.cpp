@@ -77,7 +77,7 @@ void default_settings()
 
     osd.bat.voltage = 23.4;
     osd.bat.current = 10.0;
-    osd.bat.max_capacity = 12000;
+    osd.bat.max_capacity = 0;
     osd.bat.remaining_capacity = 50;
 
     osd.stat.x = 7;
@@ -120,6 +120,9 @@ void default_settings()
     osd.arming_status = false;
     osd.displayed_arming_status = true;
     osd.armed_start_time = 0;
+
+    osd.last_capacity_query = 0;
+
 
 
 }

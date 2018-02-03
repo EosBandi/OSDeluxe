@@ -116,7 +116,7 @@ void heartbeat_validation(void)
         for (int n = 0; n < 3; n++)
         {
             request_mavlink_rates(); // Three times to make sure it will be readed
-            delay(100); // wait for 100ms
+            delay(200); // wait for 100ms
         }
         enable_mav_request = 0;
         waitingMAVBeats = 0;
@@ -140,6 +140,13 @@ void request_mavlink_rates(void)
         mavlink_msg_request_data_stream_send(MAVLINK_COMM_0, mavlink_system.sysid, mavlink_system.compid, MAVStreams[i], MAVRates[i], 1);
     }
 }
+
+void request_mavlink_battery_capacity(void)
+{
+    mavlink_msg_param_request_read_send(MAVLINK_COMM_0,mavlink_system.sysid, mavlink_system.compid, "BATT_CAPACITY",-1);
+}
+
+
 
 void read_mavlink()
 {
@@ -253,6 +260,26 @@ void read_mavlink()
             {
                 osd.gps.hdop = (float)mavlink_msg_gps_raw_int_get_eph(&msg) / 100.0;
                 osd.gps.sat = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
+                osd.gps.fix = mavlink_msg_gps_raw_int_get_fix_type(&msg);
+
+                osd.stat.gps_status = STATUS_OK;
+                if (osd.gps.fix < GPS_FIX_TYPE_3D_FIX)
+                {
+                    osd.stat.gps_status = STATUS_CRITICAL;
+                    break;
+                }
+
+                if (osd.gps.sat <= 5 || osd.gps.hdop > 2.5)
+                {
+                    osd.stat.gps_status = STATUS_CRITICAL;
+                    break;
+                }
+
+                if (osd.gps.sat <= 7 || osd.gps.hdop > 1.5)
+                {
+                    osd.stat.gps_status = STATUS_WARNING;
+                    break;
+                }
             }
             break;
 
@@ -326,6 +353,18 @@ void read_mavlink()
 
             }
             break;
+
+            case MAVLINK_MSG_ID_PARAM_VALUE:
+            {
+                char param_name[17];
+                mavlink_msg_param_value_get_param_id(&msg,(char *)param_name);
+                debug("%s :",param_name);
+                if ( strcmp(param_name,"BATT_CAPACITY") == 0 )
+                {
+                    osd.bat.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
+                    debug("%i\n", osd.bat.max_capacity);
+                }
+            }
 
             /*
                         case MAVLINK_MSG_ID_GPS_RAW_INT:

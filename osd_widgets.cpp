@@ -121,9 +121,9 @@ void osd_gps_render(struct gps_widget_t *g)
     }
 
     font_type = FONT_16x8;
-    tw_printf(g->x + 9, g->y+2, "%u", g->sat);
+    tw_printf(g->x + 11, g->y+2, "%u", g->sat);
     font_type = FONT_8x8;
-    tw_printf(g->x + 9, g->y + 12, "%2.2f", g->hdop);
+    tw_printf(g->x + 11, g->y + 12, "%2.2f", g->hdop);
 }
 
 void osd_battery_prerender( struct battery_widget_t *bw)
@@ -190,7 +190,7 @@ unsigned char mix;
         mix = 0;
 
  tw_osd_rectangle(s->x,s->y, 3*BAR_W + 8 , BAR_H, BACKROUND); //background
- tw_osd_rectangle(s->x+1, s->y+1, 3*BAR_W + 6,BAR_H-2, COLOR_WHITE | mix); //White border
+ //tw_osd_rectangle(s->x+1, s->y+1, 3*BAR_W + 6,BAR_H-2, COLOR_WHITE | mix); //White border
 
  font_type = FONT_SHADOW_8x8;
 
@@ -199,13 +199,13 @@ unsigned char mix;
  {
  case STATUS_OK:
      bar_color = COLOR_GREEN | mix;
-     disp_color = COLOR_WHITE | mix;
+     disp_color = COLOR_75_WHITE | mix;
      disp_color_background = COLOR_GREEN | mix;
      disp_color_shadow = COLOR_BLACK | mix;
      break;
  case STATUS_WARNING:
      bar_color = COLOR_DARK_YELLOW | mix;
-     disp_color = COLOR_WHITE | mix;
+     disp_color = COLOR_75_WHITE | mix;
      disp_color_background = COLOR_DARK_YELLOW | mix;
      disp_color_shadow = COLOR_BLACK | mix;
      break;
@@ -229,13 +229,13 @@ unsigned char mix;
  {
  case STATUS_OK:
      bar_color = COLOR_GREEN | mix;
-     disp_color = COLOR_WHITE | mix;
+     disp_color = COLOR_75_WHITE | mix;
      disp_color_background = COLOR_GREEN | mix;
      disp_color_shadow = COLOR_BLACK | mix;
      break;
  case STATUS_WARNING:
      bar_color = COLOR_DARK_YELLOW | mix;
-     disp_color = COLOR_WHITE | mix;
+     disp_color = COLOR_75_WHITE | mix;
      disp_color_background = COLOR_DARK_YELLOW | mix;
      disp_color_shadow = COLOR_BLACK | mix;
      break;
@@ -260,13 +260,13 @@ switch (s->vibe_status)
  {
  case STATUS_OK:
      bar_color = COLOR_GREEN | mix;
-     disp_color = COLOR_WHITE | mix;
+     disp_color = COLOR_75_WHITE | mix;
      disp_color_background = COLOR_GREEN | mix;
      disp_color_shadow = COLOR_BLACK | mix;
      break;
  case STATUS_WARNING:
      bar_color = COLOR_DARK_YELLOW | mix;
-     disp_color = COLOR_WHITE | mix;
+     disp_color = COLOR_75_WHITE | mix;
      disp_color_background = COLOR_DARK_YELLOW | mix;
      disp_color_shadow = COLOR_BLACK | mix;
      break;

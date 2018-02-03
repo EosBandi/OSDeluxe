@@ -56,6 +56,8 @@ struct osd_settings {
 
     bool          displayed_arming_status;
     unsigned long armed_start_time;
+
+    unsigned long last_capacity_query;
     //unsigned long 
    
 };

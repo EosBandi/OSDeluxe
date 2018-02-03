@@ -80,6 +80,7 @@ struct gps_widget_t {
     unsigned char sat_warn;
     float         hdop;
     float         hdop_warn;
+    unsigned char  fix;
     unsigned char color;
 };
 

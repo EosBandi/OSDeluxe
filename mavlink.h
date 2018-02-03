@@ -24,6 +24,7 @@ extern unsigned int mav_seq;
 
 void read_mavlink();
 void request_mavlink_rates(void);
+void request_mavlink_battery_capacity(void);
 void heartbeat_validation(void);
 unsigned long mavdata_age(unsigned int id);
 void mavlink_send_msg(mavlink_message_t *msg);

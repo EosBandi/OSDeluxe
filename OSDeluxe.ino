@@ -40,6 +40,8 @@ void setup ()
     Serial.begin (115200);
 
     Serial1.begin(115200);
+
+    //delay(5000);
 }
 
 void loop ()
@@ -167,6 +169,12 @@ while (1)
     //check heartbeat
     heartbeat_validation();
     if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
+
+    if ( (osd.bat.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) )
+    {
+      request_mavlink_battery_capacity();
+      debug("Requested Battery capacity\n");  
+    }
 
 }
 }
