@@ -28,6 +28,7 @@
 #define MAVLINK_USE_CONVENIENCE_FUNCTIONS
 #include "./mavlink_gen/mavlink_types.h"
 
+
 extern mavlink_system_t mavlink_system; //Ardupilot:7,1  Pixhawk:100,50
 extern mavlink_message_t msg; 
 extern mavlink_status_t mv_status;
@@ -53,7 +54,6 @@ void heartbeat_validation(void);
 unsigned long mavdata_age(unsigned int id);
 void mavlink_send_msg(mavlink_message_t *msg);
 
-void message_buffer_add_line(char *message);
 void heartbeat_out(void);
 
 
