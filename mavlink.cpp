@@ -406,7 +406,7 @@ void read_mavlink()
 
             }
             break;
-			/*
+			
             case MAVLINK_MSG_ID_PARAM_VALUE:
             {
                 char param_name[17];
@@ -418,7 +418,7 @@ void read_mavlink()
                     //debug("%i\n", osd.bat.max_capacity);
                 }
             }
-			*/
+			
             default:
                 // Do nothing
                 break;
