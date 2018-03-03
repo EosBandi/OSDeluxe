@@ -82,7 +82,7 @@ void loop ()
     tw_ch_settings (1, 1, 0);
     tw_ch_settings (2, 1, 1);
     tw_ch_settings (3, 1, 1);
-    tw_ch_settings (4, 0, 1);
+    tw_ch_settings (4, 1, 1);
 
 
     tw_ch_set_window (1, 0, 0, 180);
@@ -237,14 +237,14 @@ while (1)
             tw_ch_settings(3, 1, 1);
             tw_ch_settings(4, 1, 1);
             break;
-        case 1:
+        case 2:
 			//only first screen
             tw_ch_settings(1, 1, 0);
             tw_ch_settings(2, 0, 1);
             tw_ch_settings(3, 0, 1);
             tw_ch_settings(4, 0, 1);
             break;
-        case 2:
+        case 1:
 			//Disable fourth smalles screen
             tw_ch_settings(1, 1, 0);
             tw_ch_settings(2, 1, 1);
@@ -268,11 +268,12 @@ while (1)
         case 1:
 			tw_osd_set_display_page(0);
 			tw_osd_set_rec_field(FLD_EVEN);
-			osd.horizon.visible = true;
+			osd.horizon.visible = false;
 			break;
 		case 2:
 			tw_osd_set_display_page(1);
 			tw_osd_set_rec_field(FLD_ODD);
+			osd.horizon.visible = false;
 			break;
 		}
     }
