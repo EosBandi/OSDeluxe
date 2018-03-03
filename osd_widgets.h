@@ -178,6 +178,8 @@ struct horizon_t {
 
     int pitch;
     int roll;
+
+	bool visible;
 };
 
 struct mode_widget_t {

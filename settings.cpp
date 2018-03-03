@@ -133,6 +133,7 @@ void default_settings()
 
     osd.horizon.x = 146;
     osd.horizon.y = 145;
+	osd.horizon.visible = true;
 
 
     //osd.mode.mode_x =  57;

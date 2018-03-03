@@ -172,7 +172,9 @@ while (1)
 
     tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
     tw_wait_for_osd_write(20);
-    render_horizon(&osd.horizon);
+
+
+    if (osd.horizon.visible) render_horizon(&osd.horizon);
 
 
     osd_gps_render( &osd.gps );
@@ -197,23 +199,27 @@ while (1)
         osd.ctr_saved_state[0] = osd.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
         switch (osd.ctr_state[0])
         {
+
+		//Default view
+		// 1-front 2-right 3-left 4-Back 
         case 0:
             tw_set_ch_input(1, INPUT_CH_1);
             tw_set_ch_input(2, INPUT_CH_2);
             tw_set_ch_input(3, INPUT_CH_3);
             tw_set_ch_input(4, INPUT_CH_4);
             break;
+		// 1-back,2-right, 3-left, 4-front
         case 1:
-            tw_set_ch_input(1, INPUT_CH_2);
-            tw_set_ch_input(2, INPUT_CH_3);
-            tw_set_ch_input(3, INPUT_CH_1);
-            tw_set_ch_input(4, INPUT_CH_4);
+            tw_set_ch_input(1, INPUT_CH_4);
+            tw_set_ch_input(2, INPUT_CH_2);
+            tw_set_ch_input(3, INPUT_CH_3);
+            tw_set_ch_input(4, INPUT_CH_1);
             break;
         case 2:
-            tw_set_ch_input(1, INPUT_CH_3);
-            tw_set_ch_input(2, INPUT_CH_1);
-            tw_set_ch_input(3, INPUT_CH_2);
-            tw_set_ch_input(4, INPUT_CH_4);
+            tw_set_ch_input(1, INPUT_CH_4);
+            tw_set_ch_input(2, INPUT_CH_2);
+            tw_set_ch_input(3, INPUT_CH_3);
+            tw_set_ch_input(4, INPUT_CH_1);
             break;
         }
     }
@@ -225,22 +231,25 @@ while (1)
         switch (osd.ctr_state[1])
         {
         case 0:
+			//All four windows are visible
             tw_ch_settings(1, 1, 0);
             tw_ch_settings(2, 1, 1);
             tw_ch_settings(3, 1, 1);
-            tw_ch_settings(4, 0, 1);
+            tw_ch_settings(4, 1, 1);
             break;
         case 1:
+			//only first screen
             tw_ch_settings(1, 1, 0);
             tw_ch_settings(2, 0, 1);
             tw_ch_settings(3, 0, 1);
             tw_ch_settings(4, 0, 1);
             break;
         case 2:
+			//Disable fourth smalles screen
             tw_ch_settings(1, 1, 0);
             tw_ch_settings(2, 1, 1);
             tw_ch_settings(3, 1, 1);
-            tw_ch_settings(4, 1, 1);
+            tw_ch_settings(4, 0, 1);
             break;
         }
     }
@@ -254,14 +263,18 @@ while (1)
         case 0:
             tw_osd_set_display_page(0);
             tw_osd_set_rec_field(FLD_EVEN);
+			osd.horizon.visible = true;
             break;
         case 1:
-            tw_osd_set_display_page(1);
-            tw_osd_set_rec_field(FLD_ODD);
-            break;
-        case 2:
-            break;
-        }
+			tw_osd_set_display_page(0);
+			tw_osd_set_rec_field(FLD_EVEN);
+			osd.horizon.visible = true;
+			break;
+		case 2:
+			tw_osd_set_display_page(1);
+			tw_osd_set_rec_field(FLD_ODD);
+			break;
+		}
     }
 
     //Switch OSD_work_field for smooth redraw
