@@ -312,6 +312,32 @@ switch (s->vibe_status)
  
 }
 
+void osd_pull_prerender(struct pull_widget_t *pw) {}
+
+void osd_pull_render(struct pull_widget_t *pw)
+{
+
+	unsigned char mix;
+
+	if (pw->mix)
+		mix = MIX;
+	else
+		mix = 0;
+
+	font_type = FONT_16x8;
+	disp_color = COLOR_YELLOW | mix;
+	disp_color_background = BACKROUND;
+	disp_color_shadow = COLOR_BLACK | mix;
+
+	if (pw->pull >= pw->warning) disp_color = COLOR_RED | mix;
+
+	tw_osd_rectangle(pw->x, pw->y, 29, 10, BACKROUND);
+	tw_printf(pw->x + 1, pw->y + 2, "%2.2f N", pw->pull);
+
+}
+
+
+
 void osd_altitude_prerender( struct alt_widget_t *aw){}
 
 void osd_altitude_render( struct alt_widget_t *aw)
@@ -708,7 +734,7 @@ void osd_mode_render(struct mode_widget_t *mw)
         OSD_path = OSD_PATH_REC;
         OSD_work_field = FLD_EVEN;
 
-        tw_osd_rectangle(mw->mode_x / 2 - 10, mw->mode_y, 20, 13, 0xff);
+        tw_osd_rectangle(mw->mode_x / 2 - 15, mw->mode_y, 30, 13, 0xff);
         font_type = FONT_OUTLINE_16x12;
         rec_color = COLOR_REC_WHITE;
         rec_color_background = COLOR_REC_NONE;

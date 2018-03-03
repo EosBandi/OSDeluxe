@@ -167,6 +167,12 @@ void default_settings()
     osd.ctr_ch[3] = 13;
     
 
+	osd.pull.x = 7;
+	osd.pull.y = 105;
+	osd.pull.mix = false;
+	osd.pull.pull = 0;
+	osd.pull.warning = 7*9.8f;
+
 
 
 }

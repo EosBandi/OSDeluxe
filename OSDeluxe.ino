@@ -61,9 +61,14 @@ void setup ()
     Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 3000000, I2C_OP_MODE_IMM);
     Wire.setDefaultTimeout (10000); // 10ms
 
-    Serial.begin (115200);
 
+	//Open USB serial port for debug and UI
+    Serial.begin (115200);
+	//Open Serial1 port for MavLink communication
     Serial1.begin(115200);
+	//Open Serial 2 port for input from weight cell
+	Serial2.begin(115200);
+
 
     //delay(5000);
 }
@@ -179,6 +184,9 @@ while (1)
     osd_vario_render(&osd.vario);
     osd_home_render(&osd.home_w);
     osd_mode_render(&osd.mode);
+
+	osd_pull_render(&osd.pull);
+
     message_buffer_render();
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
@@ -271,9 +279,35 @@ while (1)
 
     //check heartbeat
     heartbeat_validation();
-
     if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
     if ( (osd.bat.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
+
+	if (Serial2.available() == 0) 
+	{
+		Serial2.write("X"); // Any character will generate reading
+	}
+	else
+	{
+		int b;
+		char read_buffer[10];
+
+		if (Serial2.available() > 16) {
+			Serial2.clear();
+		}
+		else {
+			b = 0;
+			while (Serial2.available())
+			{
+				read_buffer[b++] = Serial2.read();
+			}
+			read_buffer[b-1] = 0; //Null terminator
+			osd.pull.pull = atof(read_buffer) *9.8f;  //Convert to newtons
+			if (osd.pull.pull < 0) osd.pull.pull = 0;
+
+		}
+	}
+
+
 
 
 

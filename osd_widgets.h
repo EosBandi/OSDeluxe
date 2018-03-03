@@ -145,6 +145,15 @@ struct alt_widget_t {
     bool mix;
 };
 
+struct pull_widget_t {
+	unsigned short x;
+	unsigned short y;
+	float pull;
+	bool mix;
+	float warning;			//Warning level in Newtons
+};
+
+
 struct vario_widget_t {
     unsigned short x;
     unsigned short y;
@@ -220,6 +229,8 @@ void osd_center_marker();
 void render_horizon(struct horizon_t *horizon);
 void osd_mode_render( struct mode_widget_t *mw);
 
+void osd_pull_prerender(struct pull_widget_t *pw);
+void osd_pull_render(struct pull_widget_t *pw);
 
 void rc_control(void);
 

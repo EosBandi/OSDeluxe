@@ -44,6 +44,8 @@ struct osd_settings {
     home_widget_t home_w;
     horizon_t horizon;
     mode_widget_t mode;
+
+	pull_widget_t pull;
     
 
 
