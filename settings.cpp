@@ -93,11 +93,11 @@ void default_settings()
     osd.bat.y = 230;
     osd.bat.min_cell_voltage = 3.3;
     osd.bat.max_cell_voltage = 4.2;
-    osd.bat.red_cell_voltage = 3.5;
-    osd.bat.yellow_cell_voltage = 3.7;
+    osd.bat.red_cell_voltage = 3.6;
+    osd.bat.yellow_cell_voltage = 3.8;
     osd.bat.bar_type = BAR_SINGLE_COLOR;
     osd.bat.mix = 0;
-    osd.bat.cells = 3;
+    osd.bat.cells = 12;
 
     osd.bat.voltage = 23.4;
     osd.bat.current = 10.0;
