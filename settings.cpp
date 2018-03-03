@@ -86,8 +86,8 @@ void default_settings()
     osd.gps.y = 232;
     osd.gps.sat_warn = 5;
     osd.gps.color = COLOR_YELLOW;
-    osd.gps.sat = 10;
-    osd.gps.hdop = 0.21;
+    osd.gps.sat = 0;
+    osd.gps.hdop = 999;
     
     osd.bat.x = 145;
     osd.bat.y = 230;
@@ -99,10 +99,10 @@ void default_settings()
     osd.bat.mix = 0;
     osd.bat.cells = 12;
 
-    osd.bat.voltage = 23.4;
-    osd.bat.current = 10.0;
+    osd.bat.voltage = osd.bat.cells * 4.2;
+    osd.bat.current = 0.0;
     osd.bat.max_capacity = 0;
-    osd.bat.remaining_capacity = 50;
+    osd.bat.remaining_capacity = 100;
 
     osd.stat.x = 7;
     osd.stat.y = 253;
