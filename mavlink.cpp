@@ -123,7 +123,7 @@ void heartbeat_validation(void)
     unsigned long now;
 
     now = millis();
-    // if no mavlink update for 2 secs, show waring and request mavlink rate again
+    // if no mavlink update for 3 secs, show warning and request mavlink rate again
     if (now > (last_mav_beat + 3000))
     {
         if (waitingMAVBeats && (now > (last_nobeat_message + 5000)) )         //Do not flood message queue with No heartbeat messages
@@ -258,7 +258,6 @@ void read_mavlink()
                 osd.bat.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
                 osd.bat.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
                 osd.bat.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
-                //debug("%5.1f\n",osd.bat.current);
             }
             break;
 
@@ -373,11 +372,8 @@ void read_mavlink()
                     osd.home.direction -= osd.home.uav_heading;
                     if (osd.home.direction < 0) osd.home.direction += 360;
                     osd.home.distance = earth_distance(&osd.home.home_coord, &osd.home.uav_coord);
-
                     osd.home_w.home_distance = osd.home.distance;
                     osd.home_w.orientation = osd.home.direction;
-
-
                 }
             }
             break;
@@ -391,7 +387,8 @@ void read_mavlink()
                 osd.ekfterrain = (int)(mavlink_msg_ekf_status_report_get_terrain_alt_variance(&msg) * 100);
 
                 osd.stat.ekf_status = STATUS_OK;
-                if (osd.ekfvel > 50 ||
+
+				if (osd.ekfvel > 50 ||
                     osd.ekfposh > 50 ||
                     osd.ekfposv > 50 ||
                     osd.ekfcompass > 50 ||
@@ -402,20 +399,17 @@ void read_mavlink()
                     osd.ekfposv > 80 ||
                     osd.ekfcompass > 80 ||
                     osd.ekfterrain > 80) osd.stat.ekf_status = STATUS_CRITICAL;
-                    
-
             }
             break;
 			
+			//Process incoming parameter values (queried by the OSD)
             case MAVLINK_MSG_ID_PARAM_VALUE:
             {
                 char param_name[17];
                 mavlink_msg_param_value_get_param_id(&msg,(char *)param_name);
-                //debug("%s :",param_name);
                 if ( strcmp(param_name,"BATT_CAPACITY") == 0 )
                 {
                     osd.bat.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
-                    //debug("%i\n", osd.bat.max_capacity);
                 }
             }
 			
@@ -423,9 +417,10 @@ void read_mavlink()
                 // Do nothing
                 break;
             }
+			//Check for timeslot expiry
+			//Abandon MavLink reading if we used up our timeslot.
+
         }
-        // delayMicroseconds(138);
-        // next one
     }
     // Update global packet drops counter
     packet_drops += mv_status.packet_rx_drop_count;

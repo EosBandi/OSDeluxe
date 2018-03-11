@@ -36,80 +36,111 @@ unsigned char disp_color_shadow, disp_color, disp_color_background;
 
 FontType font_type; // Global variable to hold current font_type
 
-void tw_init ()
+void tw_init()
 {
 
-    tw_write_register (0x100, 0x80);
-    tw_write_register (0x17e, 0x89);
-    tw_write_register (0x17f, 0x84);
 
-    cnt = 0;
-    data_buf[cnt++] = 0x60; // a0 volt 77
-    data_buf[cnt++] = 0x11; // a1
-    data_buf[cnt++] = 0x90; // a2
-    data_buf[cnt++] = 0x01; // a3
-    data_buf[cnt++] = 0x80; // a4
-    data_buf[cnt++] = 0x20; // a5  //0x20
-    data_buf[cnt++] = 0x00; // a6
-    data_buf[cnt++] = 0x0C; // a7
-    data_buf[cnt++] = 0x20; // a8
-    data_buf[cnt++] = 0x4d; // a9  4c
-    tw_write_buf (0x1a0, data_buf, cnt);
+	//Output video format selection
+	//bit 7 - 1-50Hz, 625 line
+	tw_write_register(0x100, 0x80);
+	//Start memory init (SDRAM)
+	tw_write_register(0x17f, 0x80);
 
-    cnt = 0;
-    data_buf[cnt++] = 0x20;
-    data_buf[cnt++] = 0x28;
+	//Enable black background for channels with no video
+	tw_write_register(0x0c3, 0xf0);
 
-    tw_write_buf (0x005, data_buf, cnt);
-    tw_write_buf (0x015, data_buf, cnt);
-    tw_write_buf (0x025, data_buf, cnt);
-    tw_write_buf (0x035, data_buf, cnt);
 
-    cnt = 0;
-    data_buf[cnt++] = 0x90;
-    data_buf[cnt++] = 0x02;
-    data_buf[cnt++] = 0x00;
-    data_buf[cnt++] = 0x91;
-    data_buf[cnt++] = 0x02;
-    data_buf[cnt++] = 0x00;
-    data_buf[cnt++] = 0x93;
-    data_buf[cnt++] = 0x02;
-    data_buf[cnt++] = 0x00;
-    data_buf[cnt++] = 0x94;
-    data_buf[cnt++] = 0x02;
-    data_buf[cnt++] = 0x00;
-    tw_write_buf (0x160, data_buf, cnt);
 
-    tw_write_register (0x001, 0x00);
-    tw_write_register (0x080, 0x00);
-    tw_write_register (0x110, 0x00);
-    //tw_write_register (0x111, 0x00);
-    tw_write_register (0x111, 0b00001010);
-    tw_write_register (0x112, 0x00); //00
+
+
+	static unsigned char pg1_a0_video_path[] =
+	{
+		0x60,		// a0  bit67-INX - bit54-INY 
+		0x11,		// a1  1 CBVS output for both VAOYX and VAOCX DAV
+		0x90,		// a2  1 CVBS display path for VAOYY (bit7 must be 1)
+		0x00,		// a3  Digital output setting (0 disable)
+		0x80,		// a4  Enable Master mode 
+		0x20,		// a5  Vertical sync delay (0x20 - default)
+		0x00,		// a6  Horizontal sync delay (0x00 - default)
+		0x0c,		// a7  Active video delay (0x0c - default)
+		0x20,		// a8  ACTIVE_HDELAY (0x20 - default)
+		0x4d,		// a9  bit7-6 color subcarrier (1 for pal), bi54-0, bit3-1, 
+		0xaa,		// aa  Video encode chrominance bandwidth
+		0x00		// ab  No color kill and no test bar
+	};
+
+	tw_write_buf(0x1a0, pg1_a0_video_path, sizeof(pg1_a0_video_path));
+
+	//video decoder settings Same for all channels
+	static unsigned char pg0_00_decoder_settings[] =
+	{ 0x00,		//00	Read only, no need   
+		0x88,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
+		0x20,		//02	Hdelay
+		0xd0,		//03    HActive
+		0x05,		//04    Vdelay
+		0x20,		//05    VActive
+		0x28,		//06    Extra bits for the four above
+		0x80,		//07    Hue for NTSC system (no need on PAL)
+		0x8f,       //08    Bit7 NTSC SCURVE, bit6 Internal, bit5-4 CTI level (1h) bit3-0 sharpnedd 
+		0x80,		//09	Contrast 0x80 is default
+		0x00,		//0a    Brightness 0x80 is no changes
+		0x80,		//0b    Saturation Cb
+		0x80,		//0c    Saturation Cr
+		0x00,		//0d
+		0x17		//0e
+	};
+
+	tw_write_buf(0x000, pg0_00_decoder_settings, sizeof(pg0_00_decoder_settings));
+	tw_write_buf(0x010, pg0_00_decoder_settings, sizeof(pg0_00_decoder_settings));
+	tw_write_buf(0x020, pg0_00_decoder_settings, sizeof(pg0_00_decoder_settings));
+	tw_write_buf(0x030, pg0_00_decoder_settings, sizeof(pg0_00_decoder_settings));
+
+
+												//    |       ch1      ||      ch2       ||     ch3        ||     c4
+												//	   0x60  0x61  0x62  0x63  0x64  0x65  0x66  0x67  0x68  0x69  0x6a  0x6b
+	static unsigned char pg1_60_channel_settings[] = { 0x90, 0x02, 0x00, 0x91, 0x02, 0x00, 0x93, 0x02, 0x00, 0x94, 0x02, 0x00 };
+	
+	tw_write_buf(0x160, pg1_60_channel_settings, sizeof(pg1_60_channel_settings));
+
+	tw_write_register(0x105, 0b00000100); // bypass mode when video loss is detected
+
+
+	//Input selection for each scaler in the display path
+	tw_write_register(0x080, 0x00);   //ch0 scaler - VIN0 pin
+	tw_write_register(0x090, 0x40);   //ch1 scaler - VIN1 pin
+	tw_write_register(0x0a0, 0x80);   //ch2 scaler - VIN2 pin
+	tw_write_register(0x0b0, 0xc0);   //ch3 scaler - VIN3 pin
+		
+	//Channel mode selection
+	tw_write_register(0x110, 0x00);	  //channel 0 disable, no popup   bit7-enable, bit6-popup, bit1-0 As see below
+	tw_write_register(0x118, 0x01);   //channel 1 disable, no popup
+	tw_write_register(0x120, 0x02);   //channel 2 disable, no popup
+	tw_write_register(0x128, 0x03);   //channel 3 disable, no popup
+
+	//Channel settings
+	// bit7 - Recall_en, bit6-freeze, bit5-H_mirror, bit4-v_mirror,bit3-enhance, bit2-blank, bit1-boundary, bit0-boundary blink 
+	tw_write_register(0x111, 0x0a); //enhance and boundary
+	tw_write_register(0x119, 0x0a);
+	tw_write_register(0x121, 0x0a);
+	tw_write_register(0x129, 0x0a);
+
+    //Channel conversion registers
+	// bi7-0, bit6-0, bit5-field to frame mode, bit4-DVR to normal mode, bit3-0 Recall address (must be 0)
+	tw_write_register(0x112, 0x00); 
+	tw_write_register(0x11A, 0x00);
+	tw_write_register(0x122, 0x00);
+	tw_write_register(0x12a, 0x00);
+
+	//Channel strobe, do not change
     tw_write_register (0x116, 0x00);
-
-    tw_write_register (0x011, 0x08);
-    tw_write_register (0x090, 0x40);    //input was 0x40
-    tw_write_register (0x118, 0x01);
-    tw_write_register (0x119, 0x0a);
-    tw_write_register (0x11A, 0x00);
     tw_write_register (0x11e, 0x01);
-
-    tw_write_register (0x021, 0x08);
-    tw_write_register (0x0a0, 0x80);   //inpur was 0x80
-    tw_write_register (0x120, 0x02);
-    tw_write_register (0x121, 0x0a);
-    tw_write_register (0x122, 0x00);
     tw_write_register (0x126, 0x02);
-
-    tw_write_register (0x031, 0x08);
-    tw_write_register (0x0b0, 0xc0);   //input was 0xc0
-    tw_write_register (0x128, 0x03);
-    tw_write_register (0x129, 0x0a);
-    tw_write_register (0x12a, 0x00);
     tw_write_register (0x12e, 0x03);
 
+
+	//Select OSD reading page and OSD overlay mode
     tw_write_register (0x20F, 0x0F);
+
 
     for (char i = 0; i < 14; i++)
     {
@@ -140,14 +171,10 @@ void tw_init ()
         tw_write_buf (ADDR_buf, data_buf, cnt);
     }
 
-    tw_write_register (0x283, 0x05);
-    tw_write_register (0x001, 0b00001000);
-    tw_write_register (0x011, 0b00001000);
-    tw_write_register (0x021, 0b00001000);
-    tw_write_register (0x031, 0b00001000);
 
-    tw_write_register (0x0c3, 0b11110000);
-    tw_write_register (0x0c4, 0x00);
+
+    tw_write_register (0x283, 0x05);
+
 
     tw_write_register (0x21f, 0b00010011); // bitmap opacity
     tw_write_register (0x221, 0b01010000); // Red for box 1
@@ -155,27 +182,10 @@ void tw_init ()
     tw_write_register (0x223, 180);
     tw_write_register (0x225, 144);
 
-    //tw_write_register (0x220, 0b00111000);
-
-    tw_write_register (0x105, 0b00000100); // bypass mode when video loss is detected
-
-    tw_write_register (0x00d, 0x03);
-    tw_write_register (0x01d, 0x03);
-    tw_write_register (0x02d, 0x03);
-    tw_write_register (0x03d, 0x03);
-
-    // tw_write_register(0x047,0b01100010); //Reduce disp_color noise
-
-    // tw_write_register(0x1aa,0b10001000); //Output bandwith Narrow filter
-    tw_write_register(0x1aa,0b10101010); //Output bandwith Middle filter
-
-
 
     // Enable overlays dual mode high priority
     tw_write_register (0x238, 0b00000101);
 
-
-    // tw_write_register(0x1ab,0b00001010);
 //    OSD_display_field = 1;
 //    TW2823_OSD_display_on (OSD_display_field); // this switch OSD off
 //    OSD_work_field = 1;
