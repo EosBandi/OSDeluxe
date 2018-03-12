@@ -1235,21 +1235,98 @@ void tw_set_ch_input(char ch, input_channel input)
     }
 }
 
+
+void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y)
+{
+	unsigned char low, up;
+	unsigned char reg209;
+	unsigned char reg24e;
+
+
+	low = start_x & 0x00ff;
+	tw_write_register(0x205, low);
+
+	low = start_y & 0x00ff;
+	tw_write_register(0x207, low);
+
+	low = end_x & 0x00ff;
+	tw_write_register(0x206, low);
+
+	low = end_y & 0x00ff;
+	tw_write_register(0x208, low);
+	
+	reg209 = (((start_y >> 8) & 0x03) << 2)  + ((end_y >> 8) & 0x03);
+	if (OSD_work_field == FLD_EVEN) reg209 = reg209 | 0b00001000;
+	else reg209 = reg209 & 0b11110111;
+
+	tw_write_register(0x209, reg209);
+
+	reg24e = (((start_x >> 8) & 0x03) << 6) + (((end_x >> 8) & 0x03) << 4);
+	tw_write_register(0x24e, reg24e);
+	
+	debug("reg209:%u  reg24e:%u\n", reg209, reg24e);
+
+
+}
+
+
 void tw_display_logo()
 {
-
+	
     int a = 0;
+	unsigned int start_x, start_y, end_x, end_y;
 
-    for (int y = 0; y < 100; y++)
-    {
-        for (int i = 0; i < 50; i++)
-        {
-            tw_set_osd_buf(logo[a++], logo[a++], logo[a++], logo[a++]);
-            tw_wr_display_from_buffer(50 + i, y+50, 0);
-            
+	debug("- %lu\n", millis());
 
-        }
-    }
+	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
+	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
+
+	tw_ext_set_pos_registers(0, 0, 255, 143);
+
+	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+
+
+	for (int i = 0; i < sizeof(outline_block); i++)
+	{
+		unsigned char c = outline_block[i];
+//		if (c == 0) c = 0xff;
+//		if (c == 1) c = COLOR_YELLOW;
+//		if (c == 2) c = COLOR_WHITE;
+
+		tw_write_register(0x200, c);
+	}
+
+	//And now from Scratch to display
+	debug("- %lu\n", millis());
+
+	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
+	tw_write_register(0x241, 0x03);	 // OSD_OPMODE = 3 (Block move)
+
+	tw_ext_set_pos_registers(100, 300, 355, 443);
+	
+	tw_write_register(0x24c, 0);
+	tw_write_register(0x24d, 0);
+
+
+	tw_write_register(0x24f, 0x05);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+
+	debug("- %lu\n", millis());
+	delay(100);
+
+	/*
+	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
+	tw_write_register(0x241, 0x02);	 // OSD_OPMODE = 2 block fill)
+	tw_write_register(0x243, COLOR_RED);
+
+	tw_ext_set_pos_registers(0, 0, 719, 500);
+	tw_write_register(0x24f, 0x05);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+	*/
+
+
+
+
+
+
 }
 
 
@@ -1273,3 +1350,6 @@ void tw_clear_all_pages(void)
 
     tw_osd_set_display_page(0);
 }
+
+
+

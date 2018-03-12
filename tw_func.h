@@ -25,6 +25,9 @@
 #ifndef _TW_FUNC_H_
 #define _TW_FUNC_H_
 
+
+//OSD registers
+
 #define COLOR_BLACK      0
 #define COLOR_25_WHITE   1
 #define COLOR_50_WHITE   2
@@ -206,4 +209,9 @@ void tw_osd_fill_region(unsigned int x1,unsigned int y1,unsigned int x2,unsigned
 void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
 
 void tw_display_logo();
+
+void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y);
+
+
+
 #endif

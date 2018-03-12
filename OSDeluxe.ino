@@ -58,7 +58,7 @@ void setup ()
     delay (500);
 
     // Setup for Master mode, pins 18/19, external pullups, 400kHz, 10ms default timeout
-    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 3000000, I2C_OP_MODE_IMM);
+    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 3000000, I2C_OP_MODE_ISR);
     Wire.setDefaultTimeout (10000); // 10ms
 
 
@@ -80,9 +80,9 @@ void loop ()
 
     
     tw_ch_settings (1, 1, 0);
-    tw_ch_settings (2, 1, 1);
-    tw_ch_settings (3, 1, 1);
-    tw_ch_settings (4, 1, 1);
+    tw_ch_settings (2, 0, 1);
+    tw_ch_settings (3, 0, 1);
+    tw_ch_settings (4, 0, 1);
 
 
     tw_ch_set_window (1, 0, 0, 180);
@@ -163,9 +163,29 @@ memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
 osd.message_buffer_line = 0;
 osd.message_buffer_display_time = 0;
 
+////TBD!!!!!
+tw_osd_set_display_field(OSD_display_field);
+
+
 init_home();
 
 long t, l;
+
+tw_osd_fill_region(0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
+tw_wait_for_osd_write(20);
+delay(2000);
+
+tw_display_logo();
+
+
+
+
+
+
+// eddig es ne tovabb
+while (1);
+
+
 
 while (1)
 {

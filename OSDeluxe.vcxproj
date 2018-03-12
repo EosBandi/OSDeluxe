@@ -375,7 +375,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties custom_teensy31_speed="120" arduino.upload.port="COM14" />
+      <UserProperties custom_teensy31_speed="120" arduino.upload.port="COM6" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
