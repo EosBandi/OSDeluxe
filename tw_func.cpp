@@ -1259,6 +1259,7 @@ void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsign
 	if (OSD_work_field == FLD_EVEN) reg209 = reg209 | 0b00001000;
 	else reg209 = reg209 & 0b11110111;
 
+
 	tw_write_register(0x209, reg209);
 
 	reg24e = (((start_x >> 8) & 0x03) << 6) + (((end_x >> 8) & 0x03) << 4);
@@ -1288,7 +1289,7 @@ void tw_display_logo()
 
 	for (int i = 0; i < sizeof(outline_block); i++)
 	{
-		unsigned char c = outline_block[i];
+		unsigned char c = 1;
 //		if (c == 0) c = 0xff;
 //		if (c == 1) c = COLOR_YELLOW;
 //		if (c == 2) c = COLOR_WHITE;
@@ -1302,10 +1303,11 @@ void tw_display_logo()
 	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
 	tw_write_register(0x241, 0x03);	 // OSD_OPMODE = 3 (Block move)
 
-	tw_ext_set_pos_registers(100, 300, 355, 443);
+	tw_ext_set_pos_registers(100, 100, 355, 243);
 	
 	tw_write_register(0x24c, 0);
 	tw_write_register(0x24d, 0);
+
 
 
 	tw_write_register(0x24f, 0x05);  // OSD_DSTLOC = 1, OSD_OPSTART = 1

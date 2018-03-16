@@ -164,7 +164,7 @@ osd.message_buffer_line = 0;
 osd.message_buffer_display_time = 0;
 
 ////TBD!!!!!
-tw_osd_set_display_field(OSD_display_field);
+tw_osd_set_display_field(OSD_work_field);
 
 
 init_home();
@@ -173,9 +173,12 @@ long t, l;
 
 tw_osd_fill_region(0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
 tw_wait_for_osd_write(20);
-delay(2000);
+//delay(2000);
 
-tw_display_logo();
+
+
+
+//tw_display_logo();
 
 
 
@@ -183,7 +186,7 @@ tw_display_logo();
 
 
 // eddig es ne tovabb
-while (1);
+//while (1);
 
 
 
