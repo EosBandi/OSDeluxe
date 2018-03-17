@@ -77,31 +77,21 @@ void loop ()
 {
 
     tw_init ();
+	//init_scratch_memory();
 
-    
-    tw_ch_settings (1, 1, 0);
-    tw_ch_settings (2, 0, 1);
-    tw_ch_settings (3, 0, 1);
-    tw_ch_settings (4, 0, 1);
+
+
+
+    tw_ch_settings (1, CH_ON, CH_NO_POPUP);
+    tw_ch_settings (2, CH_OFF, CH_POPUP);
+    tw_ch_settings (3, CH_OFF, CH_POPUP);
+    tw_ch_settings (4, CH_OFF, CH_POPUP);
 
 
     tw_ch_set_window (1, 0, 0, 180);
     tw_ch_set_window (2, 4, 0 , 64);
     tw_ch_set_window (3, 116, 0, 64);
     tw_ch_set_window (4, 68, 0, 48);
-/*
-    tw_write_register(0x081,0xff);
-    tw_write_register(0x082,0xff);
-
-    tw_write_register(0x083,0xff);
-    tw_write_register(0x084,0xff);
-
-    tw_write_register(0x130,0x00);
-    tw_write_register(0x131,0xb4);
-    tw_write_register(0x132,0x00);
-    tw_write_register(0x133,0x90);
-    
-*/
 
     tw_set_ch_input(1,INPUT_CH_1);
     tw_set_ch_input(2,INPUT_CH_2);
@@ -110,7 +100,8 @@ void loop ()
 
 
     tw_write_register(0x0c8,0x03);
-            
+	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
+	tw_write_register(0x1aa, 0xBB);  // middle bandwith for Y DAC, reduce color crawl
 
     digitalWrite (LED_PIN, HIGH);
 
@@ -124,18 +115,7 @@ void loop ()
 
 
     tw_clear_all_pages();
-    /*
-    // Clear OSD on display path both fields
-    tw_osd_fill_region (0, 0, 179, 287, 0xff, FLD_EVEN, OSD_PATH_DISP);
-    tw_wait_for_osd_write (100);
-    tw_osd_fill_region (0, 0, 179, 287, 0xff, FLD_ODD, OSD_PATH_DISP);
-    tw_wait_for_osd_write (100);
-    // Clear OSD on record path both fields
-    tw_osd_fill_region (0, 0, 89, 287, 0xff, FLD_EVEN, OSD_PATH_REC);
-    tw_wait_for_osd_write (100);
-    tw_osd_fill_region (0, 0, 89, 287, 0xff, FLD_ODD, OSD_PATH_REC);
-    tw_wait_for_osd_write (100);
-*/
+
     OSD_path = OSD_PATH_DISP;
     OSD_work_field = FLD_EVEN;
 
@@ -163,17 +143,20 @@ memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
 osd.message_buffer_line = 0;
 osd.message_buffer_display_time = 0;
 
-////TBD!!!!!
-tw_osd_set_display_field(OSD_work_field);
-
+////Ez torolni
+//tw_osd_set_display_field(OSD_work_field);
 
 init_home();
 
-long t, l;
-
-tw_osd_fill_region(0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
-tw_wait_for_osd_write(20);
+//Ezt is torolni
+//tw_osd_fill_region(0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
+//tw_wait_for_osd_write(20);
 //delay(2000);
+//font_type = FONT_OUTLINE_16x12;
+//disp_color = COLOR_WHITE;
+//debug("normal write start - %lu\n", millis());
+//tw_printf(20, 40, "IMU0: In flight calibration completed !");
+//debug("normal write end - %lu\n", millis());
 
 
 
@@ -196,23 +179,36 @@ while (1)
     tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
     tw_wait_for_osd_write(20);
 
-
+	//debug("fill:%lu\n", millis() - now); now = millis();
     if (osd.horizon.visible) render_horizon(&osd.horizon);
+	//debug("horizon:%lu\n", millis() - now); now = millis();
 
 
     osd_gps_render( &osd.gps );
-    osd_battery_prerender(&osd.bat);
-    osd_home_prerender(&osd.home_w);
-    osd_battery_render(&osd.bat);
-    osd_status_render(&osd.stat);
-    osd_altitude_render(&osd.alt);
-    osd_vario_render(&osd.vario);
-    osd_home_render(&osd.home_w);
-    osd_mode_render(&osd.mode);
+	//debug("gps:%lu\n", millis() - now); now = millis();
+	osd_battery_prerender(&osd.bat);
+	//debug("battery pre:%lu\n", millis() - now); now = millis();
+	osd_home_prerender(&osd.home_w);
+	//debug("home_pre:%lu\n", millis() - now); now = millis();
+	osd_battery_render(&osd.bat);
+	//debug("battery:%lu\n", millis() - now); now = millis();
+	osd_status_render(&osd.stat);
+	//debug("status:%lu\n", millis() - now); now = millis();
+	osd_altitude_render(&osd.alt);
+	//debug("altitude:%lu\n", millis() - now); now = millis();
+	osd_vario_render(&osd.vario);
+	//debug("vario:%lu\n", millis() - now); now = millis();
+	osd_home_render(&osd.home_w);
+	//debug("home:%lu\n", millis() - now); now = millis();
+	osd_mode_render(&osd.mode);
+	//debug("mode:%lu\n", millis() - now); now = millis();
 
 	osd_pull_render(&osd.pull);
+	//debug("pull:%lu\n", millis() - now); now = millis();
 
     message_buffer_render();
+	//debug("messages:%lu\n", millis() - now); now = millis();
+	//debug("--------------------------\n");
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
@@ -344,6 +340,22 @@ while (1)
 		}
 	}
 
+
+	if (Serial.available() != 0)
+	{
+		char ch = Serial.read();
+		if (ch == '1') {
+			tw_write_register(0x1aa, 0xAA);
+			debug("ON\n");
+		}
+		else 
+		{
+			
+			debug("OFF\n");
+		}
+	}
+
+	//debug("Loop time: %lu\n", millis() - lt);
 
 
 

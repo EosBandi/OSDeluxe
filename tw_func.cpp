@@ -73,22 +73,23 @@ void tw_init()
 
 	//video decoder settings Same for all channels
 	static unsigned char pg0_00_decoder_settings[] =
-	{ 0x00,		//00	Read only, no need   
-		0x88,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
-		0x20,		//02	Hdelay
+	{   0x00,		//00	Read only, no need   
+		0x00,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
+		0x0a,		//02	Hdelay
 		0xd0,		//03    HActive
 		0x05,		//04    Vdelay
 		0x20,		//05    VActive
 		0x28,		//06    Extra bits for the four above
-		0x80,		//07    Hue for NTSC system (no need on PAL)
-		0x8f,       //08    Bit7 NTSC SCURVE, bit6 Internal, bit5-4 CTI level (1h) bit3-0 sharpnedd 
+		0x00,		//07    Hue for NTSC system (no need on PAL)
+		0x3f,       //08    Bit7 NTSC SCURVE, bit6 Internal, bit5-4 CTI level (1h) bit3-0 sharpnedd 
 		0x80,		//09	Contrast 0x80 is default
 		0x00,		//0a    Brightness 0x80 is no changes
-		0x80,		//0b    Saturation Cb
-		0x80,		//0c    Saturation Cr
-		0x00,		//0d
-		0x17		//0e
+		0x50,		//0b    Saturation Cb
+		0x50,		//0c    Saturation Cr
+		0x00,		//0d    Read Only
+		0x07		//0e    Standard Auto detection
 	};
+
 
 	tw_write_buf(0x000, pg0_00_decoder_settings, sizeof(pg0_00_decoder_settings));
 	tw_write_buf(0x010, pg0_00_decoder_settings, sizeof(pg0_00_decoder_settings));
@@ -138,11 +139,16 @@ void tw_init()
     tw_write_register (0x12e, 0x03);
 
 
+	//Power down audio dac and adc
+	tw_write_register(0x04c, 0b00110000);
+
+
+
 	//Select OSD reading page and OSD overlay mode
     tw_write_register (0x20F, 0x0F);
 
 
-    for (char i = 0; i < 14; i++)
+    for (char i = 0; i < 18; i++)
     {
         ADDR_buf = 0x20B;
         cnt = 0;
@@ -156,6 +162,7 @@ void tw_init()
         cnt++;
         tw_write_buf (ADDR_buf, data_buf, cnt);
     }
+
     for (char i = 0; i < 4; i++)
     {
         ADDR_buf = 0x20B;
@@ -202,12 +209,12 @@ void tw_set_attrib (char _color, char _bgcolor, char _fontsize)
     font_type = (FontType)_fontsize;
 }
 
-void tw_puts (char *str, char posx, unsigned short posy)
+void tw_puts (char *str, unsigned short posx, unsigned short posy)
 {
 
     char inc  = 0; //Character width in posx units (OSD PATH:4pixel, REC PATH:8pixel)
     char kf_a = 0; //Addtional krening in posx units (see above);
-    char _posX = posx;
+	unsigned short _posX = posx;
 
 
 
@@ -232,12 +239,16 @@ void tw_puts (char *str, char posx, unsigned short posy)
     case FONT_OUTLINE_16x12c:
         if (OSD_path == 0) inc = 3; else inc = 2;
         break;
+	case FONT_QUICK:
+		inc = 14;
+		break;
     
     }
 
     for (char a = 0; a < strlen (str); a++)
     {
-        tw_osd_out_char (_posX, posy, str[a]);
+        if (font_type!=FONT_QUICK) tw_osd_out_char (_posX, posy, str[a]);
+		else tw_ext_putchar(_posX, posy, str[a]);
         _posX = _posX + inc;
     }
 }
@@ -533,15 +544,6 @@ void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsi
 
     m16 = w % 16;
 
-          /*
-          if (OSD_path == OSD_PATH_REC)
-          {
-              x = x / 2;
-              w = w / 2;
-          }
-
-      */
-
     if ((m16 == 10) || (m16 == 12) || (m16 == 13))
     {
         tw_osd_fill_region(x, y, x + w - 5, y + h, color, OSD_work_field, OSD_path,0);
@@ -550,11 +552,12 @@ void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsi
     else { tw_osd_fill_region(x, y, x + w, y + h, color, OSD_work_field, OSD_path,0); }
 }
 
+
 void tw_osd_fill_region (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char disp_color, unsigned char _field, unsigned char path, unsigned char rd_page)
 {
     unsigned char reg209;
     unsigned char reg20a;
-    unsigned char m16;
+
 
     cnt = 0;
     data_buf[cnt++] = disp_color;
@@ -1236,11 +1239,15 @@ void tw_set_ch_input(char ch, input_channel input)
 }
 
 
-void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y)
+void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int xw, unsigned int yw)
 {
 	unsigned char low, up;
 	unsigned char reg209;
 	unsigned char reg24e;
+	unsigned int end_x, end_y;
+
+	end_x = start_x + xw;
+	end_y = start_y + yw;
 
 
 	low = start_x & 0x00ff;
@@ -1265,72 +1272,164 @@ void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsign
 	reg24e = (((start_x >> 8) & 0x03) << 6) + (((end_x >> 8) & 0x03) << 4);
 	tw_write_register(0x24e, reg24e);
 	
-	debug("reg209:%u  reg24e:%u\n", reg209, reg24e);
 
 
 }
 
 
-void tw_display_logo()
+void init_scratch_memory()
 {
-	
-    int a = 0;
-	unsigned int start_x, start_y, end_x, end_y;
 
-	debug("- %lu\n", millis());
+	bool led_state = LOW;
+
+	// 0, 0 white with transparent background
+	// 256, 0 red with transparent background
+	// 512, 0 white with mixed background
+	// 768, 0 red with mixed background
+	// 0, 144 red with blinking 
+
+
+	//Upload character sets to scratch ram
+
+	//And now from Scratch to display
+	debug("table fill start - %lu\n", millis());
+	unsigned long now = millis();
+
 
 	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
 	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
-
 	tw_ext_set_pos_registers(0, 0, 255, 143);
 
 	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-
-
 	for (int i = 0; i < sizeof(outline_block); i++)
 	{
-		unsigned char c = 1;
-//		if (c == 0) c = 0xff;
-//		if (c == 1) c = COLOR_YELLOW;
-//		if (c == 2) c = COLOR_WHITE;
-
+		unsigned char c = outline_block[i];
+		if (c == 1) c = COLOR_WHITE;
 		tw_write_register(0x200, c);
 	}
 
-	//And now from Scratch to display
-	debug("- %lu\n", millis());
+	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
+	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
+	tw_ext_set_pos_registers(256, 0, 255, 143);
+
+	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+	for (int i = 0; i < sizeof(outline_block); i++)
+	{
+		unsigned char c = outline_block[i];
+		if (c == 1) c = COLOR_RED;
+		tw_write_register(0x200, c);
+	}
 
 	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
-	tw_write_register(0x241, 0x03);	 // OSD_OPMODE = 3 (Block move)
+	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
+	tw_ext_set_pos_registers(512, 0, 255, 143);
 
-	tw_ext_set_pos_registers(100, 100, 355, 243);
-	
-	tw_write_register(0x24c, 0);
-	tw_write_register(0x24d, 0);
+	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+	for (int i = 0; i < sizeof(outline_block); i++)
+	{
+		unsigned char c = outline_block[i];
+		if (c == 1) c = COLOR_WHITE;
+		if (c == 0xff) c = COLOR_50_WHITE | MIX;
+		tw_write_register(0x200, c);
+	}
 
 
-
-	tw_write_register(0x24f, 0x05);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-
-	debug("- %lu\n", millis());
-	delay(100);
-
-	/*
 	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
-	tw_write_register(0x241, 0x02);	 // OSD_OPMODE = 2 block fill)
-	tw_write_register(0x243, COLOR_RED);
+	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
+	tw_ext_set_pos_registers(768, 0, 255, 143);
 
-	tw_ext_set_pos_registers(0, 0, 719, 500);
-	tw_write_register(0x24f, 0x05);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-	*/
+	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+	for (int i = 0; i < sizeof(outline_block); i++)
+	{
+		unsigned char c = outline_block[i];
+		if (c == 1) c = COLOR_RED;
+		if (c == 0xff) c = COLOR_50_WHITE | MIX;
+		tw_write_register(0x200, c);
+	}
 
+	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
+	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
+	tw_ext_set_pos_registers(0, 144, 255, 143);
 
-
-
-
+	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+	for (int i = 0; i < sizeof(outline_block); i++)
+	{
+		unsigned char c = outline_block[i];
+		if (c == 1) c = COLOR_RED | BLINK;
+		if (c == 0xff) c = COLOR_50_WHITE | BLINK;
+		if (c == 0x00) c = COLOR_BLACK | BLINK;
+		tw_write_register(0x200, c);
+	}
+	tw_write_register(0x240, 0x00);  // OSD_EXTOP_EN = 1
 
 }
 
+void tw_ext_putchar(unsigned int x, unsigned int y, char chr)
+{
+	x = x * 4;
+	y = y * 2;
+	chr = chr - 32;
+	tw_ext_block_move_scratch_to_osd(x, y, 15, 23, (chr % 16) * 16, ((chr / 16) * 24));
+}
+
+
+
+void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsigned int width, unsigned int height, unsigned int src_hpos, unsigned int src_vpos)
+{
+
+
+	unsigned char reg205, reg206, reg207, reg208, reg209, reg24c, reg24d, reg24e, reg24f;
+	unsigned int end_hpos, end_vpos;
+
+	end_hpos = hpos + width;
+	end_vpos = vpos + height;
+
+	reg205 = hpos & 0xff;
+	reg206 = end_hpos & 0xff;
+	reg207 = vpos & 0xff;
+	reg208 = end_vpos & 0xff;
+	reg209 = (((vpos >> 8) & 0x03) << 2) + ((end_vpos >> 8) & 0x03);
+	if (OSD_work_field == FLD_EVEN) reg209 = reg209 | 0b00001000;
+	else reg209 = reg209 & 0b11110111;
+
+	reg24c = src_hpos & 0xff;
+	reg24d = src_vpos & 0xff;
+
+	reg24e = (((hpos >> 8) & 0x03) << 6) +
+		(((end_hpos >> 8) & 0x03) << 4) +
+		(((src_vpos >> 8) & 0x03) << 2) +
+		((src_hpos >> 8) & 0x03);
+
+	cnt = 0;
+	data_buf[cnt++] = 0x01;			// OSD_EXTOP_EN = 1;
+	data_buf[cnt++] = 0x03;		    // OSD_OPMODE = 3 Block move
+	tw_write_buf(0x240, data_buf, cnt);
+
+
+	cnt = 0;
+	data_buf[cnt++] = reg205;
+	data_buf[cnt++] = reg206;
+	data_buf[cnt++] = reg207;
+	data_buf[cnt++] = reg208;
+	data_buf[cnt++] = reg209;
+	if (OSD_path == OSD_PATH_REC)
+		data_buf[cnt++] = 0b00100000;
+	else
+		data_buf[cnt++] = 0b00000000;
+
+	tw_write_buf(0x205, data_buf, cnt);
+
+	cnt = 0;
+	data_buf[cnt++] = reg24c;
+	data_buf[cnt++] = reg24d;
+	data_buf[cnt++] = reg24e;
+	data_buf[cnt++] = 0x05;  // OSD_DSTLOC = 1, OSD_OPSTART = 1
+	tw_write_buf(0x24c, data_buf, cnt);
+	delay(10);
+
+	tw_write_register(0x240, 0x00);  // OSD_EXTOP_EN = 1
+
+}
 
 void tw_clear_all_pages(void)
 {

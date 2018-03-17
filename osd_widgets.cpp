@@ -624,7 +624,7 @@ void render_horizon(struct horizon_t *h)
                 disp_color_background = COLOR_NONE;
                 disp_color_shadow = COLOR_BLACK | mix ;
                 font_type = FONT_OUTLINE_8x12;
-                tw_printf ((cx-6)/SCREEN_SCALE, cy  - 6, "% 03d", j / SCALE);
+                tw_printf (((cx-6)/SCREEN_SCALE), (cy  - 6), "% 03d", j / SCALE);
                 font_type = ft_temp;
                 tw_set_osd_buf (c1, c2, c3, c4);
                 //tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);

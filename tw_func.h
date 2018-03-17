@@ -29,10 +29,10 @@
 //OSD registers
 
 #define COLOR_BLACK      0
-#define COLOR_25_WHITE   1
-#define COLOR_50_WHITE   2
-#define COLOR_75_WHITE   3
-#define COLOR_WHITE      4
+#define COLOR_25_WHITE   14
+#define COLOR_50_WHITE   15
+#define COLOR_75_WHITE   16
+#define COLOR_WHITE      17
 #define COLOR_BLUE       5
 #define COLOR_RED        6
 #define COLOR_ORANGE     7
@@ -67,8 +67,11 @@
 #define OSD_color_2	OSD_COL_GRN
 #define OSD_color_3	OSD_COL_RED
 
+#define CH_ON 1
+#define CH_OFF 0
+
 #define CH_POPUP 1
-#define CH_NOPOPUP 0
+#define CH_NO_POPUP 0
 
 
 #define FLD_NONE 0
@@ -83,16 +86,17 @@
 #define SCREEN_SCALE 1.6f
 
 enum FontType {
-    FONT_8x8	          = 0x01,
-    FONT_16x8	          = 0x02,
-    FONT_16x16	          = 0x03,
-    FONT_SHADOW_8x8       = 0x04,
-    FONT_SHADOW_16x8      = 0x05,
-    FONT_SHADOW_16x16     = 0x06,
-    FONT_OUTLINE_8x12     = 0x07,
-    FONT_OUTLINE_16x12    = 0x08,
-    FONT_OUTLINE_16x12c   = 0x09,
-    FONT_8x8b             = 0x0A
+	FONT_8x8 = 0x01,
+	FONT_16x8 = 0x02,
+	FONT_16x16 = 0x03,
+	FONT_SHADOW_8x8 = 0x04,
+	FONT_SHADOW_16x8 = 0x05,
+	FONT_SHADOW_16x16 = 0x06,
+	FONT_OUTLINE_8x12 = 0x07,
+	FONT_OUTLINE_16x12 = 0x08,
+	FONT_OUTLINE_16x12c = 0x09,
+	FONT_8x8b = 0x0A,
+	FONT_QUICK = 0x0b
 };
 
 extern FontType font_type;      //Global variable to hold current font type
@@ -128,23 +132,31 @@ extern unsigned char rec_color_shadow, rec_color, rec_color_background;
 extern unsigned char disp_color, disp_color_background, disp_color_shadow;
 extern struct osd_settings osd;  
 
-const unsigned char colortable[14][3] = {
+
+// BUG Workaround
+// TW2837 extended OSD graphic mode, does not handle colot table indexes 1,2,3,4 So 
+// White colors are moved to 14-15-16-17
+
+const unsigned char colortable[18][3] = {
 {0x00, 0x80, 0x80},							//Black         0
 {0x3f, 0x80, 0x80},							//25%white      1
 {0x7f, 0x80, 0x80},							//50%white      2
 {0xc0, 0x80, 0x80},							//75%white      3
 {0xf0, 0x80, 0x80},							//100%white     4
 {0x1d, 0xff, 0x6b},							//Blue          5
-//{0x4c, 0x54, 0xff},							//Red           6   
 {110, 97, 218},							//Red           6   
 {0x75, 0x4f, 0xb5},							//Orange        7
 {0xb2, 0xaa, 0x00},							//Cyan          8
 {0x69, 0xd4, 0xea},							//Magenta       9
-//{0x4b, 0x55, 0x4a},							//Green         10
 {181,70,52},
 {0x61, 0xb5, 0x3a},							//Ocean ??      11
 {0xe1, 0x00, 0x94},							//Yellow        12
-{190, 32, 168}                              //Dark Yellow   13
+{190, 32, 168},                              //Dark Yellow   13
+{0x3f, 0x80, 0x80},							//25%white      14
+{ 0x7f, 0x80, 0x80 },						//50%white      15
+{ 0xc0, 0x80, 0x80 },						//75%white      16
+{ 0xf0, 0x80, 0x80 }						//100%white     17
+
 };
 
 const unsigned char colortable_rec[4][3] = {
@@ -167,7 +179,7 @@ void tw_write_buf(unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT
 
 
 void tw_osd_out_char(unsigned char _pos_X, unsigned int _pos_Y, unsigned char _chr);
-void tw_puts(char *str, char posx, unsigned short posy);
+void tw_puts(char *str, unsigned short posx, unsigned short posy);
 void tw_wr_osd_buffer(char *buf, char address);
 void tw_wr_display_from_buffer(unsigned char _pos_X, unsigned int _pos_Y, char length);
 
@@ -211,7 +223,8 @@ void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsi
 void tw_display_logo();
 
 void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y);
+void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsigned int width, unsigned int height, unsigned int src_hpos, unsigned int src_vpos);
 
-
-
+void tw_ext_putchar(unsigned int x, unsigned int y, char chr);
+void init_scratch_memory();
 #endif
