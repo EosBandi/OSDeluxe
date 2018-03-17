@@ -43,6 +43,7 @@ void tw_init()
 	//Output video format selection
 	//bit 7 - 1-50Hz, 625 line
 	tw_write_register(0x100, 0x80);
+
 	//Start memory init (SDRAM)
 	tw_write_register(0x17f, 0x80);
 

@@ -35,6 +35,15 @@
 
 struct osd_settings {
 
+	unsigned char   vin_sharpening[4];
+	unsigned char   vin_saturation[4];
+	unsigned char   vin_contrast[4];
+	unsigned char   vin_brightness[4];
+
+
+
+
+
     channel_setting video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero) ???
     gps_widget_t gps;
     battery_widget_t bat;
@@ -46,9 +55,10 @@ struct osd_settings {
     mode_widget_t mode;
 
 	pull_widget_t pull;
+
+	message_widget_t msg_widget;
+
     
-
-
     //Global variables
     unsigned char mav_type;             //MAV type from mavlink heartbeat;
     unsigned char base_mode;            //It comes from the arming...
@@ -65,19 +75,19 @@ struct osd_settings {
     int           ekfcompass;
     int           ekfterrain;
 
-
-    unsigned char ctr_ch[4];
+	unsigned char ctr_ch[4];
     unsigned char ctr_state[4];
     unsigned char ctr_saved_state[4];
+
+	unsigned char ctr2[3];				// Enabled video inputs in crt2 channel 
+
 
     unsigned int           rcin[17];
     unsigned int           rc_rssi;
 
     char         system_status;   //Se MAVLINK_STATE enum 
 
-
-
-    char          message_buffer[MESSAGE_BUFFER_LINES][52];               //20 line of 52 character message_buffer
+	char          message_buffer[MESSAGE_BUFFER_LINES][52];               //20 line of 52 character message_buffer
     char          message_severity[MESSAGE_BUFFER_LINES];
     char          message_buffer_line;
     char          message_buffer_display_line;
@@ -100,7 +110,6 @@ struct osd_settings {
 void default_settings();
 void load_settings();
 void save_settings();
-void message_buffer_add_line(char *message, char severity);
-void message_buffer_render(void);
+
 
 #endif

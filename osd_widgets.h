@@ -101,11 +101,14 @@ struct gps_widget_t {
     unsigned short x;
     unsigned short y;
     unsigned char sat;
-    unsigned char sat_warn;
+    unsigned char sat_warn;			//Warning level, makes the status yellow (It belongs to the status widget, but for PARAMS it easier to put here
+	unsigned char sat_critical;     //Critical level, makes status red, and gps indicator also red
     float         hdop;
-    float         hdop_warn;
+    float         hdop_warn;		//Warning level see above (hdop above this)
+	float		  hdop_critical;	//Critical level see above  (hdop above this)
     unsigned char  fix;
     unsigned char color;
+	bool		  visible;
 };
 
 struct battery_widget_t {
@@ -125,6 +128,7 @@ struct battery_widget_t {
     bartype bar_type;
     bool mix;
     unsigned char display_members; //TODO: add posibility to switch off certain elements 
+	bool		  visible;
 };
 
 struct status_widget_t {
@@ -136,6 +140,7 @@ struct status_widget_t {
     status_info vibe_status;
 
     bool mix;
+	bool		  visible;
 };
 
 struct alt_widget_t {
@@ -143,6 +148,7 @@ struct alt_widget_t {
     unsigned short y;
     float altitude;
     bool mix;
+	bool		  visible;
 };
 
 struct pull_widget_t {
@@ -151,6 +157,7 @@ struct pull_widget_t {
 	float pull;
 	bool mix;
 	float warning;			//Warning level in Newtons
+	bool		  visible;
 };
 
 
@@ -163,6 +170,7 @@ struct vario_widget_t {
     float vario;
     float vario_max;
     bool mix;
+	bool		  visible;
 };
 
 struct home_widget_t {
@@ -170,6 +178,7 @@ struct home_widget_t {
     unsigned short y;
     float orientation;
     unsigned int home_distance;    
+	bool		  visible;
 };
 
 struct horizon_t {
@@ -195,6 +204,17 @@ struct mode_widget_t {
 
     bool mix;
     unsigned char mode; //from mavlink
+	bool		  visible;
+
+};
+
+struct message_widget_t {
+
+	unsigned short  x;
+	unsigned short  y;
+	bool mix;
+	bool		  visible;
+
 };
 
 extern struct alt_widget_t aw;
@@ -235,5 +255,8 @@ void osd_pull_prerender(struct pull_widget_t *pw);
 void osd_pull_render(struct pull_widget_t *pw);
 
 void rc_control(void);
+
+void message_buffer_add_line(char *message, char severity);
+void message_buffer_render(void);
 
 #endif

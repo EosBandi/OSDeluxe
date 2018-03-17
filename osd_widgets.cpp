@@ -107,7 +107,7 @@ void osd_gps_render(struct gps_widget_t *g)
     char _buf[32];
 
     disp_color_background = BACKROUND;
-    if (g->sat <= g->sat_warn || g->hdop < g->hdop_warn)
+    if (g->sat <= g->sat_critical || g->hdop > g->hdop_critical)
         disp_color = COLOR_RED | BLINK;
     else
         disp_color = g->color;
@@ -804,5 +804,98 @@ void rc_control()
 {
 
 
+
+}
+
+
+
+// line 0 is a display line
+void message_buffer_add_line(char *message, char severity)
+{
+	// Check if we are standing at the last line of the buffer.
+	if (osd.message_buffer_line == MESSAGE_BUFFER_LINES - 1)
+	{
+		for (int i = 2; i < MESSAGE_BUFFER_LINES; i++)
+		{
+			strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 1
+			osd.message_severity[i - 1] = osd.message_severity[i];
+		}
+	}
+	else
+	{
+		osd.message_buffer_line++;
+	}
+
+	strcpy(osd.message_buffer[osd.message_buffer_line], message);
+	osd.message_severity[osd.message_buffer_line] = severity;
+}
+
+
+void message_buffer_render()
+{
+
+	long display_time = 5000;
+	long now;
+	char temp_fld;
+
+	temp_fld = OSD_work_field;
+	OSD_work_field = FLD_EVEN;
+
+	now = millis();
+
+	if (osd.message_buffer_line > 0) display_time = 3000; // 3sec if there are more messages in the buffer
+
+	if (now < (osd.message_buffer_display_time + display_time))
+	{
+		OSD_work_field = temp_fld;
+		return;
+	}
+
+	if (osd.clear_req)
+	{
+		OSD_path = OSD_PATH_REC;
+		tw_osd_rectangle(osd.msg_widget.x, osd.msg_widget.y, 85, 11, 0xff);
+		OSD_path = OSD_PATH_DISP;
+		osd.clear_req = false;
+	}
+
+	if (osd.message_buffer_line > 0)
+	{
+		osd.message_buffer_display_time = now;
+		for (int i = 1; i < MESSAGE_BUFFER_LINES; i++)
+		{
+			strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 0
+			osd.message_severity[i - 1] = osd.message_severity[i];
+		}
+		osd.message_buffer_line--;
+
+
+		rec_color = COLOR_REC_WHITE;
+		rec_color_shadow = COLOR_REC_BLACK;
+		if (osd.message_severity[0] <= 3)
+		{
+			rec_color = COLOR_REC_RED;
+			rec_color_shadow = COLOR_REC_BLACK;
+		}
+		if (osd.message_severity[0] <= 2)
+		{
+			rec_color = COLOR_REC_RED;
+			rec_color_shadow = COLOR_REC_BLACK;
+		}
+
+
+		rec_color_background = COLOR_REC_GREEN | REC_MIX;
+		font_type = FONT_OUTLINE_16x12;
+
+		OSD_path = OSD_PATH_REC;
+		tw_printf(osd.msg_widget.x, osd.msg_widget.y, "%s", osd.message_buffer[0]);
+		OSD_path = OSD_PATH_DISP;
+
+		osd.clear_req = true;
+		OSD_work_field = temp_fld;
+		return;
+	}
+
+	OSD_work_field = temp_fld;
 
 }

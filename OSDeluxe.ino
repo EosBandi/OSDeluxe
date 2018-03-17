@@ -65,7 +65,7 @@ void setup ()
 	//Open USB serial port for debug and UI
     Serial.begin (115200);
 	//Open Serial1 port for MavLink communication
-    Serial1.begin(115200);
+    Serial1.begin(921600);
 	//Open Serial 2 port for input from weight cell
 	Serial2.begin(115200);
 
@@ -163,7 +163,9 @@ init_home();
 
 //tw_display_logo();
 
-
+get_parameter_count();
+param_send_index = total_params;
+debug("Parameter count:%u\n", total_params);
 
 
 
@@ -171,44 +173,44 @@ init_home();
 // eddig es ne tovabb
 //while (1);
 
-
+unsigned long now;
 
 while (1)
 {
+	now = millis();
+
+
+	read_mavlink();
+
 
     tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
     tw_wait_for_osd_write(20);
 
-	//debug("fill:%lu\n", millis() - now); now = millis();
     if (osd.horizon.visible) render_horizon(&osd.horizon);
-	//debug("horizon:%lu\n", millis() - now); now = millis();
 
+	if (osd.gps.visible) osd_gps_render( &osd.gps );
 
-    osd_gps_render( &osd.gps );
-	//debug("gps:%lu\n", millis() - now); now = millis();
-	osd_battery_prerender(&osd.bat);
-	//debug("battery pre:%lu\n", millis() - now); now = millis();
-	osd_home_prerender(&osd.home_w);
-	//debug("home_pre:%lu\n", millis() - now); now = millis();
-	osd_battery_render(&osd.bat);
-	//debug("battery:%lu\n", millis() - now); now = millis();
-	osd_status_render(&osd.stat);
-	//debug("status:%lu\n", millis() - now); now = millis();
-	osd_altitude_render(&osd.alt);
-	//debug("altitude:%lu\n", millis() - now); now = millis();
-	osd_vario_render(&osd.vario);
-	//debug("vario:%lu\n", millis() - now); now = millis();
-	osd_home_render(&osd.home_w);
-	//debug("home:%lu\n", millis() - now); now = millis();
-	osd_mode_render(&osd.mode);
-	//debug("mode:%lu\n", millis() - now); now = millis();
+	if (osd.bat.visible) {
+		osd_battery_prerender(&osd.bat);
+		osd_battery_render(&osd.bat);
+	}
+	
+	if (osd.stat.visible) osd_status_render(&osd.stat);
 
-	osd_pull_render(&osd.pull);
-	//debug("pull:%lu\n", millis() - now); now = millis();
+	if (osd.alt.visible) osd_altitude_render(&osd.alt);
 
-    message_buffer_render();
-	//debug("messages:%lu\n", millis() - now); now = millis();
-	//debug("--------------------------\n");
+	if (osd.vario.visible) osd_vario_render(&osd.vario);
+
+	if (osd.home_w.visible) {
+		osd_home_prerender(&osd.home_w);
+		osd_home_render(&osd.home_w);
+	}
+
+	if (osd.mode.visible) osd_mode_render(&osd.mode);
+
+	if (osd.pull.visible) osd_pull_render(&osd.pull);
+
+    if (osd.msg_widget.visible)  message_buffer_render();
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
@@ -308,10 +310,23 @@ while (1)
 
     tw_osd_set_display_field(OSD_display_field);
 
-    read_mavlink();
+ 
 
     //check heartbeat
     heartbeat_validation();
+
+	//
+	send_param_list();
+
+	//Send out mavlink heartbeat
+	if ((millis() - last_heartbeat_sent) >= 1000)
+	{
+		heartbeat_out();
+		last_heartbeat_sent = millis();
+	}
+
+
+
     if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
     if ( (osd.bat.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
 
@@ -345,17 +360,19 @@ while (1)
 	{
 		char ch = Serial.read();
 		if (ch == '1') {
-			tw_write_register(0x1aa, 0xAA);
+			tw_write_register(0x0f3, 0b11100000);
 			debug("ON\n");
 		}
 		else 
 		{
-			
+			tw_write_register(0x0f3, 0b11110000);
+
 			debug("OFF\n");
 		}
 	}
 
-	//debug("Loop time: %lu\n", millis() - lt);
+	//debug("Loop time: %lu\n", millis() - now);
+	//debug("Bytes waiting: %u\n", Serial1.available());
 
 
 

@@ -61,6 +61,27 @@ void load_settings()
 void default_settings()
 {
 
+	osd.vin_sharpening[0] = 0xf;
+	osd.vin_saturation[0] = 0x50;
+	osd.vin_contrast[0] = 0x80;
+	osd.vin_brightness[0] = 0x00;
+
+	osd.vin_sharpening[1] = 0xf;
+	osd.vin_saturation[1] = 0x50;
+	osd.vin_contrast[1] = 0x80;
+	osd.vin_brightness[1] = 0x00;
+
+	osd.vin_sharpening[2] = 0xf;
+	osd.vin_saturation[2] = 0x50;
+	osd.vin_contrast[2] = 0x80;
+	osd.vin_brightness[2] = 0x00;
+
+	osd.vin_sharpening[3] = 0xf;
+	osd.vin_saturation[3] = 0x50;
+	osd.vin_contrast[3] = 0x80;
+	osd.vin_brightness[3] = 0x00;
+
+
     osd.video_channels[0][1].pos_h = 0;
     osd.video_channels[0][1].pos_v = 0;
     osd.video_channels[0][1].len_h = 180;
@@ -88,6 +109,7 @@ void default_settings()
     osd.gps.color = COLOR_YELLOW;
     osd.gps.sat = 0;
     osd.gps.hdop = 999;
+	osd.gps.visible = true;
     
     osd.bat.x = 145;
     osd.bat.y = 230;
@@ -104,17 +126,21 @@ void default_settings()
     osd.bat.max_capacity = 0;
     osd.bat.remaining_capacity = 100;
 
+	osd.bat.visible = true;
+
     osd.stat.x = 7;
     osd.stat.y = 253;
     osd.stat.mix = 0;
     osd.stat.gps_status = STATUS_NONE;
     osd.stat.ekf_status = STATUS_NONE;
     osd.stat.vibe_status = STATUS_NONE;
+	osd.stat.visible = true;
 
     osd.alt.x = 7;
     osd.alt.y = 270;
     osd.alt.mix = 0;
     osd.alt.altitude = 0;
+	osd.alt.visible = true;
 
     osd.vario.x = 165;
     osd.vario.y = 110;
@@ -124,11 +150,13 @@ void default_settings()
     osd.vario.vario_max = 5.0f;
     osd.vario.mix = 1;
     osd.vario.num_pos = POS_BELOW;
+	osd.vario.visible = true;
 
     osd.home_w.x = 90;
     osd.home_w.y = 252;
     osd.home_w.orientation = 0;
     osd.home_w.home_distance = 0;
+	osd.home_w.visible = true;
 
 
     osd.horizon.x = 146;
@@ -153,6 +181,8 @@ void default_settings()
     osd.mode.mix = 0;
     osd.mode.mode = 0;
 
+	osd.mode.visible = true;
+
 
     osd.arming_status = false;
     osd.displayed_arming_status = true;
@@ -173,7 +203,11 @@ void default_settings()
 	osd.pull.mix = false;
 	osd.pull.pull = 0;
 	osd.pull.warning = 7*9.8f;
+	osd.pull.visible = true;
 
 
+	osd.msg_widget.x = 4;
+	osd.msg_widget.y = 218;
+	osd.msg_widget.visible = true;
 
 }
