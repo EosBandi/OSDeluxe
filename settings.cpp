@@ -60,26 +60,34 @@ void load_settings()
 
 void default_settings()
 {
+	osd.ctr2_video_on[0] = 0b00001111;
+	osd.ctr2_video_on[1] = 0b00000111;
+	osd.ctr2_video_on[2] = 0b00000001;
+
 
 	osd.vin_sharpening[0] = 0xf;
 	osd.vin_saturation[0] = 0x50;
-	osd.vin_contrast[0] = 0x80;
+	osd.vin_contrast[0] = 0x64;
 	osd.vin_brightness[0] = 0x00;
+	osd.vin_functions[0] = 0x00;
 
 	osd.vin_sharpening[1] = 0xf;
 	osd.vin_saturation[1] = 0x50;
-	osd.vin_contrast[1] = 0x80;
+	osd.vin_contrast[1] = 0x64;
 	osd.vin_brightness[1] = 0x00;
+	osd.vin_functions[1] = 0x00;
 
 	osd.vin_sharpening[2] = 0xf;
 	osd.vin_saturation[2] = 0x50;
-	osd.vin_contrast[2] = 0x80;
+	osd.vin_contrast[2] = 0x64;
 	osd.vin_brightness[2] = 0x00;
+	osd.vin_functions[2] = 0x00;
 
 	osd.vin_sharpening[3] = 0xf;
 	osd.vin_saturation[3] = 0x50;
-	osd.vin_contrast[3] = 0x80;
+	osd.vin_contrast[3] = 0x64;
 	osd.vin_brightness[3] = 0x00;
+	osd.vin_functions[3] = 0x00;
 
 
     osd.video_channels[0][1].pos_h = 0;
@@ -109,24 +117,66 @@ void default_settings()
     osd.gps.color = COLOR_YELLOW;
     osd.gps.sat = 0;
     osd.gps.hdop = 999;
-	osd.gps.visible = true;
+	osd.gps.visible = 0x01;
     
-    osd.bat.x = 145;
-    osd.bat.y = 230;
-    osd.bat.min_cell_voltage = 3.3;
-    osd.bat.max_cell_voltage = 4.2;
-    osd.bat.red_cell_voltage = 3.6;
-    osd.bat.yellow_cell_voltage = 3.8;
-    osd.bat.bar_type = BAR_SINGLE_COLOR;
-    osd.bat.mix = 0;
-    osd.bat.cells = 12;
 
-    osd.bat.voltage = osd.bat.cells * 4.2;
-    osd.bat.current = 0.0;
-    osd.bat.max_capacity = 0;
-    osd.bat.remaining_capacity = 100;
+	osd.batt1_v.x = 145;
+	osd.batt1_v.y = 230;
+	osd.batt1_v.min_cell_voltage = 3.3;
+	osd.batt1_v.max_cell_voltage = 4.2;
+	osd.batt1_v.red_cell_voltage = 3.6;
+	osd.batt1_v.yellow_cell_voltage = 3.8;
+	osd.batt1_v.bar_type = BAR_SINGLE_COLOR;
+	osd.batt1_v.mix = 0;
+	osd.batt1_v.cells = 12;
+	osd.batt1_v.voltage = 11.11;
+	osd.batt1_v.box = true;
+	osd.batt1_v.visible = 0x01;
 
-	osd.bat.visible = true;
+
+	osd.batt2_v.x = 145;
+	osd.batt2_v.y = 130;
+	osd.batt2_v.min_cell_voltage = 3.3;
+	osd.batt2_v.max_cell_voltage = 4.2;
+	osd.batt2_v.red_cell_voltage = 3.6;
+	osd.batt2_v.yellow_cell_voltage = 3.8;
+	osd.batt2_v.bar_type = BAR_SINGLE_COLOR;
+	osd.batt2_v.mix = 0;
+	osd.batt2_v.cells = 6;
+	osd.batt2_v.voltage = 22.22;
+	osd.batt2_v.box = true;
+	osd.batt2_v.visible = 0x01;
+
+
+	osd.batt1_cap.x = 50;
+	osd.batt1_cap.y = 230;
+	osd.batt1_cap.max_capacity = 0;
+	osd.batt1_cap.remaining_capacity = 50;
+	osd.batt1_cap.bar_type = BAR_SINGLE_COLOR;
+	osd.batt1_cap.mix = true;
+	osd.batt1_cap.box = false;
+	osd.batt1_cap.visible = 0x01;
+
+	osd.batt2_cap.x = 100;
+	osd.batt2_cap.y = 230;
+	osd.batt2_cap.max_capacity = 3000;
+	osd.batt2_cap.remaining_capacity = 10;
+	osd.batt2_cap.bar_type = BAR_SINGLE_COLOR;
+	osd.batt2_cap.mix = true;
+	osd.batt2_cap.box = true;
+	osd.batt2_cap.visible = 0x01;
+
+	osd.batt1_curr.x = 100;
+	osd.batt1_curr.y = 100;
+	osd.batt1_curr.mix = true;
+	osd.batt1_curr.box = true;
+	osd.batt1_curr.visible = 0x01;
+
+	osd.batt2_curr.x = 50;
+	osd.batt2_curr.y = 50;
+	osd.batt2_curr.mix = true;
+	osd.batt2_curr.box = true;
+	osd.batt2_curr.visible = 0x01;
 
     osd.stat.x = 7;
     osd.stat.y = 253;
@@ -134,13 +184,13 @@ void default_settings()
     osd.stat.gps_status = STATUS_NONE;
     osd.stat.ekf_status = STATUS_NONE;
     osd.stat.vibe_status = STATUS_NONE;
-	osd.stat.visible = true;
+	osd.stat.visible = 0x01;
 
     osd.alt.x = 7;
     osd.alt.y = 270;
     osd.alt.mix = 0;
     osd.alt.altitude = 0;
-	osd.alt.visible = true;
+	osd.alt.visible = 0x01;
 
     osd.vario.x = 165;
     osd.vario.y = 110;
@@ -150,64 +200,55 @@ void default_settings()
     osd.vario.vario_max = 5.0f;
     osd.vario.mix = 1;
     osd.vario.num_pos = POS_BELOW;
-	osd.vario.visible = true;
+	osd.vario.visible = 0x01;
 
     osd.home_w.x = 90;
     osd.home_w.y = 252;
     osd.home_w.orientation = 0;
     osd.home_w.home_distance = 0;
-	osd.home_w.visible = true;
+	osd.home_w.visible = 0x01;
 
 
     osd.horizon.x = 146;
     osd.horizon.y = 145;
-	osd.horizon.visible = true;
+	osd.horizon.visible = 0x01;
 
-
-    //osd.mode.mode_x =  57;
-    //osd.mode.mode_y = 270;
 
    osd.mode.mode_x =  90;
    osd.mode.mode_y = 5;
 
-    osd.mode.fs_x =  90;
-    osd.mode.fs_y = 23;
+   osd.mode.fs_x =  90;
+   osd.mode.fs_y = 23;
 
-    osd.mode.arm_x =  90;
-    osd.mode.arm_y = 36;
+   osd.mode.arm_x =  90;
+   osd.mode.arm_y = 36;
 
+   osd.mode.mix = 0;
+   osd.mode.mode = 0;
 
+   osd.mode.visible = 0x01;
+
+   osd.arming_status = false;
+   osd.displayed_arming_status = true;
+   osd.armed_start_time = 0;
+
+   osd.last_capacity_query = 0;
+
+   osd.ctr_ch[0] = 10;
+   osd.ctr_ch[1] = 11;
+   osd.ctr_ch[2] = 12;
+   osd.ctr_ch[3] = 13;
     
-    osd.mode.mix = 0;
-    osd.mode.mode = 0;
-
-	osd.mode.visible = true;
-
-
-    osd.arming_status = false;
-    osd.displayed_arming_status = true;
-    osd.armed_start_time = 0;
-
-
-    osd.last_capacity_query = 0;
-
-
-    osd.ctr_ch[0] = 10;
-    osd.ctr_ch[1] = 11;
-    osd.ctr_ch[2] = 12;
-    osd.ctr_ch[3] = 13;
-    
-
 	osd.pull.x = 7;
 	osd.pull.y = 105;
 	osd.pull.mix = false;
 	osd.pull.pull = 0;
 	osd.pull.warning = 7*9.8f;
-	osd.pull.visible = true;
+	osd.pull.visible = 0x01;
 
 
 	osd.msg_widget.x = 4;
 	osd.msg_widget.y = 218;
-	osd.msg_widget.visible = true;
+	osd.msg_widget.visible = 0x01;
 
 }

@@ -259,9 +259,9 @@ void read_mavlink()
             case MAVLINK_MSG_ID_SYS_STATUS:
             {
 
-                osd.bat.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
-                osd.bat.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
-                osd.bat.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
+                osd.batt1_v.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
+                osd.batt1_curr.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
+                osd.batt1_cap.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
             }
             break;
 
@@ -417,7 +417,7 @@ void read_mavlink()
                 mavlink_msg_param_value_get_param_id(&msg,(char *)param_name);
                 if ( strcmp(param_name,"BATT_CAPACITY") == 0 )
                 {
-                    osd.bat.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
+                    osd.batt1_cap.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
                 }
             }
 			break;
@@ -458,7 +458,7 @@ void read_mavlink()
 
 				debug("set_param: %s - %f\n", param_name, param_value);
 
-				idx = params_set_value(param_name, param_value, 0);
+				idx = params_set_value(param_name, param_value, 1);
 
 				/* broadcast new parameter value */
 				mavlink_msg_param_value_pack(OSD_SYS_ID, MAV_COMP_ID_OSD, &msg2,

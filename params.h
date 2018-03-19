@@ -55,6 +55,8 @@ void cast2param(struct param_def *p, float v);
 float get_parameter_value(int idx, char *name);
 void send_param_list();
 int params_set_value(char *name, float value, unsigned char trigger_cbk);
-
+void update_channel_onoff();
+void update_vin_settings();
+void update_vout_settings();
 
 #endif

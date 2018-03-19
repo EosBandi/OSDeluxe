@@ -83,7 +83,7 @@ void tw_init()
 		0x28,		//06    Extra bits for the four above
 		0x00,		//07    Hue for NTSC system (no need on PAL)
 		0x3f,       //08    Bit7 NTSC SCURVE, bit6 Internal, bit5-4 CTI level (1h) bit3-0 sharpnedd 
-		0x80,		//09	Contrast 0x80 is default
+		0x64,		//09	Contrast 0x80 is default
 		0x00,		//0a    Brightness 0x80 is no changes
 		0x50,		//0b    Saturation Cb
 		0x50,		//0c    Saturation Cr
@@ -102,7 +102,7 @@ void tw_init()
 												//	   0x60  0x61  0x62  0x63  0x64  0x65  0x66  0x67  0x68  0x69  0x6a  0x6b
 	static unsigned char pg1_60_channel_settings[] = { 0x90, 0x02, 0x00, 0x91, 0x02, 0x00, 0x93, 0x02, 0x00, 0x94, 0x02, 0x00 };
 	
-	tw_write_buf(0x160, pg1_60_channel_settings, sizeof(pg1_60_channel_settings));
+	//tw_write_buf(0x160, pg1_60_channel_settings, sizeof(pg1_60_channel_settings));
 
 	tw_write_register(0x105, 0b00000100); // bypass mode when video loss is detected
 

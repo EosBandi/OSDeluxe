@@ -79,9 +79,6 @@ void loop ()
     tw_init ();
 	//init_scratch_memory();
 
-
-
-
     tw_ch_settings (1, CH_ON, CH_NO_POPUP);
     tw_ch_settings (2, CH_OFF, CH_POPUP);
     tw_ch_settings (3, CH_OFF, CH_POPUP);
@@ -102,6 +99,7 @@ void loop ()
     tw_write_register(0x0c8,0x03);
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
 	tw_write_register(0x1aa, 0xBB);  // middle bandwith for Y DAC, reduce color crawl
+
 
     digitalWrite (LED_PIN, HIGH);
 
@@ -179,7 +177,6 @@ while (1)
 {
 	now = millis();
 
-
 	read_mavlink();
 
 
@@ -190,22 +187,26 @@ while (1)
 
 	if (osd.gps.visible) osd_gps_render( &osd.gps );
 
-	if (osd.bat.visible) {
-		osd_battery_prerender(&osd.bat);
-		osd_battery_render(&osd.bat);
-	}
-	
+	//if (osd.bat.visible) osd_battery_render(&osd.bat);
+	osd_batt_volt_render(&osd.batt1_v);
+	osd_batt_volt_render(&osd.batt2_v);
+
+	osd_batt_cap_render(&osd.batt1_cap);
+	osd_batt_cap_render(&osd.batt2_cap);
+
+	osd_batt_curr_render(&osd.batt1_curr);
+	osd_batt_curr_render(&osd.batt2_curr);
+
+
+
 	if (osd.stat.visible) osd_status_render(&osd.stat);
 
 	if (osd.alt.visible) osd_altitude_render(&osd.alt);
 
 	if (osd.vario.visible) osd_vario_render(&osd.vario);
 
-	if (osd.home_w.visible) {
-		osd_home_prerender(&osd.home_w);
-		osd_home_render(&osd.home_w);
-	}
-
+	if (osd.home_w.visible) osd_home_render(&osd.home_w);
+	
 	if (osd.mode.visible) osd_mode_render(&osd.mode);
 
 	if (osd.pull.visible) osd_pull_render(&osd.pull);
@@ -214,6 +215,8 @@ while (1)
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
+
+	//Control channel 1 - Control video input channels
     if (osd.ctr_saved_state[0] != osd.ctr_state[0])
     {
         // There is a change in ctr1 state
@@ -245,6 +248,8 @@ while (1)
         }
     }
 
+    //Control channel 2 - Video inputs on/off
+
     if (osd.ctr_saved_state[1] != osd.ctr_state[1])
     {
         // There is a change in ctr1 state
@@ -253,28 +258,29 @@ while (1)
         {
         case 0:
 			//All four windows are visible
-            tw_ch_settings(1, 1, 0);
-            tw_ch_settings(2, 1, 1);
-            tw_ch_settings(3, 1, 1);
-            tw_ch_settings(4, 1, 1);
+            tw_ch_settings(1, osd.ctr2_video_on[0] & 0x01, 0);
+            tw_ch_settings(2, osd.ctr2_video_on[0] & 0x02, 1);
+            tw_ch_settings(3, osd.ctr2_video_on[0] & 0x04, 1);
+            tw_ch_settings(4, osd.ctr2_video_on[0] & 0x08, 1);
             break;
         case 2:
 			//only first screen
-            tw_ch_settings(1, 1, 0);
-            tw_ch_settings(2, 0, 1);
-            tw_ch_settings(3, 0, 1);
-            tw_ch_settings(4, 0, 1);
-            break;
+			tw_ch_settings(1, osd.ctr2_video_on[1] & 0x01, 0);
+			tw_ch_settings(2, osd.ctr2_video_on[1] & 0x02, 1);
+			tw_ch_settings(3, osd.ctr2_video_on[1] & 0x04, 1);
+			tw_ch_settings(4, osd.ctr2_video_on[1] & 0x08, 1);
+			break;
         case 1:
 			//Disable fourth smalles screen
-            tw_ch_settings(1, 1, 0);
-            tw_ch_settings(2, 1, 1);
-            tw_ch_settings(3, 1, 1);
-            tw_ch_settings(4, 0, 1);
-            break;
+			tw_ch_settings(1, osd.ctr2_video_on[2] & 0x01, 0);
+			tw_ch_settings(2, osd.ctr2_video_on[2] & 0x02, 1);
+			tw_ch_settings(3, osd.ctr2_video_on[2] & 0x04, 1);
+			tw_ch_settings(4, osd.ctr2_video_on[2] & 0x08, 1);
+			break;
         }
     }
 
+	//Control channel 3 - display pages
     if (osd.ctr_saved_state[2] != osd.ctr_state[2])
     {
         // There is a change in ctr1 state
@@ -315,8 +321,8 @@ while (1)
     //check heartbeat
     heartbeat_validation();
 
-	//
 	send_param_list();
+
 
 	//Send out mavlink heartbeat
 	if ((millis() - last_heartbeat_sent) >= 1000)
@@ -328,7 +334,7 @@ while (1)
 
 
     if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
-    if ( (osd.bat.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
+    if ( (osd.batt1_cap.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
 
 	if (Serial2.available() == 0) 
 	{
@@ -360,17 +366,18 @@ while (1)
 	{
 		char ch = Serial.read();
 		if (ch == '1') {
-			tw_write_register(0x0f3, 0b11100000);
+			tw_write_register(0x0f2, 0xff);
 			debug("ON\n");
 		}
 		else 
 		{
-			tw_write_register(0x0f3, 0b11110000);
+			tw_write_register(0x0f2,0x00);
 
 			debug("OFF\n");
 		}
 	}
 
+	//debug("Looptime : %ul\n", millis() - now);
 	//debug("Loop time: %lu\n", millis() - now);
 	//debug("Bytes waiting: %u\n", Serial1.available());
 

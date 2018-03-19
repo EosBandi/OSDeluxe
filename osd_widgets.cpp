@@ -24,23 +24,17 @@
 
 #include "OSDeluxe.h"
 
-struct bar b;
-struct gps_widget_t g;
-struct battery_widget_t bw;
-struct status_widget_t status;
-struct alt_widget_t aw;
-struct vario_widget_t vw;
-struct home_widget_t hw;
-struct horizon_t hor;
+//struct bar b;
+//struct gps_widget_t g;
+//struct status_widget_t status;
+//struct alt_widget_t aw;
+//struct vario_widget_t vw;
+//struct home_widget_t hw;
+//struct horizon_t hor;
 
 char sVoltFormat[] = "%5.1f\x82\x83";
 char sCapFormat[] =  "%5.0f\x80\x81";
 
-
-void osd_bar_prerender(struct bar *b)
-{
-    //Nothing ?
-}
 
 void osd_bar_render(struct bar *b)
 {
@@ -68,7 +62,7 @@ void osd_bar_render(struct bar *b)
 
     OSD_path = OSD_PATH_DISP;
     //Outside
-    tw_osd_rectangle(b->x, b->y, b->w, b->h + 10, BACKROUND);
+    if (b->box) tw_osd_rectangle(b->x, b->y, b->w, b->h + 10, BACKROUND);
     tw_osd_rectangle(b->x + 1, b->y + 1, b->w - 2, b->h - 2, COLOR_WHITE | mix);
 
     if (b->bar_type == BAR_MULTICOLOR)
@@ -88,7 +82,9 @@ void osd_bar_render(struct bar *b)
         tw_osd_rectangle(b->x + 2, b->y + 2, tw, b->h - 4, bar_color | mix);
     }
 
-    disp_color_background = BACKROUND;
+    if (b->box) disp_color_background = BACKROUND;
+	else disp_color_background = 0xff;
+
     if (b->val <= b->warn_red)
         disp_color = COLOR_RED | BLINK;
     else
@@ -96,8 +92,6 @@ void osd_bar_render(struct bar *b)
     font_type = FONT_16x8;
     tw_printf(b->x + 2, b->y + b->h + 2, b->format, b->val);
 }
-
-void osd_gps_prerender(struct gps_widget_t *g) {}
 
 void osd_gps_render(struct gps_widget_t *g)
 {
@@ -150,54 +144,69 @@ void osd_gps_render(struct gps_widget_t *g)
     tw_printf(g->x + 11, g->y + 12, "%2.2f", g->hdop);
 }
 
-void osd_battery_prerender( struct battery_widget_t *bw)
+void osd_batt_volt_render(struct batt_volt_widget_t *bw)
 {
 
-bw->volt.x = bw->x;
-bw->volt.y = bw->y;
-bw->volt.w = 30;
-bw->volt.h = 10;
+	bw->volt.x = bw->x;
+	bw->volt.y = bw->y;
+	bw->volt.w = 30;
+	bw->volt.h = 10;
 
-bw->volt.max = bw->max_cell_voltage * bw->cells;
-bw->volt.min = bw->min_cell_voltage * bw->cells;
-bw->volt.val = bw->voltage;
-bw->volt.warn_red = bw->red_cell_voltage * bw->cells;
-bw->volt.warn_yellow = bw->yellow_cell_voltage * bw->cells;
-bw->volt.mix = bw->mix;
-bw->volt.bar_type = bw->bar_type;
-bw->volt.format = sVoltFormat;
+	bw->volt.max = bw->max_cell_voltage * bw->cells;
+	bw->volt.min = bw->min_cell_voltage * bw->cells;
+	bw->volt.val = bw->voltage;
+	bw->volt.warn_red = bw->red_cell_voltage * bw->cells;
+	bw->volt.warn_yellow = bw->yellow_cell_voltage * bw->cells;
+	bw->volt.mix = bw->mix;
+	bw->volt.bar_type = bw->bar_type;
+	bw->volt.format = sVoltFormat;
+	bw->volt.box = bw->box;
 
-bw->cap.x = bw->x;
-bw->cap.y = bw->y + 20;
-bw->cap.w = 30;
-bw->cap.h = 10;
-
-bw->cap.max = bw->max_capacity;
-bw->cap.min = 0;
-if (bw->remaining_capacity >= 0)
-    bw->cap.val = bw->max_capacity * ((float)bw->remaining_capacity / 100);
-else 
-    bw->cap.val = 0;
-bw->cap.warn_yellow = bw->max_capacity * 0.2f;      //Yellow warning at 20%
-bw->cap.warn_red = bw->max_capacity * 0.1f;         //Red warning at 10%
-bw->cap.mix = bw->mix;
-bw->cap.bar_type = bw->bar_type;
-bw->cap.format = sCapFormat;
+	osd_bar_render(&bw->volt);
 
 }
 
-void osd_battery_render( struct battery_widget_t *bw)
+void osd_batt_cap_render(struct batt_cap_widget_t *bw)
 {
 
-  osd_bar_render( &bw->volt);
-  osd_bar_render( &bw->cap);
-  tw_osd_rectangle(bw->x, bw->y+40,30,10,BACKROUND);
-  disp_color = COLOR_YELLOW;
-  tw_printf(bw->x + 2, bw->y+42,"%5.1f\x84\x85", bw->current);
+	bw->cap.x = bw->x;
+	bw->cap.y = bw->y;
+	bw->cap.w = 30;
+	bw->cap.h = 10;
+
+	bw->cap.max = bw->max_capacity;
+	bw->cap.min = 0;
+	if (bw->remaining_capacity >= 0)
+		bw->cap.val = bw->max_capacity * ((float)bw->remaining_capacity / 100);
+	else
+		bw->cap.val = 0;
+	bw->cap.warn_yellow = bw->max_capacity * 0.2f;      //Yellow warning at 20%
+	bw->cap.warn_red = bw->max_capacity * 0.1f;         //Red warning at 10%
+	bw->cap.mix = bw->mix;
+	bw->cap.bar_type = bw->bar_type;
+	bw->cap.format = sCapFormat;
+	bw->cap.box = bw->box;
+
+	osd_bar_render(&bw->cap);
+
 }
 
+void osd_batt_curr_render(struct batt_curr_widget_t *bw)
+{
 
-void osd_status_prerender( struct status_widget_t *s) {}
+	if (bw->box) {
+		tw_osd_rectangle(bw->x, bw->y + 40, 30, 10, BACKROUND);
+		disp_color_background = BACKROUND;
+	} else 
+	{
+		tw_osd_rectangle(bw->x, bw->y + 40, 30, 10, 0xff);
+		disp_color_background = 0xff;
+
+	}
+	if (bw->mix) disp_color = COLOR_YELLOW | MIX;
+	else disp_color = COLOR_YELLOW;
+	tw_printf(bw->x + 2, bw->y + 42, "%5.1f\x84\x85", bw->current);
+}
 
 void osd_status_render( struct status_widget_t *s)
 {
@@ -214,8 +223,7 @@ unsigned char mix;
         mix = 0;
 
  tw_osd_rectangle(s->x,s->y, 3*BAR_W + 8 , BAR_H, BACKROUND); //background
- //tw_osd_rectangle(s->x+1, s->y+1, 3*BAR_W + 6,BAR_H-2, COLOR_WHITE | mix); //White border
-
+ 
  font_type = FONT_SHADOW_8x8;
 
  // Display notification bars
@@ -312,8 +320,6 @@ switch (s->vibe_status)
  
 }
 
-void osd_pull_prerender(struct pull_widget_t *pw) {}
-
 void osd_pull_render(struct pull_widget_t *pw)
 {
 
@@ -336,10 +342,6 @@ void osd_pull_render(struct pull_widget_t *pw)
 
 }
 
-
-
-void osd_altitude_prerender( struct alt_widget_t *aw){}
-
 void osd_altitude_render( struct alt_widget_t *aw)
 {
 
@@ -359,8 +361,6 @@ unsigned char mix;
  tw_printf(aw->x+1, aw->y+2, "\x86\x87%4dm", (int)aw->altitude);
 
 } 
-
-void osd_vario_prerender(struct vario_widget_t *vw){}
 
 void osd_vario_render(struct vario_widget_t *vw)
 {
@@ -411,9 +411,6 @@ void osd_vario_render(struct vario_widget_t *vw)
         break;
     }
 }
-
-
-void osd_home_prerender(struct home_widget_t *hw){}
 
 void osd_home_render(struct home_widget_t *hw)
 {

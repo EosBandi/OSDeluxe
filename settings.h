@@ -38,15 +38,32 @@ struct osd_settings {
 	unsigned char   vin_sharpening[4];
 	unsigned char   vin_saturation[4];
 	unsigned char   vin_contrast[4];
-	unsigned char   vin_brightness[4];
+	unsigned char	vin_brightness[4];
+	unsigned char   vin_functions[4];
 
 
+	unsigned char ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
+
+	bool color_bar_x = false;
+	bool color_bar_y = false;
+
+	bool color_kill_x = false;
+	bool color_kill_y = false;
 
 
 
     channel_setting video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero) ???
     gps_widget_t gps;
-    battery_widget_t bat;
+
+	batt_volt_widget_t batt1_v;
+	batt_volt_widget_t batt2_v;
+
+	batt_cap_widget_t batt1_cap;
+	batt_cap_widget_t batt2_cap;
+	batt_curr_widget_t batt1_curr;
+	batt_curr_widget_t batt2_curr;
+
+
     status_widget_t stat;
     alt_widget_t alt;
     vario_widget_t vario;
@@ -79,7 +96,6 @@ struct osd_settings {
     unsigned char ctr_state[4];
     unsigned char ctr_saved_state[4];
 
-	unsigned char ctr2[3];				// Enabled video inputs in crt2 channel 
 
 
     unsigned int           rcin[17];
