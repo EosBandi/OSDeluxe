@@ -24,14 +24,6 @@
 
 #include "OSDeluxe.h"
 
-//struct bar b;
-//struct gps_widget_t g;
-//struct status_widget_t status;
-//struct alt_widget_t aw;
-//struct vario_widget_t vw;
-//struct home_widget_t hw;
-//struct horizon_t hor;
-
 char sVoltFormat[] = "%5.1f\x82\x83";
 char sCapFormat[] =  "%5.0f\x80\x81";
 
@@ -195,17 +187,17 @@ void osd_batt_curr_render(struct batt_curr_widget_t *bw)
 {
 
 	if (bw->box) {
-		tw_osd_rectangle(bw->x, bw->y + 40, 30, 10, BACKROUND);
+		tw_osd_rectangle(bw->x, bw->y, 30, 10, BACKROUND);
 		disp_color_background = BACKROUND;
 	} else 
 	{
-		tw_osd_rectangle(bw->x, bw->y + 40, 30, 10, 0xff);
+		tw_osd_rectangle(bw->x, bw->y, 30, 10, 0xff);
 		disp_color_background = 0xff;
 
 	}
 	if (bw->mix) disp_color = COLOR_YELLOW | MIX;
 	else disp_color = COLOR_YELLOW;
-	tw_printf(bw->x + 2, bw->y + 42, "%5.1f\x84\x85", bw->current);
+	tw_printf(bw->x + 2, bw->y + 2, "%5.1f\x84\x85", bw->current);
 }
 
 void osd_status_render( struct status_widget_t *s)

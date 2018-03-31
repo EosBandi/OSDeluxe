@@ -203,7 +203,7 @@ void tw_wait_for_osd_write(int timeout);
 
 void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H);
 void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _popup);
-void tw_set_ch_input(char ch, input_channel input);
+void tw_set_ch_input(char ch, char input);
 
 void tw_osd_set_display_field( char dp_field);
 void tw_osd_set_rec_field( char rec_field);

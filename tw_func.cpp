@@ -76,7 +76,7 @@ void tw_init()
 	static unsigned char pg0_00_decoder_settings[] =
 	{   0x00,		//00	Read only, no need   
 		0x00,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
-		0x0a,		//02	Hdelay
+		0x02,		//02	Hdelay    //0x0a
 		0xd0,		//03    HActive
 		0x05,		//04    Vdelay
 		0x20,		//05    VActive
@@ -1162,6 +1162,8 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
     unsigned int _HL, _HR, _VT, _VB, _SCALE;
     long unsigned int luint;
 
+	//debug("tw_ch_set_window %u, %u, %u, %u\n", _ch, _pos_H, _pos_V, _len_H);
+
     switch (_ch)
     {
     default:
@@ -1199,6 +1201,8 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
     luint = luint / 180;
     _SCALE = luint;
 
+	//debug("tw_scale: %u,%u,%u,%u,%u\n", _SCALE, _HL, _HR, _VT, _VB);
+
     tw_write_register (_ADDR_1++, _SCALE >> 8);
     tw_write_register (_ADDR_1++, _SCALE);
     tw_write_register (_ADDR_1++, _SCALE >> 8);
@@ -1220,21 +1224,39 @@ void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _po
     tw_write_register (0x110 + (_ch - 1) * 0x08, value);
 }
 
-void tw_set_ch_input(char ch, input_channel input)
+void tw_set_ch_input(char ch, char input)
 {
+
+	unsigned char inp;
+	switch (input)
+	{
+	case 1:
+		inp = INPUT_CH_1;
+		break;
+	case 2:
+		inp = INPUT_CH_2;
+		break;
+	case 3:
+		inp = INPUT_CH_3;
+		break;
+	case 4:
+		inp = INPUT_CH_4;
+		break;
+	}
+
     switch (ch)
     {
     case 1:
-        tw_write_register(0x080, input);
+        tw_write_register(0x080, inp);
         break;
     case 2:
-        tw_write_register(0x090, input);
+        tw_write_register(0x090, inp);
         break;
     case 3:
-        tw_write_register(0x0a0, input);
+        tw_write_register(0x0a0, inp);
         break;
     case 4:
-        tw_write_register(0x0b0, input);
+        tw_write_register(0x0b0, inp);
         break;
     }
 }

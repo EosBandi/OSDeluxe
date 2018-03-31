@@ -96,7 +96,8 @@ struct osd_settings {
     unsigned char ctr_state[4];
     unsigned char ctr_saved_state[4];
 
-
+	unsigned char visible_osd_page;			//The OSD page to show. (bit coded)
+	unsigned char pip_page;
 
     unsigned int           rcin[17];
     unsigned int           rc_rssi;

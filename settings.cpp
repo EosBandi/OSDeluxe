@@ -93,23 +93,32 @@ void default_settings()
     osd.video_channels[0][1].pos_h = 0;
     osd.video_channels[0][1].pos_v = 0;
     osd.video_channels[0][1].len_h = 180;
-    osd.video_channels[0][1].input = INPUT_CH_1;
+    osd.video_channels[0][1].input = 0;
     osd.video_channels[0][1].enable = 1;
     osd.video_channels[0][1].popup = 0;
 
     osd.video_channels[0][2].pos_h = 4;
-    osd.video_channels[0][2].pos_v = 10;
+    osd.video_channels[0][2].pos_v = 0;
     osd.video_channels[0][2].len_h = 64;
-    osd.video_channels[0][2].input = INPUT_CH_2;
-    osd.video_channels[0][2].enable = 1;
+    osd.video_channels[0][2].input = 1;
+    osd.video_channels[0][2].enable = 0;
     osd.video_channels[0][2].popup = 1;
 
     osd.video_channels[0][3].pos_h = 116;
-    osd.video_channels[0][3].pos_v = 10;
+    osd.video_channels[0][3].pos_v = 0;
     osd.video_channels[0][3].len_h = 64;
-    osd.video_channels[0][3].input = INPUT_CH_3;
-    osd.video_channels[0][3].enable = 1;
+    osd.video_channels[0][3].input = 1;
+    osd.video_channels[0][3].enable = 0;
     osd.video_channels[0][3].popup = 1;
+
+	osd.video_channels[0][4].pos_h = 68;
+	osd.video_channels[0][4].pos_v = 0;
+	osd.video_channels[0][4].len_h = 48;
+	osd.video_channels[0][4].input = 1;
+	osd.video_channels[0][4].enable = 0;
+	osd.video_channels[0][4].popup = 1;
+
+
 
     osd.gps.x = 7;
     osd.gps.y = 232;
@@ -135,7 +144,7 @@ void default_settings()
 
 
 	osd.batt2_v.x = 145;
-	osd.batt2_v.y = 130;
+	osd.batt2_v.y = 230;
 	osd.batt2_v.min_cell_voltage = 3.3;
 	osd.batt2_v.max_cell_voltage = 4.2;
 	osd.batt2_v.red_cell_voltage = 3.6;
@@ -145,11 +154,11 @@ void default_settings()
 	osd.batt2_v.cells = 6;
 	osd.batt2_v.voltage = 22.22;
 	osd.batt2_v.box = true;
-	osd.batt2_v.visible = 0x01;
+	osd.batt2_v.visible = 0x00;
 
 
-	osd.batt1_cap.x = 50;
-	osd.batt1_cap.y = 230;
+	osd.batt1_cap.x = 145;
+	osd.batt1_cap.y = 250;
 	osd.batt1_cap.max_capacity = 0;
 	osd.batt1_cap.remaining_capacity = 50;
 	osd.batt1_cap.bar_type = BAR_SINGLE_COLOR;
@@ -157,26 +166,27 @@ void default_settings()
 	osd.batt1_cap.box = false;
 	osd.batt1_cap.visible = 0x01;
 
-	osd.batt2_cap.x = 100;
+	osd.batt2_cap.x = 145;
 	osd.batt2_cap.y = 230;
 	osd.batt2_cap.max_capacity = 3000;
 	osd.batt2_cap.remaining_capacity = 10;
 	osd.batt2_cap.bar_type = BAR_SINGLE_COLOR;
 	osd.batt2_cap.mix = true;
 	osd.batt2_cap.box = true;
-	osd.batt2_cap.visible = 0x01;
+	osd.batt2_cap.visible = 0x00;
 
-	osd.batt1_curr.x = 100;
-	osd.batt1_curr.y = 100;
-	osd.batt1_curr.mix = true;
+	osd.batt1_curr.x = 145;
+	osd.batt1_curr.y = 272;
+	osd.batt1_curr.mix = false;
 	osd.batt1_curr.box = true;
 	osd.batt1_curr.visible = 0x01;
+	osd.batt1_curr.current = 100;
 
 	osd.batt2_curr.x = 50;
 	osd.batt2_curr.y = 50;
 	osd.batt2_curr.mix = true;
 	osd.batt2_curr.box = true;
-	osd.batt2_curr.visible = 0x01;
+	osd.batt2_curr.visible = 0x00;
 
     osd.stat.x = 7;
     osd.stat.y = 253;

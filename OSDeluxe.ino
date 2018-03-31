@@ -79,26 +79,34 @@ void loop ()
     tw_init ();
 	//init_scratch_memory();
 
+	osd.pip_page = 0;
+	//update_pip();
+
+
+	/*
+
     tw_ch_settings (1, CH_ON, CH_NO_POPUP);
     tw_ch_settings (2, CH_OFF, CH_POPUP);
     tw_ch_settings (3, CH_OFF, CH_POPUP);
     tw_ch_settings (4, CH_OFF, CH_POPUP);
 
 
-    tw_ch_set_window (1, 0, 0, 180);
-    tw_ch_set_window (2, 4, 0 , 64);
-    tw_ch_set_window (3, 116, 0, 64);
-    tw_ch_set_window (4, 68, 0, 48);
+  // tw_ch_set_window (1, 0, 0, 180);
+  // tw_ch_set_window (2, 4, 0 , 64);
+  //  tw_ch_set_window (3, 116, 0, 64);
+  //  tw_ch_set_window (4, 68, 0, 48);
 
-    tw_set_ch_input(1,INPUT_CH_1);
-    tw_set_ch_input(2,INPUT_CH_2);
-    tw_set_ch_input(3,INPUT_CH_3);
-    tw_set_ch_input(4,INPUT_CH_4);
-
+	
+	tw_set_ch_input(1,1);
+    tw_set_ch_input(2,2);
+    tw_set_ch_input(3,3);
+    tw_set_ch_input(4,4);
+	
+	*/
 
     tw_write_register(0x0c8,0x03);
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
-	tw_write_register(0x1aa, 0xBB);  // middle bandwith for Y DAC, reduce color crawl
+	tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
 
 
     digitalWrite (LED_PIN, HIGH);
@@ -128,6 +136,8 @@ void loop ()
     //save_settings();
     //load_settings();
 
+	update_pip();
+
 // Prerender 
 
 osd.displayed_mode = -1;        // Signal startup
@@ -140,6 +150,10 @@ OSD_display_field = FLD_EVEN;
 memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
 osd.message_buffer_line = 0;
 osd.message_buffer_display_time = 0;
+
+
+osd.visible_osd_page = 0x01; //bit coded 
+osd.pip_page = 0x00;
 
 ////Ez torolni
 //tw_osd_set_display_field(OSD_work_field);
@@ -173,6 +187,8 @@ debug("Parameter count:%u\n", total_params);
 
 unsigned long now;
 
+
+
 while (1)
 {
 	now = millis();
@@ -183,35 +199,32 @@ while (1)
     tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
     tw_wait_for_osd_write(20);
 
-    if (osd.horizon.visible) render_horizon(&osd.horizon);
+    if (osd.horizon.visible & osd.visible_osd_page) render_horizon(&osd.horizon);
 
-	if (osd.gps.visible) osd_gps_render( &osd.gps );
+	if (osd.gps.visible & osd.visible_osd_page) osd_gps_render( &osd.gps );
 
-	//if (osd.bat.visible) osd_battery_render(&osd.bat);
-	osd_batt_volt_render(&osd.batt1_v);
-	osd_batt_volt_render(&osd.batt2_v);
+	if (osd.batt1_v.visible  & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
+	if (osd.batt2_v.visible  & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
 
-	osd_batt_cap_render(&osd.batt1_cap);
-	osd_batt_cap_render(&osd.batt2_cap);
+	if (osd.batt1_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
+	if (osd.batt2_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
 
-	osd_batt_curr_render(&osd.batt1_curr);
-	osd_batt_curr_render(&osd.batt2_curr);
+	if (osd.batt1_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
+	if (osd.batt2_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
 
+	if (osd.stat.visible & osd.visible_osd_page) osd_status_render(&osd.stat);
 
+	if (osd.alt.visible & osd.visible_osd_page) osd_altitude_render(&osd.alt);
 
-	if (osd.stat.visible) osd_status_render(&osd.stat);
+	if (osd.vario.visible & osd.visible_osd_page) osd_vario_render(&osd.vario);
 
-	if (osd.alt.visible) osd_altitude_render(&osd.alt);
-
-	if (osd.vario.visible) osd_vario_render(&osd.vario);
-
-	if (osd.home_w.visible) osd_home_render(&osd.home_w);
+	if (osd.home_w.visible & osd.visible_osd_page) osd_home_render(&osd.home_w);
 	
-	if (osd.mode.visible) osd_mode_render(&osd.mode);
+	if (osd.mode.visible & osd.visible_osd_page) osd_mode_render(&osd.mode);
 
-	if (osd.pull.visible) osd_pull_render(&osd.pull);
+	if (osd.pull.visible & osd.visible_osd_page) osd_pull_render(&osd.pull);
 
-    if (osd.msg_widget.visible)  message_buffer_render();
+    if (osd.msg_widget.visible & osd.visible_osd_page)  message_buffer_render();
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
@@ -221,31 +234,21 @@ while (1)
     {
         // There is a change in ctr1 state
         osd.ctr_saved_state[0] = osd.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
-        switch (osd.ctr_state[0])
-        {
+  
+		osd.pip_page = osd.ctr_state[0];
 
-		//Default view
-		// 1-front 2-right 3-left 4-Back 
-        case 0:
-            tw_set_ch_input(1, INPUT_CH_1);
-            tw_set_ch_input(2, INPUT_CH_2);
-            tw_set_ch_input(3, INPUT_CH_3);
-            tw_set_ch_input(4, INPUT_CH_4);
-            break;
-		// 1-back,2-right, 3-left, 4-front
-        case 1:
-            tw_set_ch_input(1, INPUT_CH_4);
-            tw_set_ch_input(2, INPUT_CH_2);
-            tw_set_ch_input(3, INPUT_CH_3);
-            tw_set_ch_input(4, INPUT_CH_1);
-            break;
-        case 2:
-            tw_set_ch_input(1, INPUT_CH_4);
-            tw_set_ch_input(2, INPUT_CH_2);
-            tw_set_ch_input(3, INPUT_CH_3);
-            tw_set_ch_input(4, INPUT_CH_1);
-            break;
-        }
+		for (char i = 1; i++; i < 5)
+		{
+			tw_set_ch_input(i, osd.video_channels[osd.pip_page][i].input);
+
+			tw_ch_settings(i, osd.video_channels[osd.pip_page][i].enable,
+				osd.video_channels[osd.pip_page][i].popup);
+
+			tw_ch_set_window(i, osd.video_channels[osd.pip_page][i].pos_h,
+				osd.video_channels[osd.pip_page][i].pos_v,
+				osd.video_channels[osd.pip_page][i].len_h);
+		}
+		
     }
 
     //Control channel 2 - Video inputs on/off
@@ -321,9 +324,12 @@ while (1)
     //check heartbeat
     heartbeat_validation();
 
-	send_param_list();
-
-
+	//Send five params at once, to speed up parameter download time
+	if (param_send_index != total_params)
+	{
+		for (int i = 0; i < 5; i++)send_param_list();
+	}
+	
 	//Send out mavlink heartbeat
 	if ((millis() - last_heartbeat_sent) >= 1000)
 	{
@@ -361,17 +367,18 @@ while (1)
 		}
 	}
 
+	//0x111 enhance mode.... keep looking
 
 	if (Serial.available() != 0)
 	{
 		char ch = Serial.read();
 		if (ch == '1') {
-			tw_write_register(0x0f2, 0xff);
+			tw_write_register(0x111, 0x08);
 			debug("ON\n");
 		}
 		else 
 		{
-			tw_write_register(0x0f2,0x00);
+			tw_write_register(0x111,0x00);
 
 			debug("OFF\n");
 		}

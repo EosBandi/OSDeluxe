@@ -58,5 +58,6 @@ int params_set_value(char *name, float value, unsigned char trigger_cbk);
 void update_channel_onoff();
 void update_vin_settings();
 void update_vout_settings();
+void update_pip();
 
 #endif
