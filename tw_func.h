@@ -112,12 +112,12 @@ enum input_channel {
 
 struct channel_setting
 {
-    unsigned int pos_h;
-    unsigned int pos_v;
-    unsigned int len_h;
     char input;
     char enable;
     char popup;
+	unsigned int pos_h;
+	unsigned int pos_v;
+	unsigned int len_h;
 
 };
 

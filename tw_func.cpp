@@ -75,7 +75,7 @@ void tw_init()
 	//video decoder settings Same for all channels
 	static unsigned char pg0_00_decoder_settings[] =
 	{   0x00,		//00	Read only, no need   
-		0x00,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
+		0x07,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
 		0x02,		//02	Hdelay    //0x0a
 		0xd0,		//03    HActive
 		0x05,		//04    Vdelay
@@ -189,6 +189,29 @@ void tw_init()
     tw_write_register (0x222, 0);
     tw_write_register (0x223, 180);
     tw_write_register (0x225, 144);
+
+
+
+    unsigned char	tbl_pal_pg0_sfr3[] = {		//... 
+	//	0x00,0x00,0x00,0x07,		//...		0xc0~0xc3	//... AUTOBGNDxx on
+		0x00,0x00,0x00,0x00,		//...		0xc0~0xc3	//... AUTOBGNDxx off
+		0x00,0xff,0xf0,0xff,		//...		0xc4~0xc7	//... recommend:full table
+	//	0x00,0x00,0xf0,0xff,		//...		0xc4~0xc7	//... temporal:quad table
+		0x00,0x3c,0x4f				//...		0xc8~0xca	//... update:060315
+	};
+
+	tw_write_buf(0x0c0, tbl_pal_pg0_sfr3, sizeof(tbl_pal_pg0_sfr3));
+
+unsigned char	tbl_pal_pg0_sfr1[] = {		//... other decoder part
+		0x00,0x77,0x07,0x45,		//...		0x40~0x43	//... update:060626
+		0xa0,0xd0,0x0, 0xf0,		//...		0x44~0x47
+		0xf0,0xf0,0xf0,0x02,		//...		0x48~0x4b
+		0x00,0x0f,0x05,0x05,		//...		0x4c~0x4f
+		0x00,0x00,0x10,0x00,		//...		0x50~0x53
+		0x00,0x00,0x00,0x30			//...		0x54~0x57
+	};
+
+tw_write_buf(0x040, tbl_pal_pg0_sfr1, sizeof(tbl_pal_pg0_sfr1));
 
 
     // Enable overlays dual mode high priority
@@ -1202,7 +1225,15 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
     _SCALE = luint;
 
 	//debug("tw_scale: %u,%u,%u,%u,%u\n", _SCALE, _HL, _HR, _VT, _VB);
-
+	tw_write_register(_ADDR_1++, _SCALE >> 8);
+	tw_write_register(_ADDR_1++, _SCALE);
+	tw_write_register(_ADDR_1++, _SCALE >> 8);
+	tw_write_register(_ADDR_1++, _SCALE);
+	tw_write_register(_ADDR_2++, _HL);
+	tw_write_register(_ADDR_2++, _HR);
+	tw_write_register(_ADDR_2++, _VT);
+	tw_write_register(_ADDR_2++, _VB);
+/*
     tw_write_register (_ADDR_1++, _SCALE >> 8);
     tw_write_register (_ADDR_1++, _SCALE);
     tw_write_register (_ADDR_1++, _SCALE >> 8);
@@ -1211,7 +1242,8 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
     tw_write_register (_ADDR_2++, _HR);
     tw_write_register (_ADDR_2++, _VT);
     tw_write_register (_ADDR_2++, _VB);
-}
+	*/
+	}
 
 void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _popup)
 {

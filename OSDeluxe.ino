@@ -177,7 +177,7 @@ init_home();
 
 get_parameter_count();
 param_send_index = total_params;
-debug("Parameter count:%u\n", total_params);
+//debug("Parameter count:%u\n", total_params);
 
 
 
@@ -203,8 +203,8 @@ while (1)
 
 	if (osd.gps.visible & osd.visible_osd_page) osd_gps_render( &osd.gps );
 
-	if (osd.batt1_v.visible  & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
-	if (osd.batt2_v.visible  & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
+	if (osd.batt1_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
+	if (osd.batt2_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
 
 	if (osd.batt1_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
 	if (osd.batt2_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
@@ -229,15 +229,14 @@ while (1)
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
 
-	//Control channel 1 - Control video input channels
+	//Control channel 1 - Control PIP mode
     if (osd.ctr_saved_state[0] != osd.ctr_state[0])
     {
         // There is a change in ctr1 state
         osd.ctr_saved_state[0] = osd.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
-  
-		osd.pip_page = osd.ctr_state[0];
+    	osd.pip_page = osd.ctr_state[0];
 
-		for (char i = 1; i++; i < 5)
+		for (unsigned char i = 1; i < 5; i++)
 		{
 			tw_set_ch_input(i, osd.video_channels[osd.pip_page][i].input);
 
@@ -251,38 +250,19 @@ while (1)
 		
     }
 
-    //Control channel 2 - Video inputs on/off
+    //Control channel 2 - OSD widgets page
 
     if (osd.ctr_saved_state[1] != osd.ctr_state[1])
     {
         // There is a change in ctr1 state
         osd.ctr_saved_state[1] = osd.ctr_state[1]; // Save it, to prevent unneccessary state changes in the main loop
-        switch (osd.ctr_state[1])
-        {
-        case 0:
-			//All four windows are visible
-            tw_ch_settings(1, osd.ctr2_video_on[0] & 0x01, 0);
-            tw_ch_settings(2, osd.ctr2_video_on[0] & 0x02, 1);
-            tw_ch_settings(3, osd.ctr2_video_on[0] & 0x04, 1);
-            tw_ch_settings(4, osd.ctr2_video_on[0] & 0x08, 1);
-            break;
-        case 2:
-			//only first screen
-			tw_ch_settings(1, osd.ctr2_video_on[1] & 0x01, 0);
-			tw_ch_settings(2, osd.ctr2_video_on[1] & 0x02, 1);
-			tw_ch_settings(3, osd.ctr2_video_on[1] & 0x04, 1);
-			tw_ch_settings(4, osd.ctr2_video_on[1] & 0x08, 1);
-			break;
-        case 1:
-			//Disable fourth smalles screen
-			tw_ch_settings(1, osd.ctr2_video_on[2] & 0x01, 0);
-			tw_ch_settings(2, osd.ctr2_video_on[2] & 0x02, 1);
-			tw_ch_settings(3, osd.ctr2_video_on[2] & 0x04, 1);
-			tw_ch_settings(4, osd.ctr2_video_on[2] & 0x08, 1);
-			break;
-        }
+
+		//visible_osd_page is a bit coded value bit represents the one page (1 - page 1, 2-page 2, 4-page 3, 8-page 4.... up to page 5)
+		osd.visible_osd_page = 0x01 << osd.ctr_state[1];
+
     }
 
+	/*
 	//Control channel 3 - display pages
     if (osd.ctr_saved_state[2] != osd.ctr_state[2])
     {
@@ -307,7 +287,7 @@ while (1)
 			break;
 		}
     }
-
+	*/
     //Switch OSD_work_field for smooth redraw
     if (OSD_work_field == FLD_ODD){
         OSD_work_field = FLD_EVEN;
@@ -327,7 +307,7 @@ while (1)
 	//Send five params at once, to speed up parameter download time
 	if (param_send_index != total_params)
 	{
-		for (int i = 0; i < 5; i++)send_param_list();
+		for (int i = 0; i < 8; i++)send_param_list();
 	}
 	
 	//Send out mavlink heartbeat
@@ -368,7 +348,8 @@ while (1)
 	}
 
 	//0x111 enhance mode.... keep looking
-
+    //0x57 coring for shapening
+	//a7 0d instead of 0x0c
 	if (Serial.available() != 0)
 	{
 		char ch = Serial.read();

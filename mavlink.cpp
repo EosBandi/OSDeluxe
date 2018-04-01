@@ -24,9 +24,9 @@
 
 #include "osdeluxe.h"
 
-extern mavlink_system_t mavlink_system = { OSD_SYS_ID, 111 }; // Ardupilot:7,1  Pixhawk:100,50
-extern mavlink_message_t msg;
-extern mavlink_status_t mv_status;
+mavlink_system_t mavlink_system = { OSD_SYS_ID, 111 }; // Ardupilot:7,1  Pixhawk:100,50
+mavlink_message_t msg;
+mavlink_status_t mv_status;
 
 unsigned long mavlink_seen[256]; // Timestamp of the [id] message last seen.
 unsigned long last_heartbeat_sent;		//Timestamp of the last heartbeat sent out by the OSD
@@ -105,11 +105,10 @@ bool last_motor_armed = false;
 uint8_t base_mode = 0;
 
 // true when we have received at least 1 MAVLink packet
-static bool mavlink_active;
-static uint8_t crlf_count = 0;
+bool mavlink_active;
 
-static int packet_drops = 0;
-static int parse_error = 0;
+int packet_drops = 0;
+int parse_error = 0;
 
 #define MAX_STREAMS 7
 
@@ -123,13 +122,14 @@ void heartbeat_validation(void)
 {
     unsigned long now;
 
+
     now = millis();
     // if no mavlink update for 3 secs, show warning and request mavlink rate again
     if (now > (last_mav_beat + 3000))
     {
         if (waitingMAVBeats && (now > (last_nobeat_message + 5000)) )         //Do not flood message queue with No heartbeat messages
         {
-            message_buffer_add_line("No MAVLink heartbeat received!", 1);
+            message_buffer_add_line("No MAVLink heartbeat received!", 1);     //TODO:Move strings to an external definition
             last_nobeat_message = now;
         }
         heatbeat_start_time = 0;
@@ -286,12 +286,18 @@ void read_mavlink()
                 osd.rcin[16] = mavlink_msg_rc_channels_get_chan16_raw(&msg);
                 osd.rc_rssi = mavlink_msg_rc_channels_get_rssi(&msg);
 
-                //set up ctr_state1 variables
+				//ctr_state[] contains the actual switch state of a given control channel
+				//ctr_chp[]   contains the rc channel id for pip and osd_page channels
+
+                //set up ctr_state variables
                 for (int i=0;i<4;i++)
                 {
-                    if (osd.rcin[osd.ctr_ch[i]] <= RC_STATE0) osd.ctr_state[i] = 0;
-                    else if (osd.rcin[osd.ctr_ch[i]] <= RC_STATE1) osd.ctr_state[i] = 1;
-                    else osd.ctr_state[i] = 2;
+                    if (osd.rcin[osd.ctr_ch[i]] < RC_STATE1) osd.ctr_state[i] = 0;
+                    else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE2) osd.ctr_state[i] = 1;
+					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE3) osd.ctr_state[i] = 2;
+					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE4) osd.ctr_state[i] = 3;
+					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE5) osd.ctr_state[i] = 4;
+                    else osd.ctr_state[i] = 5;
                 }
 
             }
@@ -440,7 +446,7 @@ void read_mavlink()
 			{
 				unsigned char sys, comp;
 				mavlink_message_t msg2;
-				unsigned int len;
+				//unsigned int len;
 				char param_name[17];
 				float param_value;
 				int idx;
@@ -451,12 +457,12 @@ void read_mavlink()
 				if ((sys != OSD_SYS_ID) || (comp != MAV_COMP_ID_OSD))
 					break;
 				
-				len = mavlink_msg_param_set_get_param_id(&msg, param_name);
+				//len = mavlink_msg_param_set_get_param_id(&msg, param_name);
 				param_name[16] = '\0';
 
 				param_value = mavlink_msg_param_set_get_param_value(&msg);
 
-				debug("set_param: %s - %f\n", param_name, param_value);
+				//debug("set_param: %s - %f\n", param_name, param_value);
 
 				idx = params_set_value(param_name, param_value, 1);
 
@@ -509,13 +515,13 @@ void send_param_list()
 
 void mavlink_send_msg(mavlink_message_t *msg)
 {
-    unsigned char i;
+
     unsigned int len;
     unsigned char buf[MAVLINK_MAX_PACKET_LEN];
 
     len = mavlink_msg_to_send_buffer(buf, msg);
     
-    Serial1.write(buf, len) == 0;
+    Serial1.write(buf, len);
 
 }
 

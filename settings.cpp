@@ -89,38 +89,41 @@ void default_settings()
 	osd.vin_brightness[3] = 0x00;
 	osd.vin_functions[3] = 0x00;
 
+							//   input, enable, popup, pos_h, pos_vm, lenh, 
+	osd.video_channels[0][1] = { 1, 1, 0, 0, 0, 180 };
+	osd.video_channels[0][2] = { 2, 1, 1, 0, 0, 64 };
+	osd.video_channels[0][3] = { 3, 1, 1, 116, 0, 64 };
+	osd.video_channels[0][4] = { 4, 1, 1, 64, 0, 52 };
+	
+							//   input, enable, popup, pos_h, pos_vm, lenh, 
+	osd.video_channels[1][1] = { 1, 1, 0, 0, 0, 180 };
+	osd.video_channels[1][2] = { 2, 0, 1, 0, 0, 64 };
+	osd.video_channels[1][3] = { 3, 0, 1, 116, 0, 64 };
+	osd.video_channels[1][4] = { 4, 0, 1, 64, 0, 52 };
 
-    osd.video_channels[0][1].pos_h = 0;
-    osd.video_channels[0][1].pos_v = 0;
-    osd.video_channels[0][1].len_h = 180;
-    osd.video_channels[0][1].input = 0;
-    osd.video_channels[0][1].enable = 1;
-    osd.video_channels[0][1].popup = 0;
+							//   input, enable, popup, pos_h, pos_vm, lenh, 
+	osd.video_channels[2][1] = { 1, 1, 0, 0, 0, 180 };
+	osd.video_channels[2][2] = { 2, 1, 1, 0, 0, 64 };
+	osd.video_channels[2][3] = { 3, 1, 1, 116, 0, 64 };
+	osd.video_channels[2][4] = { 4, 0, 1, 64, 0, 52 };
 
-    osd.video_channels[0][2].pos_h = 4;
-    osd.video_channels[0][2].pos_v = 0;
-    osd.video_channels[0][2].len_h = 64;
-    osd.video_channels[0][2].input = 1;
-    osd.video_channels[0][2].enable = 0;
-    osd.video_channels[0][2].popup = 1;
+							//   input, enable, popup, pos_h, pos_vm, lenh, 
+	osd.video_channels[3][1] = { 4, 1, 0, 0, 0, 180 };
+	osd.video_channels[3][2] = { 2, 0, 1, 0, 0, 64 };
+	osd.video_channels[3][3] = { 3, 0, 1, 116, 0, 64 };
+	osd.video_channels[3][4] = { 1, 1, 1, 64, 0, 52 };
 
-    osd.video_channels[0][3].pos_h = 116;
-    osd.video_channels[0][3].pos_v = 0;
-    osd.video_channels[0][3].len_h = 64;
-    osd.video_channels[0][3].input = 1;
-    osd.video_channels[0][3].enable = 0;
-    osd.video_channels[0][3].popup = 1;
+	osd.video_channels[4][1] = { 1, 1, 0, 0, 0, 180 };
+	osd.video_channels[4][2] = { 2, 0, 1, 0, 0, 64 };
+	osd.video_channels[4][3] = { 3, 0, 1, 116, 0, 64 };
+	osd.video_channels[4][4] = { 4, 1, 1, 64, 0, 52 };
 
-	osd.video_channels[0][4].pos_h = 68;
-	osd.video_channels[0][4].pos_v = 0;
-	osd.video_channels[0][4].len_h = 48;
-	osd.video_channels[0][4].input = 1;
-	osd.video_channels[0][4].enable = 0;
-	osd.video_channels[0][4].popup = 1;
+	osd.video_channels[5][1] = { 1, 1, 0, 0, 0, 180 };
+	osd.video_channels[5][2] = { 2, 0, 1, 0, 0, 64 };
+	osd.video_channels[5][3] = { 3, 0, 1, 116, 0, 64 };
+	osd.video_channels[5][4] = { 4, 0, 1, 64, 0, 52 };
 
-
-
-    osd.gps.x = 7;
+	osd.gps.x = 7;
     osd.gps.y = 232;
     osd.gps.sat_warn = 5;
     osd.gps.color = COLOR_YELLOW;

@@ -28,8 +28,12 @@
 #define CHANNEL_MODES 6
 #define MESSAGE_BUFFER_LINES 20
 
-#define RC_STATE0 1300
-#define RC_STATE1 1700
+#define RC_STATE0 0
+#define RC_STATE1 1231
+#define RC_STATE2 1361
+#define RC_STATE3 1491
+#define RC_STATE4 1621
+#define RC_STATE5 1750
 
 
 
@@ -49,6 +53,11 @@ struct osd_settings {
 
 	bool color_kill_x = false;
 	bool color_kill_y = false;
+
+	char vout1_gain = 7;  //YX
+	char vout2_gain = 7;  //CX
+	char vout3_gain = 7;  //YY
+
 
 
 

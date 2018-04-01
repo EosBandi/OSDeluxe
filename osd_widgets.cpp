@@ -503,7 +503,6 @@ void render_horizon(struct horizon_t *h)
     int y, i, j;
     int x0, x1, y0, y1;
     unsigned char size, gap;
-    char buf[10];
     float offset;
     float cx, cy;
     float pitchrad, rollrad;
