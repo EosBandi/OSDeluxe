@@ -239,6 +239,14 @@ struct message_widget_t {
 
 };
 
+struct message_list_widget_t {
+	unsigned short x;
+	unsigned short y;
+	bool mix;
+	
+	unsigned char visible;
+};
+
 extern struct alt_widget_t aw;
 extern struct battery_widget_t bw;
 extern struct gps_widget_t g;
@@ -266,5 +274,6 @@ void rc_control(void);
 
 void message_buffer_add_line(char *message, char severity);
 void message_buffer_render(void);
+void message_list_render();
 
 #endif

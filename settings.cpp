@@ -264,4 +264,10 @@ void default_settings()
 	osd.msg_widget.y = 218;
 	osd.msg_widget.visible = 0x01;
 
+	osd.msg_list_widget.x = 4;
+	osd.msg_list_widget.y = 20;
+	osd.msg_list_widget.mix = false;
+	osd.msg_list_widget.visible = 0x01;
+
+
 }

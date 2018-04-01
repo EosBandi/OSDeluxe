@@ -83,6 +83,7 @@ struct osd_settings {
 	pull_widget_t pull;
 
 	message_widget_t msg_widget;
+	message_list_widget_t msg_list_widget;
 
     
     //Global variables
@@ -120,6 +121,11 @@ struct osd_settings {
     long          message_buffer_display_time;
     bool          message_display; //we have message to display in the buffer
     bool          clear_req;
+
+	char		  message_archive[MESSAGE_BUFFER_LINES][52];
+	char		  message_archive_severity[MESSAGE_BUFFER_LINES];
+	char		  message_archive_line = 0;
+
 
     bool          displayed_arming_status;
     unsigned long armed_start_time;

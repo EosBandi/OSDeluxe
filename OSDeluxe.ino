@@ -226,6 +226,8 @@ while (1)
 
     if (osd.msg_widget.visible & osd.visible_osd_page)  message_buffer_render();
 
+	//if (osd.msg_list_widget.visible & osd.visible_osd_page) message_list_render();
+
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
 

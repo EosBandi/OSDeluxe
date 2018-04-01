@@ -816,6 +816,23 @@ void message_buffer_add_line(char *message, char severity)
 
 	strcpy(osd.message_buffer[osd.message_buffer_line], message);
 	osd.message_severity[osd.message_buffer_line] = severity;
+
+	//Add line to the archive as well, so we can always display the last 20 messages if needed
+	if (osd.message_archive_line == MESSAGE_BUFFER_LINES - 1)
+	{
+		for (int i = 2; i < MESSAGE_BUFFER_LINES; i++)
+		{
+			strcpy(osd.message_archive[i - 1], osd.message_archive[i]); // roll to 1
+			osd.message_archive_severity[i - 1] = osd.message_archive_severity[i];
+		}
+	}
+	else {
+		osd.message_archive_line++;
+	}
+
+	strcpy(osd.message_archive[osd.message_archive_line], message);
+	osd.message_archive_severity[osd.message_archive_line] = severity;
+
 }
 
 
@@ -886,4 +903,14 @@ void message_buffer_render()
 
 	OSD_work_field = temp_fld;
 
+}
+
+void message_list_render()
+{
+	font_type = FONT_OUTLINE_16x12;
+
+	for (char i = 0; i < MESSAGE_BUFFER_LINES; i++)
+	{
+		tw_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 12, "%s", osd.message_archive[i]);
+	}
 }
