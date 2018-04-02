@@ -72,9 +72,9 @@ void default_settings()
 
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[0][1] = { 1, 1, 0, 0, 0, 180 };
-	osd.video_channels[0][2] = { 2, 1, 1, 0, 0, 64 };
-	osd.video_channels[0][3] = { 3, 1, 1, 116, 0, 64 };
-	osd.video_channels[0][4] = { 4, 1, 1, 64, 0, 52 };
+	osd.video_channels[0][2] = { 2, 0, 1, 0, 0, 64 };
+	osd.video_channels[0][3] = { 3, 0, 1, 116, 0, 64 };
+	osd.video_channels[0][4] = { 4, 0, 1, 64, 0, 52 };
 	
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[1][1] = { 1, 1, 0, 0, 0, 180 };

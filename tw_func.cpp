@@ -1532,4 +1532,382 @@ void tw_clear_all_pages(void)
 }
 
 
+//*******************************************************************************/
+#define FONT_X 16
+#define FONT_Y 20
+#define U8 unsigned char
+#define U16 unsigned int
 
+#define	SetBit(x,y)			((x) |= (y))         
+#define	ClearBit(x,y)		((x) &= ~(y))        
+#define	BitSet(x,y)			(((x)&(y))== (y))    
+#define	BitClear(x,y)		(((x)&(y))== 0)      
+#define	IfBitSet(x,y)		if(((x)&(y)) == (y)) 
+#define	IfBitClear(x,y)		if(((x)&(y)) == 0)
+
+#define	PTH_X			BIT0//BIT1//
+#define	PTH_Y			BIT1//BIT5//
+#define	PTH_PB			BIT2//
+#define	PTH_ALL			(PTH_X|PTH_Y)
+
+
+#define WAIT_OSG_WRSTALL		while(tw_read_register(0x241)&0x40)
+#define WAIT_OSG_IDLE			while(!(tw_read_register(0x241)&0x80))
+#define WAIT_INDR_DONE			while(tw_read_register(0x246)&0x1)
+
+
+#define SCR_X_SIZE (720-1)
+#define SCR_Y_SIZE (576-1)
+
+void OSD256_OSG_Mode_Selection(U8 mode)
+{
+	U8 tmp;
+
+	tmp = tw_read_register(0x241);
+	tmp &= ~0x3;
+	tmp |= (mode & 0x3);
+	tmp |= 0x8; //test
+	tw_write_register(0x241, tmp);
+}
+
+
+
+void WriteOSD256Fnt(U8 _pth, U8 dst, U8 _pos_x, U16 _pos_y, U8 _prp, U8 _indx)
+{
+	U8 reg40, tmp;
+	const U8 *ptr;
+	U16 tmp1;
+
+
+	if (BitSet(_pth, PTH_X))
+	{
+		tw_write_register(0x20a, 0x0);					//... y path 0x20, x Path 0x00
+		tmp1 = _pos_x << 4;										//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
+	}
+	else
+	{
+		tw_write_register(0x20a, 0x20);					//... y path 0x20, x Path 0x00
+		tmp1 = _pos_x << 3;										//... (_pos_x)*2 -> 8 pixel * 2 -> 16 pixel char
+	}
+	_pos_y = (_pos_y << 4) + (_pos_y << 2);						//... (_pos_y)*(16+4)
+
+
+	reg40 = tw_read_register(0x240);
+	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
+
+	OSD256_OSG_Mode_Selection(1);					// Set OSG operation mode to BMP operation	
+
+	tw_write_register(0x205, tmp1);
+
+	if (_pth == PTH_X)
+		tmp1 = tmp1 + FONT_X - 1;
+	else
+		tmp1 = tmp1 + (FONT_X / 2) - 1;
+
+	tw_write_register(0x206, tmp1);
+
+	tmp = ((tmp1 & 0xff00) >> 8 << 6) | ((tmp1 & 0xff00) >> 8 << 4);
+	tw_write_register(0x24e, tmp);
+
+	tw_write_register(0x207, _pos_y);
+	tmp1 = _pos_y + FONT_Y - 1;
+
+
+	tw_write_register(0x208, tmp1);
+	tmp = ((_pos_y & 0xff00) >> 8 << 2) | ((tmp1 & 0xff00) >> 8);
+	tw_write_register(0x209, tmp);
+
+
+	tmp1 = (80 * _indx);
+	ptr = (ufont_16x20 + tmp1);
+
+
+	//Set OSG_DSTCTL           0 scratch 1 display   
+	if (dst == 1)
+		tmp = 0x4;				//To Display buffer
+	else
+		tmp = 0;					//scratch 
+
+	tw_write_register(0x24f, tmp | 0x1);
+
+
+	for (tmp = 0; tmp<FONT_Y; tmp++)
+	{
+		U8 pix, pix_data;
+		U8 i, j, mask;
+
+
+		for (i = 0; i<4; i++)
+		{
+			mask = 0xC0;
+
+			for (j = 0; j<4; j++)
+			{
+				pix = (mask &(*ptr)) >> ((3 - j) << 1);
+				//debug("0x%02x ", pix);
+				if (_pth == PTH_X)
+				{
+					if (!pix) pix_data = 0xff;
+					else
+					{
+							pix_data = pix;
+					}
+
+					tw_write_register(0x200, pix_data);
+				}
+				else
+				{
+					if (!pix) pix = 0xf;
+					if (j & 1 == 1)
+					{
+						pix_data |= pix;
+						tw_write_register(0x200, pix_data);
+					}
+					else
+					{
+						pix_data = pix << 4;
+					}
+				}
+				mask >>= 2;
+			}
+			ptr++;
+		}
+
+
+		WAIT_OSG_WRSTALL;
+	}
+	WAIT_OSG_IDLE;
+	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
+}
+
+void CreateScrathFntTab(U8 _pth, U8 dst)
+{
+	U8 i, j;
+
+	for (i = 0; i<14; i++) {
+		for (j = 0; j<8; j++)
+		{
+			U8 tmp = i * 8 + j;
+
+			WriteOSD256Fnt(_pth, dst, (tmp % 32), (tmp / 32), 0, tmp);
+		}
+	}
+}
+
+
+
+void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color)
+{
+	unsigned char reg40, tmp;
+
+	if (BitSet(_pth, PTH_X))
+	{
+		tw_write_register(0x20a, 0x0);					//... y path 0x20, x Path 0x00
+	}
+	else
+	{
+		tw_write_register(0x20a, 0x20);					//... y path 0x20, x Path 0x00
+		start_X >>= 1;
+		end_X >>= 1;
+	}
+
+
+	if (start_X >= SCR_X_SIZE)  start_X = SCR_X_SIZE;
+
+	if (start_Y >= SCR_Y_SIZE)  start_Y = SCR_Y_SIZE;
+
+	if (end_X >= SCR_X_SIZE)  end_X = SCR_X_SIZE;
+
+	if (end_Y >= SCR_Y_SIZE)  end_Y = SCR_Y_SIZE;
+
+
+	if (start_X >= end_X) start_X = end_X;
+
+	if (start_Y >= end_Y) start_Y = end_Y;
+
+	if ((start_X == end_X) && (start_Y == end_Y))           //Since we can't fill only 1 pixel, just return.
+		return;
+
+	reg40 = tw_read_register(0x240);
+	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
+
+	tw_write_register(0x243, color); 				// Filling color
+
+	OSD256_OSG_Mode_Selection(2);					// Set OSG operation mode to Block fill
+
+
+	tw_write_register(0x205, start_X);
+	tw_write_register(0x206, end_X);
+	tmp = ((start_X & 0xff00) >> 8 << 6) | ((end_X & 0xff00) >> 8 << 4);
+	tw_write_register(0x24e, tmp);
+
+
+	tw_write_register(0x207, start_Y);
+	tw_write_register(0x208, end_Y);
+	tmp = ((start_Y & 0xff00) >> 8 << 2) | ((end_Y & 0xff00) >> 8);
+	tw_write_register(0x209, tmp);
+
+	//Set OSG_DSTCTL           0 scratch 1 display   
+	if (dst == 1)
+		tmp = 0x4;					//To Display buffer
+	else
+		tmp = 0;						//scratch 
+
+	tw_write_register(0x24f, tmp | 0x1);
+
+	WAIT_OSG_IDLE;
+	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
+}
+
+void WriteOSDSqr(U8 _pth, U8 _hl, U8 _hr, U16 start_Y, U16 end_Y, U8 color)	//... 180(4 pixel/_pos_x) x 240/288 domain
+{
+	unsigned char reg40, tmp;
+	U16 start_X, end_X;
+
+	if (BitSet(_pth, PTH_X))
+	{
+		start_X = _hl << 2;
+		end_X = _hr << 2;
+		tw_write_register(0x20a, 0x0);					//... y path 0x20, x Path 0x00
+
+	}
+	else
+	{
+		start_X = _hl << 1;
+		end_X = _hr << 1;
+		tw_write_register(0x20a, 0x20);					//... y path 0x20, x Path 0x00
+	}
+
+	start_Y <<= 1;
+	end_Y <<= 1;
+
+	if (start_X>end_X) start_X = end_X;
+
+	if (start_Y>end_Y) start_Y = end_Y;
+
+
+	reg40 = tw_read_register(0x240);
+	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
+
+
+	tw_write_register(0x243, color); 				// Filling color
+
+	OSD256_OSG_Mode_Selection(2);					// Set OSG operation mode to Block fill
+
+
+	tw_write_register(0x205, start_X);
+	tw_write_register(0x206, end_X);
+	tmp = ((start_X & 0xff00) >> 8 << 6) | ((end_X & 0xff00) >> 8 << 4);
+	tw_write_register(0x24e, tmp);
+
+
+	tw_write_register(0x207, start_Y);
+	tw_write_register(0x208, end_Y);
+	tmp = ((start_Y & 0xff00) >> 8 << 2) | ((end_Y & 0xff00) >> 8);
+	tw_write_register(0x209, tmp);
+
+	tmp = 0x4;					//To Display buffer
+
+	tw_write_register(0x24f, tmp | 0x1);
+
+	WAIT_OSG_IDLE;
+
+	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
+
+}
+
+void OSD256_Block_Transfer(U8 direction, U16 src_start_x, U16 src_start_y,
+	U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y)
+{
+
+	unsigned char reg40, tmp;
+
+#if 0
+	Printf("\r\nBlock move from ");
+
+	if (direction & 1 == 1 && direction & 2 == 0)
+		Printf("display (%d %d)  to scratch ", src_start_x, src_start_y);
+	else
+		Printf("scratch (%d %d) to display ", src_start_x, src_start_y);
+
+	Printf("(%d %d) (%d %d)\n", dst_start_x, dst_start_y, dst_end_x, dst_end_y);
+
+#endif
+
+	reg40 = tw_read_register(0x240);
+	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
+
+	OSD256_OSG_Mode_Selection(3);					// Set OSG operation mode to Block transfer
+
+
+	tw_write_register(0x207, dst_start_y);
+	tw_write_register(0x208, dst_end_y);
+	tmp = ((dst_start_y & 0xff00) >> 8 << 2) | ((dst_end_y & 0xff00) >> 8);
+	tw_write_register(0x209, tmp);
+
+	tw_write_register(0x205, dst_start_x);
+	tw_write_register(0x206, dst_end_x);
+	tmp = ((dst_start_x & 0xff00) >> 8 << 6) | ((dst_end_x & 0xff00) >> 8 << 4);
+
+	tw_write_register(0x24c, src_start_x);
+	tw_write_register(0x24d, src_start_y);
+
+	tmp |= ((src_start_x & 0xff00) >> 8) | ((src_start_y & 0xff00) >> 8 << 2);
+	tw_write_register(0x24e, tmp);
+
+	tmp = direction << 1;
+	tw_write_register(0x24f, (tmp | 0x1));
+
+	WAIT_OSG_IDLE;
+
+	tw_write_register(0x240, reg40); 		// Restore the saved register 2x40 value
+}
+
+void WriteOSDFnt(U8 _pth, U16 _pos_x, U16 _pos_y, U8 _indx)
+{
+
+	U8 direction;
+	U16 src_start_x, src_start_y, dst_start_x, dst_end_x, dst_end_y;
+
+	src_start_x = _indx % 32;
+
+	dst_start_x = _pos_x;
+
+	dst_end_x = dst_start_x + 15;
+
+
+	if (BitSet(_pth, PTH_X))
+	{
+		//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
+		src_start_x <<= 4;
+		//dst_start_x <<= 4;
+		//dst_end_x = (dst_end_x << 4) - 1;
+		tw_write_register(0x20a, 0x0);					//... y path 0x20, x Path 0x00
+
+	}
+	else
+	{
+		//... (_pos_x)*2 -> 8 pixel * 2 -> 16 pixel char
+		src_start_x <<= 3;
+		dst_start_x <<= 3;
+		dst_end_x = (dst_end_x << 3) - 1;
+		tw_write_register(0x20a, 0x20);					//... y path 0x20, x Path 0x00
+
+	}
+
+	direction = 0x2;
+
+	src_start_y = _indx / 32;
+	src_start_y = (src_start_y << 4) + (src_start_y << 2);
+
+	dst_end_y = _pos_y + 19;
+	
+	//_pos_y = (_pos_y << 4) + (_pos_y << 2);
+
+	//dst_end_y = (dst_end_y << 4) + (dst_end_y << 2) - 1;
+
+
+	OSD256_Block_Transfer(direction, src_start_x, src_start_y,
+		dst_start_x, _pos_y, dst_end_x, dst_end_y);
+
+}

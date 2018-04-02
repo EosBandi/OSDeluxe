@@ -25,6 +25,9 @@
 #ifndef OSDELUXE_H
 #define	OSDELUXE_H
 
+#define U8 unsigned char
+#define U16 unsigned int
+
 
 #include <Arduino.h>
 #include <stdlib.h>
@@ -42,7 +45,6 @@
 #include "settings.h"
 #include "mavlink.h"
 #include "params.h"
-
 
 
 

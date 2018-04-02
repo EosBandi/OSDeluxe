@@ -256,8 +256,15 @@ void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsi
 void tw_ext_putchar(unsigned int x, unsigned int y, char chr);
 void init_scratch_memory();
 
+void WriteOSD256Fnt(unsigned char _pth, unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _prp, unsigned char _indx);
 
+void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color);
+void OSD256_Block_Transfer(U8 direction, U16 src_start_x, U16 src_start_y, U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y);
+void WriteOSDFnt(U8 _pth, U16 _pos_x, U16 _pos_y, U8 _indx);
 
 unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
 void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);
+
+void CreateScrathFntTab(unsigned char _pth, unsigned char dst);
+
 #endif

@@ -82,34 +82,12 @@ void loop ()
 	osd.pip_page = 0;
 	//update_pip();
 
-
-	/*
-
-    tw_ch_settings (1, CH_ON, CH_NO_POPUP);
-    tw_ch_settings (2, CH_OFF, CH_POPUP);
-    tw_ch_settings (3, CH_OFF, CH_POPUP);
-    tw_ch_settings (4, CH_OFF, CH_POPUP);
-
-
-  // tw_ch_set_window (1, 0, 0, 180);
-  // tw_ch_set_window (2, 4, 0 , 64);
-  //  tw_ch_set_window (3, 116, 0, 64);
-  //  tw_ch_set_window (4, 68, 0, 48);
-
-	
-	tw_set_ch_input(1,1);
-    tw_set_ch_input(2,2);
-    tw_set_ch_input(3,3);
-    tw_set_ch_input(4,4);
-	
-	*/
-
-    tw_write_register(0x0c8,0x03);
+	tw_write_register(0x0c8, 0x03);
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
 	tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
 
-
     digitalWrite (LED_PIN, HIGH);
+
 
     rec_color_shadow = COLOR_REC_BLACK;
     rec_color = COLOR_REC_WHITE;
@@ -119,14 +97,14 @@ void loop ()
     disp_color_background = COLOR_NONE;
     disp_color_shadow = COLOR_BLACK;
 
-
-    tw_clear_all_pages();
+	tw_clear_all_pages();
 
     OSD_path = OSD_PATH_DISP;
     OSD_work_field = FLD_EVEN;
 
     tw_osd_set_display_field(FLD_EVEN);
-    tw_osd_set_rec_field(FLD_EVEN);
+
+	tw_osd_set_rec_field(FLD_EVEN);
     tw_osd_set_display_page(0);
 
     OSD_path = OSD_PATH_DISP;
@@ -138,27 +116,23 @@ void loop ()
 
 	update_pip();
 
-// Prerender 
 
-osd.displayed_mode = -1;        // Signal startup
-osd_center_marker();
-
-
-OSD_work_field = FLD_ODD;
-OSD_display_field = FLD_EVEN;
-
-memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
-osd.message_buffer_line = 0;
-osd.message_buffer_display_time = 0;
+	osd.displayed_mode = -1;        // Signal startup
+	//osd_center_marker();
 
 
-osd.visible_osd_page = 0x01; //bit coded 
-osd.pip_page = 0x00;
+	OSD_work_field = FLD_ODD;
+	OSD_display_field = FLD_EVEN;
 
-////Ez torolni
-//tw_osd_set_display_field(OSD_work_field);
+	memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
+	osd.message_buffer_line = 0;
+	osd.message_buffer_display_time = 0;
 
-init_home();
+
+	osd.visible_osd_page = 0x01; //bit coded 
+	osd.pip_page = 0x00;
+
+	init_home();
 
 //Ezt is torolni
 //tw_osd_fill_region(0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
@@ -170,22 +144,46 @@ init_home();
 //tw_printf(20, 40, "IMU0: In flight calibration completed !");
 //debug("normal write end - %lu\n", millis());
 
+	get_parameter_count();
+	param_send_index = total_params;
+#define	PTH_X			BIT0//BIT1//
+#define	PTH_Y			BIT1//BIT5//
+#define	PTH_PB			BIT2//
+#define	PTH_ALL			(PTH_X|PTH_Y)
 
 
-
-//tw_display_logo();
-
-get_parameter_count();
-param_send_index = total_params;
-//debug("Parameter count:%u\n", total_params);
+	tw_write_register(0x20f, 0x0f);
 
 
+//	WriteOSD256Fnt(PTH_X, 1, 10, 10, 1, 45);
+//	WriteOSD256Fnt(PTH_X, 1, 11, 10, 1, 46);
+//	WriteOSD256Fnt(PTH_X, 1, 12, 10, 1, 47);
 
+	CreateScrathFntTab(PTH_X, 0);
+	unsigned long now;
+
+	now = millis();
+
+	for (int i = 1; i < 40; i++) {
+		WriteOSD256Fnt(PTH_X, 1, 0+i, 10, 1, 40+i);
+		//WriteOSDFnt(PTH_X, 1 + i, 10, 40+i);
+	}
+	debug("%lu\n", millis() - now);
+
+	now = millis();
+
+	for (int i = 1; i < 40; i++) {
+		//WriteOSD256Fnt(PTH_X, 1, 1 + i, 10, 1, 40 + i);
+		WriteOSDFnt(PTH_X, i*16, 15, 40+i);
+	}
+	debug("%lu\n", millis() - now);
+
+	delay(1000);
+//	tw_write_register(0x20f, 0x1f);
 
 // eddig es ne tovabb
-//while (1);
+	while (1);
 
-unsigned long now;
 
 
 
