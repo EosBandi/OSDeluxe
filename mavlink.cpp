@@ -446,7 +446,7 @@ void read_mavlink()
 			{
 				unsigned char sys, comp;
 				mavlink_message_t msg2;
-				//unsigned int len;
+				unsigned int len;
 				char param_name[17];
 				float param_value;
 				int idx;
@@ -457,7 +457,7 @@ void read_mavlink()
 				if ((sys != OSD_SYS_ID) || (comp != MAV_COMP_ID_OSD))
 					break;
 				
-				//len = mavlink_msg_param_set_get_param_id(&msg, param_name);
+				len = mavlink_msg_param_set_get_param_id(&msg, param_name);
 				param_name[16] = '\0';
 
 				param_value = mavlink_msg_param_set_get_param_value(&msg);

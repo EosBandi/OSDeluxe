@@ -39,11 +39,7 @@
 
 struct osd_settings {
 
-	unsigned char   vin_sharpening[4];
-	unsigned char   vin_saturation[4];
-	unsigned char   vin_contrast[4];
-	unsigned char	vin_brightness[4];
-	unsigned char   vin_functions[4];
+	vin_params_t vin_params[4];					// Video in
 
 
 	unsigned char ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
@@ -61,7 +57,8 @@ struct osd_settings {
 
 
 
-    channel_setting video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero) ???
+    channel_setting_t video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero) ???
+
     gps_widget_t gps;
 
 	batt_volt_widget_t batt1_v;
@@ -134,7 +131,8 @@ struct osd_settings {
 
     unsigned long last_capacity_query;
     unsigned long last_outgoing_heartbeat;
-    //unsigned long 
+    
+	char test_byte;
    
 };
 

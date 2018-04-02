@@ -61,6 +61,7 @@ void update_channel_onoff();
 void update_vin_settings();
 void update_vout_settings();
 void update_pip();
+void update_test_byte();
 
 
 #endif

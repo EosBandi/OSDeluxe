@@ -26,6 +26,22 @@
 #define _TW_FUNC_H_
 
 
+#define	BIT0		(0x0001)
+#define	BIT1		(0x0002)
+#define	BIT2		(0x0004)
+#define	BIT3		(0x0008)
+#define	BIT4		(0x0010)
+#define	BIT5		(0x0020)
+#define	BIT6		(0x0040)
+#define	BIT7		(0x0080)
+
+#define	SetBit(x,y)			((x) |= (y))         
+#define	ClearBit(x,y)		((x) &= ~(y))        
+#define	BitSet(x,y)			(((x)&(y))== (y))    
+#define	BitClear(x,y)		(((x)&(y))== 0)      
+#define	IfBitSet(x,y)		if(((x)&(y)) == (y)) 
+#define	IfBitClear(x,y)	if(((x)&(y)) == 0)
+
 //OSD registers
 
 #define COLOR_BLACK      0
@@ -110,7 +126,7 @@ enum input_channel {
 
 
 
-struct channel_setting
+struct channel_setting_t
 {
     char input;
     char enable;
@@ -119,6 +135,19 @@ struct channel_setting
 	unsigned int pos_v;
 	unsigned int len_h;
 
+};
+
+struct vin_params_t
+{
+	char sharpening;
+	char saturation;
+	char contrast;
+	char brightness;
+	char enhance;
+	char h_mirror;
+	char v_mirror;
+	char boundary;
+	char peaking;
 };
 
 
@@ -220,11 +249,15 @@ void tw_osd_fill_region(unsigned int x1,unsigned int y1,unsigned int x2,unsigned
 
 void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
 
-void tw_display_logo();
 
 void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y);
 void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsigned int width, unsigned int height, unsigned int src_hpos, unsigned int src_vpos);
 
 void tw_ext_putchar(unsigned int x, unsigned int y, char chr);
 void init_scratch_memory();
+
+
+
+unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
+void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);
 #endif

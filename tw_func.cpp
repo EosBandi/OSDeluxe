@@ -322,6 +322,25 @@ void tw_write_register (unsigned int wrADDR, unsigned char content)
     Wire.endTransmission ();
 }
 
+unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg)
+{
+	unsigned char val;
+	
+	val = tw_read_register(rdADDR);
+	return (val & _flg);
+}
+
+void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data)
+{
+	unsigned char val;
+
+	val = tw_read_register(wrADDR);
+	val = (val & ~_flg) | _data;
+	tw_write_register(wrADDR, val);
+
+}
+
+
 void tw_write_buf (unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT)
 {
 
@@ -1233,6 +1252,11 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
 	tw_write_register(_ADDR_2++, _HR);
 	tw_write_register(_ADDR_2++, _VT);
 	tw_write_register(_ADDR_2++, _VB);
+
+	if ((_SCALE >> 8) > 191) {
+
+	}
+
 /*
     tw_write_register (_ADDR_1++, _SCALE >> 8);
     tw_write_register (_ADDR_1++, _SCALE);

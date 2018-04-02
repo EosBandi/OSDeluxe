@@ -33,30 +33,45 @@ unsigned int param_send_index;
 struct param_def parameters[] = {
 	//Generic parameters
 
-	PARAM("VIN1_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_sharpening[0], &update_vin_settings),
-	PARAM("VIN1_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_saturation[0], &update_vin_settings),
-	PARAM("VIN1_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_contrast[0], &update_vin_settings),
-	PARAM("VIN1_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_brightness[0], &update_vin_settings),
-	PARAM("VIN1_FUNCTIONS",  MAV_PARAM_TYPE_UINT8,&osd.vin_functions[0], &update_vin_settings),
+	PARAM("VIN1_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].sharpening, &update_vin_settings),
+	PARAM("VIN1_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].saturation, &update_vin_settings),
+	PARAM("VIN1_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].contrast, &update_vin_settings),
+ 	PARAM("VIN1_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].brightness, &update_vin_settings),
+	PARAM("VIN1_ENHANCE",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].enhance, &update_vin_settings),
+	PARAM("VIN1_H_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].h_mirror, &update_vin_settings),
+	PARAM("VIN1_V_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].v_mirror, &update_vin_settings),
+	PARAM("VIN1_BOUNDARY",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].boundary, &update_vin_settings),
+	PARAM("VIN1_PEAKING",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].peaking, &update_vin_settings),
 
+	PARAM("VIN2_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].sharpening, &update_vin_settings),
+	PARAM("VIN2_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].saturation, &update_vin_settings),
+	PARAM("VIN2_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].contrast, &update_vin_settings),
+	PARAM("VIN2_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].brightness, &update_vin_settings),
+	PARAM("VIN2_ENHANCE",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].enhance, &update_vin_settings),
+	PARAM("VIN2_H_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].h_mirror, &update_vin_settings),
+	PARAM("VIN2_V_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].v_mirror, &update_vin_settings),
+	PARAM("VIN2_BOUNDARY",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].boundary, &update_vin_settings),
+	PARAM("VIN2_PEAKING",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[1].peaking, &update_vin_settings),
 
-	PARAM("VIN2_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_sharpening[1], &update_vin_settings),
-	PARAM("VIN2_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_saturation[1], &update_vin_settings),
-	PARAM("VIN2_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_contrast[1], &update_vin_settings),
-	PARAM("VIN2_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_brightness[1], &update_vin_settings),
-	PARAM("VIN2_FUNCTIONS",  MAV_PARAM_TYPE_UINT8,&osd.vin_functions[1], &update_vin_settings),
+	PARAM("VIN3_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].sharpening, &update_vin_settings),
+	PARAM("VIN3_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].saturation, &update_vin_settings),
+	PARAM("VIN3_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].contrast, &update_vin_settings),
+	PARAM("VIN3_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].brightness, &update_vin_settings),
+	PARAM("VIN3_ENHANCE",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].enhance, &update_vin_settings),
+	PARAM("VIN3_H_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].h_mirror, &update_vin_settings),
+	PARAM("VIN3_V_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].v_mirror, &update_vin_settings),
+	PARAM("VIN3_BOUNDARY",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].boundary, &update_vin_settings),
+	PARAM("VIN3_PEAKING",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[2].peaking, &update_vin_settings),
 
-	PARAM("VIN3_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_sharpening[1], &update_vin_settings),
-	PARAM("VIN3_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_saturation[1], &update_vin_settings),
-	PARAM("VIN3_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_contrast[1], &update_vin_settings),
-	PARAM("VIN3_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_brightness[1], &update_vin_settings),
-	PARAM("VIN3_FUNCTIONS",  MAV_PARAM_TYPE_UINT8,&osd.vin_functions[1], &update_vin_settings),
-
-	PARAM("VIN4_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_sharpening[1], &update_vin_settings),
-	PARAM("VIN4_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_saturation[1], &update_vin_settings),
-	PARAM("VIN4_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_contrast[1], &update_vin_settings),
-	PARAM("VIN4_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_brightness[1], &update_vin_settings),
-	PARAM("VIN4_FUNCTIONS",  MAV_PARAM_TYPE_UINT8,&osd.vin_functions[1], &update_vin_settings),
+	PARAM("VIN4_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].sharpening, &update_vin_settings),
+	PARAM("VIN4_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].saturation, &update_vin_settings),
+	PARAM("VIN4_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].contrast, &update_vin_settings),
+	PARAM("VIN4_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].brightness, &update_vin_settings),
+	PARAM("VIN4_ENHANCE",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].enhance, &update_vin_settings),
+	PARAM("VIN4_H_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].h_mirror, &update_vin_settings),
+	PARAM("VIN4_V_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].v_mirror, &update_vin_settings),
+	PARAM("VIN4_BOUNDARY",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].boundary, &update_vin_settings),
+	PARAM("VIN4_PEAKING",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[3].peaking, &update_vin_settings),
 
 
 	PARAM("VARIO_POSX", MAV_PARAM_TYPE_UINT16, &osd.vario.x, NULL),
@@ -357,10 +372,18 @@ struct param_def parameters[] = {
 	PARAM("TEST_PIP_PAGE",MAV_PARAM_TYPE_UINT8, &osd.pip_page, &update_pip),
 	PARAM("TEST_OSD_PAGE", MAV_PARAM_TYPE_UINT8, &osd.visible_osd_page, NULL),
 
+	PARAM("XXX", MAV_PARAM_TYPE_UINT8, &osd.test_byte, &update_test_byte),
 
 	PARAM_END
 };
 
+
+void update_test_byte()
+{
+
+	tw_write_register(0x0c5, osd.test_byte);
+
+}
 
 void update_pip()
 {
@@ -395,7 +418,6 @@ void update_vout_settings()
 	tw_write_register(0x041, reg041);
 	tw_write_register(0x042, osd.vout3_gain);
 
-	//debug("0x%02x\n", reg041);
 
 
 }
@@ -403,19 +425,25 @@ void update_vout_settings()
 
 void update_vin_settings()
 {
-	//Check some boundaries
+	//Check some boundaries and update all four channels
 	for (int i = 0; i < 4; i++)
 	{
-		if (osd.vin_sharpening[i] > 0x0f) osd.vin_sharpening[i] = 0x0f;
-		tw_write_register(i * 0x10 + 0x08, 0x30 + osd.vin_sharpening[i]);
+		if (osd.vin_params[i].sharpening > 0x0f) osd.vin_params[i].sharpening = 0x0f;
+		if (osd.vin_params[i].peaking > 0x07) osd.vin_params[i].peaking = 0x07;
 
-		tw_write_register(i * 0x10 + 0x09, osd.vin_contrast[i]);
-		tw_write_register(i * 0x10 + 0x0a, osd.vin_brightness[i]);
+		tw_write_register(i * 0x10 + 0x08, 0x30 + osd.vin_params[i].sharpening);
+		tw_write_register(i * 0x10 + 0x09, osd.vin_params[i].contrast);
+		tw_write_register(i * 0x10 + 0x0a, osd.vin_params[i].brightness);
+		tw_write_register(i * 0x10 + 0x0b, osd.vin_params[i].saturation);
+		tw_write_register(i * 0x10 + 0x0c, osd.vin_params[i].saturation);
+		tw_write_register(i * 0x10 + 0x01, osd.vin_params[i].peaking);
 
-		tw_write_register(i * 0x10 + 0x0b, osd.vin_saturation[i]);
-		tw_write_register(i * 0x10 + 0x0c, osd.vin_saturation[i]);
-
-		tw_write_register(0x111 + (i * 0x08), osd.vin_functions[i]);
+		char func_reg = 0;
+		if (osd.vin_params[i].enhance) func_reg += BIT3;
+		if (osd.vin_params[i].h_mirror) func_reg += BIT5;
+		if (osd.vin_params[i].v_mirror) func_reg += BIT4;
+		if (osd.vin_params[i].boundary) func_reg += BIT1;
+		tw_write_register(0x111 + (i * 0x08), func_reg);
 	}
 
 

@@ -64,30 +64,11 @@ void default_settings()
 	osd.ctr2_video_on[1] = 0b00000111;
 	osd.ctr2_video_on[2] = 0b00000001;
 
-
-	osd.vin_sharpening[0] = 0xf;
-	osd.vin_saturation[0] = 0x50;
-	osd.vin_contrast[0] = 0x64;
-	osd.vin_brightness[0] = 0x00;
-	osd.vin_functions[0] = 0x00;
-
-	osd.vin_sharpening[1] = 0xf;
-	osd.vin_saturation[1] = 0x50;
-	osd.vin_contrast[1] = 0x64;
-	osd.vin_brightness[1] = 0x00;
-	osd.vin_functions[1] = 0x00;
-
-	osd.vin_sharpening[2] = 0xf;
-	osd.vin_saturation[2] = 0x50;
-	osd.vin_contrast[2] = 0x64;
-	osd.vin_brightness[2] = 0x00;
-	osd.vin_functions[2] = 0x00;
-
-	osd.vin_sharpening[3] = 0xf;
-	osd.vin_saturation[3] = 0x50;
-	osd.vin_contrast[3] = 0x64;
-	osd.vin_brightness[3] = 0x00;
-	osd.vin_functions[3] = 0x00;
+	                    // sharp, sat, contr, bright, enhance, hmir, vmir, bound, peak
+	osd.vin_params[0] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1, 2};
+	osd.vin_params[1] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1, 2};
+	osd.vin_params[2] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1, 2};
+	osd.vin_params[3] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1 ,2};
 
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[0][1] = { 1, 1, 0, 0, 0, 180 };
