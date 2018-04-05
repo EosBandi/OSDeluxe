@@ -98,6 +98,8 @@
 #define OSD_PATH_DISP 0
 #define OSD_PATH_REC  1
 
+#define SCRATCH 0
+#define DISPLAY 1
 
 #define SCREEN_SCALE 1.6f
 
@@ -159,6 +161,10 @@ extern unsigned char OSD_work_field, OSD_display_field;
 extern unsigned char OSD_path; //0-display, 1-record
 extern unsigned char rec_color_shadow, rec_color, rec_color_background;
 extern unsigned char disp_color, disp_color_background, disp_color_shadow;
+
+extern unsigned char OSD256_font_color;
+extern unsigned char OSD256_wr_page;
+
 extern struct osd_settings osd;  
 
 
@@ -202,6 +208,16 @@ const unsigned char colortable_rec[4][3] = {
 #define COLOR_REC_NONE  0xf
 #define REC_MIX         0x8
 #define REC_BLINK       0x4
+
+
+#define OSD256_FONT_WHITE     0
+#define OSD256_FONT_RED       1
+#define OSD256_FONT_RED_BLINK 2
+#define OSD256_FONT_YELLOW    3
+#define OSD256_FONT_GREEN     4
+#define OSD256_FONT_BLUE	  5
+
+
 
 void tw_init();
 void tw_write_buf(unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT);
@@ -256,15 +272,20 @@ void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsi
 void tw_ext_putchar(unsigned int x, unsigned int y, char chr);
 void init_scratch_memory();
 
-void WriteOSD256Fnt(unsigned char _pth, unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _prp, unsigned char _indx);
+void WriteOSD256Fnt(unsigned char _pth, unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _indx, U8 color, U8 attrib);
 
 void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color);
-void OSD256_Block_Transfer(U8 direction, U16 src_start_x, U16 src_start_y, U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y);
-void WriteOSDFnt(U8 _pth, U16 _pos_x, U16 _pos_y, U8 _indx);
+void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y, U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y);
+void OSD256_putc(U8 _pth, U16 _pos_x, U16 _pos_y, U8 _indx, U8 color);
+void OSD256_Scratch_Buffer_Select(unsigned char number);
+void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned char color);
+void OSD256_printf(unsigned short posx, unsigned short posy, char color, const char *format, ...);
+
+
 
 unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
 void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);
 
-void CreateScrathFntTab(unsigned char _pth, unsigned char dst);
+void CreateScrathFntTab(unsigned char _pth, unsigned char dst, U8 color, U8 attrib);
 
 #endif

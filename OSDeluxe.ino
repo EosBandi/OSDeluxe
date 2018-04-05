@@ -158,28 +158,30 @@ void loop ()
 //	WriteOSD256Fnt(PTH_X, 1, 10, 10, 1, 45);
 //	WriteOSD256Fnt(PTH_X, 1, 11, 10, 1, 46);
 //	WriteOSD256Fnt(PTH_X, 1, 12, 10, 1, 47);
+	CreateScrathFntTab(PTH_X, 0, COLOR_RED, 0);
+	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 60, 609, 119);
 
-	CreateScrathFntTab(PTH_X, 0);
+	CreateScrathFntTab(PTH_X, 0, COLOR_RED, BLINK);
+	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 120, 609, 179);
+
+	CreateScrathFntTab(PTH_X, 0, COLOR_YELLOW, 0);
+	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 180, 609, 239);
+
+	CreateScrathFntTab(PTH_X, 0, COLOR_GREEN, 0);
+	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 240, 609, 299);
+
+	CreateScrathFntTab(PTH_X, 0, COLOR_WHITE, 0);
+
+
+
+
 	unsigned long now;
+	debug("table ok");
 
-	now = millis();
+	for (int i = 0; i < 500; i++) {
 
-	for (int i = 1; i < 40; i++) {
-		WriteOSD256Fnt(PTH_X, 1, 0+i, 10, 1, 40+i);
-		//WriteOSDFnt(PTH_X, 1 + i, 10, 40+i);
+		OSD256_printf(20+i, 20+i, OSD256_FONT_GREEN, "Ma a faszom !");
 	}
-	debug("%lu\n", millis() - now);
-
-	now = millis();
-
-	for (int i = 1; i < 40; i++) {
-		//WriteOSD256Fnt(PTH_X, 1, 1 + i, 10, 1, 40 + i);
-		WriteOSDFnt(PTH_X, i*16, 15, 40+i);
-	}
-	debug("%lu\n", millis() - now);
-
-	delay(1000);
-//	tw_write_register(0x20f, 0x1f);
 
 // eddig es ne tovabb
 	while (1);
