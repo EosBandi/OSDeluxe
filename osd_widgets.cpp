@@ -579,8 +579,7 @@ void render_horizon(struct horizon_t *h)
             offset = (size * sin_roll);
             y1 = y0 - offset;
 
- 
-				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+ 				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
  
 				if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
             {

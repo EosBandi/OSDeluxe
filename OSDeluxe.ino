@@ -172,19 +172,15 @@ void loop ()
 
 
 
-
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 1/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 1);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 0, 865, 143);
-
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 2/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 1);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 144, 865, 287);
-
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 3/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_YELLOW, 0, 1);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 288, 865, 431);
-	//
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 4/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 60, 609, 119);
@@ -210,12 +206,14 @@ void loop ()
 	
 	OSD256_clear_screen(0);
 
-
 	//From now on we assume that extended OSD functions are enabled...
 	tw_write_register(0x240, 0x01);
 
 	unsigned long now;
 
+
+	OSD256_Circle(360, 288, 200, COLOR_WHITE);
+	while (1);
 
 	now = millis();
 

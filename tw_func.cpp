@@ -1973,3 +1973,38 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 		j -= decInc;
 	}
 }
+void OSD256_Circle(int  xCenter, int yCenter, int radius, unsigned char color)
+{
+	int tSwitch, y, x = 0;
+	int d;
+
+	d = yCenter - xCenter;
+	y = radius;
+	tSwitch = 3 - 2 * radius;
+
+	while (x <= y)
+	{
+
+		OSD256_setpixel(PTH_X,xCenter + x, yCenter + y, color);
+		OSD256_setpixel(PTH_X, xCenter + x, yCenter - y, color);
+		OSD256_setpixel(PTH_X, xCenter - x, yCenter + y, color);
+		OSD256_setpixel(PTH_X, xCenter - x, yCenter - y, color);
+
+		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter + x, color);
+		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter - x, color);
+
+		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter + x, color);
+		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter - x, color);
+
+		if (tSwitch < 0)
+		{
+			tSwitch += (4 * x + 6);
+		}
+		else
+		{
+			tSwitch += (4 * (x - y) + 10);
+			y--;
+		}
+		x++;
+	}
+}

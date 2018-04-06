@@ -291,7 +291,7 @@ void OSD256_clear_screen(U8 page);
 
 void OSD256_setpixel(U8 _pth, U16 start_X, U16 start_Y, U8 color);
 void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2);
-
+void OSD256_Circle(int  xCenter, int yCenter, int radius, unsigned char color);
 
 unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
 void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);
