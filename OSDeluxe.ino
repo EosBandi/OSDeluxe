@@ -58,7 +58,7 @@ void setup ()
     delay (500);
 
     // Setup for Master mode, pins 18/19, external pullups, 400kHz, 10ms default timeout
-    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 3000000, I2C_OP_MODE_ISR);
+    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 4000000, I2C_OP_MODE_IMM);
     Wire.setDefaultTimeout (10000); // 10ms
 
 
@@ -103,9 +103,9 @@ void loop ()
     OSD_work_field = FLD_EVEN;
 
     tw_osd_set_display_field(FLD_EVEN);
-
 	tw_osd_set_rec_field(FLD_EVEN);
-    tw_osd_set_display_page(0);
+
+	tw_osd_set_display_page(0);
 
     OSD_path = OSD_PATH_DISP;
     OSD_work_field = FLD_EVEN;
@@ -118,11 +118,16 @@ void loop ()
 
 
 	osd.displayed_mode = -1;        // Signal startup
+	
+									
 	//osd_center_marker();
 
 
 	OSD_work_field = FLD_ODD;
 	OSD_display_field = FLD_EVEN;
+
+	tw_osd_set_display_field(OSD_display_field);
+
 
 	memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
 	osd.message_buffer_line = 0;
@@ -146,42 +151,95 @@ void loop ()
 
 	get_parameter_count();
 	param_send_index = total_params;
-#define	PTH_X			BIT0//BIT1//
-#define	PTH_Y			BIT1//BIT5//
-#define	PTH_PB			BIT2//
-#define	PTH_ALL			(PTH_X|PTH_Y)
 
-
+	//Display both fields !!!!
 	tw_write_register(0x20f, 0x0f);
 
+	//  Display width 54 character
+	//  012345678901234567890123456789012345678901234
 
-//	WriteOSD256Fnt(PTH_X, 1, 10, 10, 1, 45);
-//	WriteOSD256Fnt(PTH_X, 1, 11, 10, 1, 46);
-//	WriteOSD256Fnt(PTH_X, 1, 12, 10, 1, 47);
-	CreateScrathFntTab(PTH_X, 0, COLOR_RED, 0);
+	OSD256_printf_slow(18, 10, COLOR_WHITE, 0, "OSDeluxe");
+	OSD256_printf_slow(9, 13, COLOR_WHITE, 0, "C");
+	OSD256_printf_slow(10, 13, COLOR_BLUE, 0, "O");
+	OSD256_printf_slow(11, 13, COLOR_GREEN, 0, "L");
+	OSD256_printf_slow(12, 13, COLOR_RED, 0, "O");
+	OSD256_printf_slow(13, 13, COLOR_YELLOW, 0, "R");
+
+	OSD256_printf_slow(15, 13, COLOR_WHITE, 0, "PIP OSD for ARDU");
+	OSD256_printf_slow(31, 13, COLOR_YELLOW, 0, "PILOT");
+	
+	OSD256_printf_slow(6, 15, COLOR_WHITE, 0, "firmware version 1.0 build 12345");
+
+
+
+
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 1/8...");
+	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 1);
+	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 0, 865, 143);
+
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 2/8...");
+	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 1);
+	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 144, 865, 287);
+
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 3/8...");
+	CreateScrathFntTab(SCRATCH, COLOR_YELLOW, 0, 1);
+	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 288, 865, 431);
+	//
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 4/8...");
+	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 60, 609, 119);
 
-	CreateScrathFntTab(PTH_X, 0, COLOR_RED, BLINK);
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 5/8...");
+	CreateScrathFntTab(SCRATCH, COLOR_RED, BLINK, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 120, 609, 179);
 
-	CreateScrathFntTab(PTH_X, 0, COLOR_YELLOW, 0);
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 6/8...");
+	CreateScrathFntTab(SCRATCH, COLOR_YELLOW, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 180, 609, 239);
 
-	CreateScrathFntTab(PTH_X, 0, COLOR_GREEN, 0);
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 7/8...");
+
+	CreateScrathFntTab(SCRATCH, COLOR_GREEN, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 240, 609, 299);
 
-	CreateScrathFntTab(PTH_X, 0, COLOR_WHITE, 0);
+	//This must be the last one
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 8/8...");
+	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 0);
+	
+	OSD256_printf_slow(8, 19, COLOR_GREEN, 0, "            DONE              ");
+	
+	OSD256_clear_screen(0);
 
 
-
+	//From now on we assume that extended OSD functions are enabled...
+	tw_write_register(0x240, 0x01);
 
 	unsigned long now;
-	debug("table ok");
 
-	for (int i = 0; i < 500; i++) {
 
-		OSD256_printf(20+i, 20+i, OSD256_FONT_GREEN, "Ma a faszom !");
+	now = millis();
+
+	osd.horizon.x = 360;
+	osd.horizon.y = 288;
+
+	OSD256_wr_page = 0;
+	tw_osd_set_display_page(1);
+
+	for (int i = 0; i > -45; i--)
+	{
+		osd.horizon.roll = i;
+		osd.horizon.pitch = i;
+
+		OSD256_clear_screen(OSD256_wr_page);
+		render_horizon(&osd.horizon);
+		OSD256_wr_page = !OSD256_wr_page;
+		tw_osd_set_display_page(!OSD256_wr_page);
 	}
+
+	debug("Horizon render time: %u", millis() - now);
+
+
+
 
 // eddig es ne tovabb
 	while (1);
@@ -199,32 +257,49 @@ while (1)
     tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
     tw_wait_for_osd_write(20);
 
+	now = millis();
+	debug("start\n");
     if (osd.horizon.visible & osd.visible_osd_page) render_horizon(&osd.horizon);
+	debug("%ul\n", millis() - now);
 
 	if (osd.gps.visible & osd.visible_osd_page) osd_gps_render( &osd.gps );
+	debug("%ul\n", millis() - now);
 
 	if (osd.batt1_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
+	debug("%ul\n", millis() - now);
 	if (osd.batt2_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
+	debug("%ul\n", millis() - now);
 
 	if (osd.batt1_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
+	debug("%ul\n", millis() - now);
 	if (osd.batt2_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
+	debug("%ul\n", millis() - now);
 
 	if (osd.batt1_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
+	debug("%ul\n", millis() - now);
 	if (osd.batt2_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
+	debug("%ul\n", millis() - now);
 
 	if (osd.stat.visible & osd.visible_osd_page) osd_status_render(&osd.stat);
+	debug("%ul\n", millis() - now);
 
 	if (osd.alt.visible & osd.visible_osd_page) osd_altitude_render(&osd.alt);
+	debug("%ul\n", millis() - now);
 
 	if (osd.vario.visible & osd.visible_osd_page) osd_vario_render(&osd.vario);
+	debug("%ul\n", millis() - now);
 
 	if (osd.home_w.visible & osd.visible_osd_page) osd_home_render(&osd.home_w);
-	
+	debug("%ul\n", millis() - now);
+
 	if (osd.mode.visible & osd.visible_osd_page) osd_mode_render(&osd.mode);
+	debug("%ul\n", millis() - now);
 
 	if (osd.pull.visible & osd.visible_osd_page) osd_pull_render(&osd.pull);
+	debug("%ul\n", millis() - now);
 
     if (osd.msg_widget.visible & osd.visible_osd_page)  message_buffer_render();
+	debug("%ul\n", millis() - now);
 
 	//if (osd.msg_list_widget.visible & osd.visible_osd_page) message_list_render();
 

@@ -493,16 +493,20 @@ void osd_center_marker()
 
 }
 
-#define RANGE 120
-#define SCALE 3
+#define RANGE 250
+#define SCALE 6
 #define MINOR_TICK  5
 #define MAJOR_TICK  10
+#define ZERO_LINE 100
+#define MAJOR_LINE  50
+#define MINOR_LINE  10
+
 
 void render_horizon(struct horizon_t *h)
 {
     int y, i, j;
     int x0, x1, y0, y1;
-    unsigned char size, gap;
+    int  size, gap;
     float offset;
     float cx, cy;
     float pitchrad, rollrad;
@@ -522,18 +526,12 @@ void render_horizon(struct horizon_t *h)
 
     if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
     {
-        c1 = COLOR_RED | mix; c2= COLOR_YELLOW | mix; c3= c1; c4= c2;
+		c1 = COLOR_ORANGE;
     }
     else{
-        c1 = COLOR_WHITE | mix; c2 = COLOR_BLACK | mix; c3 = c1; c4 = c2;
+		c1 = COLOR_WHITE;
     }
 
-
-    //tw_osd_fill_region (50, 78, 130, 205, COLOR_NONE, OSD_work_field, OSD_PATH_DISP);
-    //tw_osd_rectangle(38,60,100,160, COLOR_NONE);
-
-    tw_set_osd_buf (c1, c2, c3, c4);
-    //tw_set_osd_buf (COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
 
     for (i = -RANGE / 2; i <= RANGE / 2; i++)
     {
@@ -544,16 +542,16 @@ void render_horizon(struct horizon_t *h)
         {
             if (j == 0)
             {
-                size = 50; // Zero line
+                size = ZERO_LINE; // Zero line
                 gap = 8;
             }
             else
             {
                 if (j % (MAJOR_TICK * SCALE) == 0)
-                    size = 20; // tick
+                    size = MAJOR_LINE; // tick
                 else
-                    size = 10; // small tick
-                gap = 10;
+                    size = MINOR_LINE; // small tick
+                gap = 20;
             }
 
             cx = h->x + (i * sin_roll);
@@ -569,19 +567,8 @@ void render_horizon(struct horizon_t *h)
             offset = (size * sin_roll);
             y1 = y0 + offset;
 
-            if (size == 50)
-            {
-                tw_set_osd_buf(COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix);
-                tw_osd_drawline(x0, y0-1, x1, y1-1);
-                tw_osd_drawline(x0, y0+1, x1, y1+1);
-                tw_set_osd_buf(COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix);
-                tw_osd_drawline(x0, y0, x1, y1);
-                tw_set_osd_buf (c1, c2, c3, c4);
-            }
-            else
-            {
-                tw_osd_drawline(x0, y0, x1, y1);
-            }
+			OSD256_drawline(PTH_X, c1,x0, y0, x1, y1);
+
             offset = (gap * cos_roll);
             x0 = cx - offset;
             offset = (size * cos_roll);
@@ -592,30 +579,12 @@ void render_horizon(struct horizon_t *h)
             offset = (size * sin_roll);
             y1 = y0 - offset;
 
-            if (size == 50)
+ 
+				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+ 
+				if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
             {
-                tw_set_osd_buf(COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix, COLOR_BLACK | mix);
-                tw_osd_drawline(x0, y0-1, x1, y1-1);
-                tw_osd_drawline(x0, y0+1, x1, y1+1);
-                tw_set_osd_buf(COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix, COLOR_WHITE | mix);
-                tw_osd_drawline(x0, y0, x1, y1);
-                tw_set_osd_buf (c1, c2, c3, c4);
-            }
-            else
-            {
-                tw_osd_drawline(x0, y0, x1, y1);
-            }
-            if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
-            {
-                ft_temp = font_type;
-                disp_color = c1;
-                disp_color_background = COLOR_NONE;
-                disp_color_shadow = COLOR_BLACK | mix ;
-                font_type = FONT_OUTLINE_8x12;
-                tw_printf (((cx-6)/SCREEN_SCALE), (cy  - 6), "% 03d", j / SCALE);
-                font_type = ft_temp;
-                tw_set_osd_buf (c1, c2, c3, c4);
-                //tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+                OSD256_printf((cx-20), (cy-15), OSD256_FONT_WHITE, 1, "% 03d", j / SCALE);
                 
             }
         }

@@ -272,8 +272,7 @@ void tw_puts (char *str, unsigned short posx, unsigned short posy)
 
     for (char a = 0; a < strlen (str); a++)
     {
-        if (font_type!=FONT_QUICK) tw_osd_out_char (_posX, posy, str[a]);
-		else tw_ext_putchar(_posX, posy, str[a]);
+        tw_osd_out_char (_posX, posy, str[a]);
         _posX = _posX + inc;
     }
 }
@@ -1357,159 +1356,6 @@ void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsign
 }
 
 
-void init_scratch_memory()
-{
-
-	bool led_state = LOW;
-
-	// 0, 0 white with transparent background
-	// 256, 0 red with transparent background
-	// 512, 0 white with mixed background
-	// 768, 0 red with mixed background
-	// 0, 144 red with blinking 
-
-
-	//Upload character sets to scratch ram
-
-	//And now from Scratch to display
-	debug("table fill start - %lu\n", millis());
-	unsigned long now = millis();
-
-
-	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
-	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
-	tw_ext_set_pos_registers(0, 0, 255, 143);
-
-	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-	for (int i = 0; i < sizeof(outline_block); i++)
-	{
-		unsigned char c = outline_block[i];
-		if (c == 1) c = COLOR_WHITE;
-		tw_write_register(0x200, c);
-	}
-
-	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
-	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
-	tw_ext_set_pos_registers(256, 0, 255, 143);
-
-	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-	for (int i = 0; i < sizeof(outline_block); i++)
-	{
-		unsigned char c = outline_block[i];
-		if (c == 1) c = COLOR_RED;
-		tw_write_register(0x200, c);
-	}
-
-	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
-	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
-	tw_ext_set_pos_registers(512, 0, 255, 143);
-
-	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-	for (int i = 0; i < sizeof(outline_block); i++)
-	{
-		unsigned char c = outline_block[i];
-		if (c == 1) c = COLOR_WHITE;
-		if (c == 0xff) c = COLOR_50_WHITE | MIX;
-		tw_write_register(0x200, c);
-	}
-
-
-	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
-	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
-	tw_ext_set_pos_registers(768, 0, 255, 143);
-
-	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-	for (int i = 0; i < sizeof(outline_block); i++)
-	{
-		unsigned char c = outline_block[i];
-		if (c == 1) c = COLOR_RED;
-		if (c == 0xff) c = COLOR_50_WHITE | MIX;
-		tw_write_register(0x200, c);
-	}
-
-	tw_write_register(0x240, 0x01);  // OSD_EXTOP_EN = 1
-	tw_write_register(0x241, 0x01);	 // OSD_OPMODE = 1 (Bitmap fill)
-	tw_ext_set_pos_registers(0, 144, 255, 143);
-
-	tw_write_register(0x24f, 0x01);  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-	for (int i = 0; i < sizeof(outline_block); i++)
-	{
-		unsigned char c = outline_block[i];
-		if (c == 1) c = COLOR_RED | BLINK;
-		if (c == 0xff) c = COLOR_50_WHITE | BLINK;
-		if (c == 0x00) c = COLOR_BLACK | BLINK;
-		tw_write_register(0x200, c);
-	}
-	tw_write_register(0x240, 0x00);  // OSD_EXTOP_EN = 1
-
-}
-
-void tw_ext_putchar(unsigned int x, unsigned int y, char chr)
-{
-	x = x * 4;
-	y = y * 2;
-	chr = chr - 32;
-	tw_ext_block_move_scratch_to_osd(x, y, 15, 23, (chr % 16) * 16, ((chr / 16) * 24));
-}
-
-
-
-void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsigned int width, unsigned int height, unsigned int src_hpos, unsigned int src_vpos)
-{
-
-
-	unsigned char reg205, reg206, reg207, reg208, reg209, reg24c, reg24d, reg24e, reg24f;
-	unsigned int end_hpos, end_vpos;
-
-	end_hpos = hpos + width;
-	end_vpos = vpos + height;
-
-	reg205 = hpos & 0xff;
-	reg206 = end_hpos & 0xff;
-	reg207 = vpos & 0xff;
-	reg208 = end_vpos & 0xff;
-	reg209 = (((vpos >> 8) & 0x03) << 2) + ((end_vpos >> 8) & 0x03);
-	if (OSD_work_field == FLD_EVEN) reg209 = reg209 | 0b00001000;
-	else reg209 = reg209 & 0b11110111;
-
-	reg24c = src_hpos & 0xff;
-	reg24d = src_vpos & 0xff;
-
-	reg24e = (((hpos >> 8) & 0x03) << 6) +
-		(((end_hpos >> 8) & 0x03) << 4) +
-		(((src_vpos >> 8) & 0x03) << 2) +
-		((src_hpos >> 8) & 0x03);
-
-	cnt = 0;
-	data_buf[cnt++] = 0x01;			// OSD_EXTOP_EN = 1;
-	data_buf[cnt++] = 0x03;		    // OSD_OPMODE = 3 Block move
-	tw_write_buf(0x240, data_buf, cnt);
-
-
-	cnt = 0;
-	data_buf[cnt++] = reg205;
-	data_buf[cnt++] = reg206;
-	data_buf[cnt++] = reg207;
-	data_buf[cnt++] = reg208;
-	data_buf[cnt++] = reg209;
-	if (OSD_path == OSD_PATH_REC)
-		data_buf[cnt++] = 0b00100000;
-	else
-		data_buf[cnt++] = 0b00000000;
-
-	tw_write_buf(0x205, data_buf, cnt);
-
-	cnt = 0;
-	data_buf[cnt++] = reg24c;
-	data_buf[cnt++] = reg24d;
-	data_buf[cnt++] = reg24e;
-	data_buf[cnt++] = 0x05;  // OSD_DSTLOC = 1, OSD_OPSTART = 1
-	tw_write_buf(0x24c, data_buf, cnt);
-	delay(10);
-
-	tw_write_register(0x240, 0x00);  // OSD_EXTOP_EN = 1
-
-}
 
 void tw_clear_all_pages(void)
 {
@@ -1536,6 +1382,7 @@ void tw_clear_all_pages(void)
 //*******************************************************************************/
 #define FONT_X 16
 #define FONT_Y 20
+
 #define U8 unsigned char
 #define U16 unsigned int
 
@@ -1573,23 +1420,15 @@ void OSD256_OSG_Mode_Selection(U8 mode)
 
 
 
-void WriteOSD256Fnt(U8 _pth, U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib)
+void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib)
 {
 	U8 reg40, tmp;
 	const U8 *ptr;
 	U16 tmp1;
 
 
-	if (BitSet(_pth, PTH_X))
-	{
-		tw_write_register(0x20a, 0x0);					//... y path 0x20, x Path 0x00
-		tmp1 = _pos_x << 4;										//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
-	}
-	else
-	{
-		tw_write_register(0x20a, 0x20);					//... y path 0x20, x Path 0x00
-		tmp1 = _pos_x << 3;										//... (_pos_x)*2 -> 8 pixel * 2 -> 16 pixel char
-	}
+	tw_write_register(0x20a, 0x0);					//... y path 0x20, x Path 0x00
+	tmp1 = _pos_x << 4;										//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
 	_pos_y = (_pos_y << 4) + (_pos_y << 2);						//... (_pos_y)*(16+4)
 
 	reg40 = tw_read_register(0x240);
@@ -1599,11 +1438,7 @@ void WriteOSD256Fnt(U8 _pth, U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, 
 
 	tw_write_register(0x205, tmp1);
 
-	if (_pth == PTH_X)
-		tmp1 = tmp1 + FONT_X - 1;
-	else
-		tmp1 = tmp1 + (FONT_X / 2) - 1;
-
+	tmp1 = tmp1 + FONT_X - 1;
 	tw_write_register(0x206, tmp1);
 
 	tmp = ((tmp1 & 0xff00) >> 8 << 6) | ((tmp1 & 0xff00) >> 8 << 4);
@@ -1649,31 +1484,14 @@ void WriteOSD256Fnt(U8 _pth, U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, 
 				pix = (mask &(*ptr)) >> ((3 - j) << 1);
 				//debug("0x%02x ", pix);
 				// 0 - empty, 1 - outline, 2- ???, 3-main color
-				if (_pth == PTH_X)
-				{
-					if (!pix) pix_data = 0xff;
-					else
-					{
-						if (pix == 1) pix_data = 1 | attrib;
-						if (pix == 2) pix_data = 2 | attrib;
-						if (pix == 3) pix_data = color | attrib;
-					}
-
-					tw_write_register(0x200, pix_data);
-				}
+				if (!pix) pix_data = 0xff;
 				else
 				{
-					if (!pix) pix = 0xf;
-					if (j & 1 == 1)
-					{
-						pix_data |= pix;
-						tw_write_register(0x200, pix_data);
-					}
-					else
-					{
-						pix_data = pix << 4;
-					}
+					if (pix == 1) pix_data = 1 | attrib;
+					if (pix == 2) pix_data = 2 | attrib;
+					if (pix == 3) pix_data = color | attrib;
 				}
+				tw_write_register(0x200, pix_data);
 				mask >>= 2;
 			}
 			ptr++;
@@ -1686,21 +1504,31 @@ void WriteOSD256Fnt(U8 _pth, U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, 
 	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
 }
 
-void CreateScrathFntTab(U8 _pth, U8 dst, U8 color, U8 attrib)
+void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font)
 {
 	U8 i, j;
 
-	for (i = 0; i<14; i++) {
-		for (j = 0; j<8; j++)
-		{
-			U8 tmp = i * 8 + j;
 
-			WriteOSD256Fnt(_pth, dst, (tmp % 38), (tmp / 38), tmp, color, attrib);
+	if (font == 0)
+	{
+		for (i = 0; i < 14; i++) {
+			for (j = 0; j < 8; j++)
+			{
+				U8 tmp = i * 8 + j;
+
+				WriteOSD256Fnt0(dst, (tmp % 38), (tmp / 38), tmp, color, attrib);
+			}
+		}
+	}
+	else
+	{
+		for (i = 0; i < 96; i++)
+		{
+			WriteOSD256Fnt1(dst, (i % 16), (i / 16), i, color, attrib);
+
 		}
 	}
 }
-
-
 
 void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color)
 {
@@ -1808,56 +1636,76 @@ void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y,
 	tw_write_register(0x240, reg40); 		// Restore the saved register 2x40 value
 }
 
-void OSD256_putc(U8 _pth, U16 _pos_x, U16 _pos_y, U8 _indx, U8 color)
+void OSD256_putc( U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font)
 {
 
 	U16 src_start_x, src_start_y, dst_start_x, dst_end_x, dst_end_y, color_x, color_y;
 
-	src_start_x = _indx % 38;
+	U8 fnt_tbl_row_size = 38;
+	U8 fnt_height = 20;
+	U8 fnt_width = 16;
+
+
+	if (font == 1) {
+		fnt_tbl_row_size = 16;
+		fnt_height = 24;
+		fnt_width = 16;
+	}
+
+	src_start_x = _indx % fnt_tbl_row_size;
+
 	dst_start_x = _pos_x;
-	dst_end_x = dst_start_x + 15;
+	dst_end_x = dst_start_x + fnt_width - 1;
 
 
-	if (BitSet(_pth, PTH_X))
+	//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
+	src_start_x <<= 4; // This could be changed later
+	tw_write_register(0x20a,(OSD256_wr_page & 0x7) << 2);					//... y path 0x20, x Path 0x00
+
+	src_start_y = _indx / fnt_tbl_row_size;
+
+	src_start_y = src_start_y * fnt_height;
+
+	dst_end_y = _pos_y + fnt_height - 1;
+	
+
+	if (font == 0)
 	{
-		//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
-		src_start_x <<= 4;
-		tw_write_register(0x20a,(OSD256_wr_page & 0x7) << 2);					//... y path 0x20, x Path 0x00
-
+		switch (color)
+		{
+		case OSD256_FONT_WHITE:
+			color_x = 0; color_y = 0;
+			break;
+		case OSD256_FONT_RED:
+			color_x = 0; color_y = 60;
+			break;
+		case OSD256_FONT_RED_BLINK:
+			color_x = 0; color_y = 120;
+			break;
+		case OSD256_FONT_YELLOW:
+			color_x = 0; color_y = 180;
+			break;
+		case OSD256_FONT_GREEN:
+			color_x = 0; color_y = 240;
+			break;
+		}
 	}
 	else
 	{
-		//... (_pos_x)*2 -> 8 pixel * 2 -> 16 pixel char
-		src_start_x <<= 3;
-		dst_end_x = (dst_end_x << 3) - 1;
-		tw_write_register(0x20a, 0x20);					//... y path 0x20, x Path 0x00
+		switch (color)
+		{
+		case OSD256_FONT_WHITE:
+			color_x = 610; color_y = 0;
+			break;
+		case OSD256_FONT_RED:
+			color_x = 610; color_y = 144;
+			break;
+		case OSD256_FONT_YELLOW:
+			color_x = 610; color_y = 288;
+			break;
+		}
+
 	}
-
-	src_start_y = _indx / 38;
-	src_start_y = (src_start_y << 4) + (src_start_y << 2);
-
-	dst_end_y = _pos_y + 19;
-	
-
-	switch (color)
-	{
-	case OSD256_FONT_WHITE:
-		color_x = 0; color_y = 0;
-		break;
-	case OSD256_FONT_RED:
-		color_x = 0; color_y = 60;
-		break;
-	case OSD256_FONT_RED_BLINK:
-		color_x = 0; color_y = 120;
-		break;
-	case OSD256_FONT_YELLOW:
-		color_x = 0; color_y = 180;
-		break;
-	case OSD256_FONT_GREEN:
-		color_x = 0; color_y = 240;
-		break;
-	}
-
 	src_start_x = src_start_x + color_x;
 	src_start_y = src_start_y + color_y;
 
@@ -1868,19 +1716,20 @@ void OSD256_putc(U8 _pth, U16 _pos_x, U16 _pos_y, U8 _indx, U8 color)
 }
 
 
-void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned char color)
+void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned char color, unsigned char font)
 {
 
 	unsigned short _posX = posx;
 
 	for (char a = 0; a < strlen(str); a++)
 	{
-		OSD256_putc(PTH_X, _posX, posy, str[a]-32, color);
-		_posX = _posX + 16;
+		OSD256_putc(_posX, posy, str[a]-32, color,font);
+		if (font == 0)_posX = _posX + 15;
+		else _posX = _posX + 12;
 	}
 }
 
-void OSD256_printf(unsigned short posx, unsigned short posy, char color, const char *format, ...)
+void OSD256_printf(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...)
 {
 	char buf[128];
 	va_list args;
@@ -1890,25 +1739,237 @@ void OSD256_printf(unsigned short posx, unsigned short posy, char color, const c
 	va_end(args);
 
 	byte _posX = posx;
-	OSD256_puts(buf, posx, posy, color);
+	OSD256_puts(buf, posx, posy, color, font);
 }
 
 
-
-
-/***************************************************************
-void OSD256_Scratch_Buffer_Select(unsigned char number)
-using to selected scratch buffer
-0: Select scracth buffer 0
-1: Select scracth buffer 1
-****************************************************************/
-void OSD256_Scratch_Buffer_Select(unsigned char number)
+void OSD256_printf_slow(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...)
 {
-	unsigned char reg41;
+	char buf[128];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buf, sizeof(buf), format,
+		args); // does not overrun sizeof(buf) including null terminator
+	va_end(args);
 
-	reg41 = tw_read_register(0x241);
-	reg41 &= ~0x20;
-	reg41 |= (number & 0x1) << 6;
-	tw_write_register(0x241, reg41); 				// Restore the saved register 2x40 value
+	byte _posX = posx;
+
+	for (char a = 0; a < strlen(buf); a++)
+	{
+		if (font) WriteOSD256Fnt1(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
+		else WriteOSD256Fnt0(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
+		_posX++;
+	}
+
 }
 
+void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib)
+{
+	U8 reg40, tmp;
+	const U8 *ptr;
+	U16 tmp1;
+
+
+	tw_write_register(0x20a, 0x0);					        //... y path 0x20, x Path 0x00
+	tmp1 = _pos_x << 4;										//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
+	
+	_pos_y = _pos_y * 24;		
+
+	reg40 = tw_read_register(0x240);
+	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
+
+	OSD256_OSG_Mode_Selection(1);				    	// Set OSG operation mode to BMP operation	
+
+	tw_write_register(0x205, tmp1);
+
+	tmp1 = tmp1 + FONT_X - 1;
+
+	tw_write_register(0x206, tmp1);
+
+	tmp = ((tmp1 & 0xff00) >> 8 << 6) | ((tmp1 & 0xff00) >> 8 << 4);
+	tw_write_register(0x24e, tmp);
+
+	tw_write_register(0x207, _pos_y);
+
+
+	tmp1 = _pos_y + 24 - 1;
+
+	tw_write_register(0x208, tmp1);
+	tmp = ((_pos_y & 0xff00) >> 8 << 2) | ((tmp1 & 0xff00) >> 8);
+	tw_write_register(0x209, tmp);
+
+
+	tmp1 = (96 * _indx);
+	ptr = (ufont_16x24 + tmp1);
+
+	//Set OSG_DSTCTL           0 scratch 1 display   
+	if (dst == 1)
+		tmp = 0x4;				//To Display buffer
+	else
+		tmp = 0;					//scratch 
+
+	tw_write_register(0x24f, tmp | 0x1);
+
+	for (tmp = 0; tmp<24; tmp++)
+	{
+		U8 pix, pix_data;
+		U8 i, j, mask;
+
+
+		for (i = 0; i<4; i++)
+		{
+			mask = 0xC0;
+
+			for (j = 0; j<4; j++)
+			{
+				pix = (mask &(*ptr)) >> ((3 - j) << 1);
+				// 0 - empty, 1 - outline, 2- ???, 3-main color
+				if (pix == 0) pix_data = 1 | attrib;
+				if (pix == 2) pix_data = color | attrib;
+				if (pix == 3) pix_data = 0xff;
+				tw_write_register(0x200, pix_data);
+				mask >>= 2;
+			}
+			ptr++;
+		}
+
+
+		WAIT_OSG_WRSTALL;
+	}
+	WAIT_OSG_IDLE;
+	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
+}
+
+void OSD256_clear_screen(U8 page)
+{
+
+	U8 tmp;
+	tmp = OSD256_wr_page;
+
+	OSD256_wr_page = page;
+	OSD256_Block_fill(PTH_X, DISPLAY, 0, 0, 719, 575, 0xff);
+	OSD256_wr_page = tmp;
+
+}
+
+void OSD256_setpixel(U8 _pth, U16 start_X, U16 start_Y, U8 color)
+{
+	unsigned char tmp;
+	U16 end_X, end_Y;
+
+	U8 reg205, reg206, reg207, reg208, reg209, reg20a;
+	U8 reg24e, reg24f;
+
+
+	end_X = start_X + 1;
+	end_Y = start_Y + 1;
+
+	if (BitSet(_pth, PTH_X))
+	{
+		reg20a = (OSD256_wr_page & 0x7) << 2;					//... y path 0x20, x Path 0x00
+	}
+	else
+	{
+		reg20a = 0x20;					//... y path 0x20, x Path 0x00
+		start_X >>= 1;
+		end_X >>= 1;
+	}
+
+	//check boundaries, if dst=1 then destination is display, so check screen boundaries
+
+	if (start_X >= SCR_X_SIZE)  start_X = SCR_X_SIZE;
+	if (start_Y >= SCR_Y_SIZE)  start_Y = SCR_Y_SIZE;
+	if (end_X >= SCR_X_SIZE)  end_X = SCR_X_SIZE;
+	if (end_Y >= SCR_Y_SIZE)  end_Y = SCR_Y_SIZE;
+
+	tw_write_register(0x243, color); 				// Filling color
+	tw_write_register(0x241, 0x02);				// Set OSG operation mode to Block fill
+
+
+	reg205 =  start_X;
+	reg206 =  end_X;
+	tmp = ((start_X & 0xff00) >> 8 << 6) | ((end_X & 0xff00) >> 8 << 4);
+	reg24e =  tmp;
+
+	reg207 = start_Y;
+	reg208 =  end_Y;
+	tmp = ((start_Y & 0xff00) >> 8 << 2) | ((end_Y & 0xff00) >> 8);
+	reg209 = tmp;
+
+	tmp = 0x4;					//To Display buffer
+	reg24f = tmp | 0x1;       //start
+
+
+	cnt = 0;
+	data_buf[cnt++] = reg205;
+	data_buf[cnt++] = reg206;
+	data_buf[cnt++] = reg207;
+	data_buf[cnt++] = reg208;
+	data_buf[cnt++] = reg209;
+	data_buf[cnt++] = reg20a;
+	tw_write_buf(0x205, data_buf, cnt);
+	
+	cnt = 0;
+	data_buf[cnt++] = reg24e;
+	data_buf[cnt++] = reg24f;
+	tw_write_buf(0x24e, data_buf, cnt);
+
+	//WAIT_OSG_IDLE; //do we really need this ?
+}
+void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
+{
+
+	bool yLonger = false;
+	int shortLen = y2 - y;
+	int longLen = x2 - x;
+	if (abs(shortLen) > abs(longLen))
+	{
+		int swap = shortLen;
+		shortLen = longLen;
+		longLen = swap;
+		yLonger = true;
+	}
+	int decInc;
+	if (longLen == 0)
+		decInc = 0;
+	else
+		decInc = (shortLen << 16) / longLen;
+
+	if (yLonger)
+	{
+		if (longLen > 0)
+		{
+			longLen += y;
+			for (int j = 0x8000 + (x << 16); y <= longLen; ++y)
+			{
+				OSD256_setpixel(_pth, j >> 16, y, color);
+				j += decInc;
+			}
+			return;
+		}
+		longLen += y;
+		for (int j = 0x8000 + (x << 16); y >= longLen; --y)
+		{
+			OSD256_setpixel(_pth,j >> 16, y, color);
+			j -= decInc;
+		}
+		return;
+	}
+
+	if (longLen > 0)
+	{
+		longLen += x;
+		for (int j = 0x8000 + (y << 16); x <= longLen; ++x)
+		{
+			OSD256_setpixel(_pth,x, j >> 16, color);
+			j += decInc;
+		}
+		return;
+	}
+	longLen += x;
+	for (int j = 0x8000 + (y << 16); x >= longLen; --x)
+	{
+		OSD256_setpixel(_pth, x, j >> 16, color);
+		j -= decInc;
+	}
+}

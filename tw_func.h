@@ -42,6 +42,11 @@
 #define	IfBitSet(x,y)		if(((x)&(y)) == (y)) 
 #define	IfBitClear(x,y)	if(((x)&(y)) == 0)
 
+#define	PTH_X			BIT0//BIT1//
+#define	PTH_Y			BIT1//BIT5//
+#define	PTH_PB			BIT2//
+#define	PTH_ALL			(PTH_X|PTH_Y)
+
 //OSD registers
 
 #define COLOR_BLACK      0
@@ -272,20 +277,25 @@ void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsi
 void tw_ext_putchar(unsigned int x, unsigned int y, char chr);
 void init_scratch_memory();
 
-void WriteOSD256Fnt(unsigned char _pth, unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _indx, U8 color, U8 attrib);
+void WriteOSD256Fnt0(unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _indx, U8 color, U8 attrib);
+void WriteOSD256Fnt1(unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _indx, U8 color, U8 attrib);
 
 void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color);
 void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y, U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y);
-void OSD256_putc(U8 _pth, U16 _pos_x, U16 _pos_y, U8 _indx, U8 color);
+void OSD256_putc(U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font);
 void OSD256_Scratch_Buffer_Select(unsigned char number);
 void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned char color);
-void OSD256_printf(unsigned short posx, unsigned short posy, char color, const char *format, ...);
+void OSD256_printf(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...);
+void OSD256_printf_slow(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...);
+void OSD256_clear_screen(U8 page);
 
+void OSD256_setpixel(U8 _pth, U16 start_X, U16 start_Y, U8 color);
+void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2);
 
 
 unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
 void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);
 
-void CreateScrathFntTab(unsigned char _pth, unsigned char dst, U8 color, U8 attrib);
+void CreateScrathFntTab(unsigned char dst, U8 color, U8 attrib, U8 font);
 
 #endif
