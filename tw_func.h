@@ -170,6 +170,7 @@ extern unsigned char disp_color, disp_color_background, disp_color_shadow;
 extern unsigned char OSD256_font_color;
 extern unsigned char OSD256_wr_page;
 
+
 extern struct osd_settings osd;  
 
 
@@ -184,12 +185,12 @@ const unsigned char colortable[18][3] = {
 {0xc0, 0x80, 0x80},							//75%white      3
 {0xf0, 0x80, 0x80},							//100%white     4
 {0x1d, 0xff, 0x6b},							//Blue          5
-{110, 97, 218},							//Red           6   
+{110, 97, 218},								//Red           6   
 {0x75, 0x4f, 0xb5},							//Orange        7
 {0xb2, 0xaa, 0x00},							//Cyan          8
 {0x69, 0xd4, 0xea},							//Magenta       9
-{181,70,52},
-{0x61, 0xb5, 0x3a},							//Ocean ??      11
+{120,70,52},								//GREEn			10
+{0x61, 0xb5, 0x3a},							//Ocean BLUE      11
 {0xe1, 0x00, 0x94},							//Yellow        12
 {190, 32, 168},                              //Dark Yellow   13
 {0x3f, 0x80, 0x80},							//25%white      14
@@ -281,17 +282,24 @@ void WriteOSD256Fnt0(unsigned char dst, unsigned char _pos_x, unsigned int _pos_
 void WriteOSD256Fnt1(unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _indx, U8 color, U8 attrib);
 
 void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color);
+
 void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y, U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y);
 void OSD256_putc(U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font);
 void OSD256_Scratch_Buffer_Select(unsigned char number);
 void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned char color);
 void OSD256_printf(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...);
+
 void OSD256_printf_slow(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...);
+
 void OSD256_clear_screen(U8 page);
 
-void OSD256_setpixel(U8 _pth, U16 start_X, U16 start_Y, U8 color);
+void OSD256_set_drawcolor(U8 color);
+void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y);
+void OSD256_setpixel_fast(U16 start_x, U16 start_Y);
 void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2);
-void OSD256_Circle(int  xCenter, int yCenter, int radius, unsigned char color);
+void OSD256_Circle(int  xCenter, int yCenter, int radius);
+
+void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height, U8 color, const char *bitmap);
 
 unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
 void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);

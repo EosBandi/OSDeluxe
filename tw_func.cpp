@@ -37,6 +37,9 @@ unsigned char OSD256_font_color;
 
 FontType font_type; // Global variable to hold current font_type
 
+unsigned char last_reg209 = 0;
+unsigned char last_reg24e = 0;
+
 void tw_init()
 {
 
@@ -1487,7 +1490,7 @@ void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 				if (!pix) pix_data = 0xff;
 				else
 				{
-					if (pix == 1) pix_data = 1 | attrib;
+					if (pix == 1) pix_data = COLOR_BLACK | attrib;
 					if (pix == 2) pix_data = 2 | attrib;
 					if (pix == 3) pix_data = color | attrib;
 				}
@@ -1643,7 +1646,7 @@ void OSD256_putc( U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font)
 
 	U8 fnt_tbl_row_size = 38;
 	U8 fnt_height = 20;
-	U8 fnt_width = 16;
+	U8 fnt_width = 16; 
 
 
 	if (font == 1) {
@@ -1724,7 +1727,7 @@ void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned c
 	for (char a = 0; a < strlen(str); a++)
 	{
 		OSD256_putc(_posX, posy, str[a]-32, color,font);
-		if (font == 0)_posX = _posX + 15;
+		if (font == 0)_posX = _posX + 14;
 		else _posX = _posX + 12;
 	}
 }
@@ -1824,7 +1827,7 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 			{
 				pix = (mask &(*ptr)) >> ((3 - j) << 1);
 				// 0 - empty, 1 - outline, 2- ???, 3-main color
-				if (pix == 0) pix_data = 1 | attrib;
+				if (pix == 0) pix_data = COLOR_BLACK | attrib;
 				if (pix == 2) pix_data = color | attrib;
 				if (pix == 3) pix_data = 0xff;
 				tw_write_register(0x200, pix_data);
@@ -1840,6 +1843,79 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
 }
 
+
+void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height, U8 color, const char *bitmap)
+{
+	U8 reg40, tmp;
+	const U8 *ptr;
+	U16 tmp1;
+
+
+	tw_write_register(0x20a, 0x0);					        //... y path 0x20, x Path 0x00
+
+	reg40 = tw_read_register(0x240);
+	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
+
+	OSD256_OSG_Mode_Selection(1);				    	// Set OSG operation mode to BMP operation	
+
+	tw_write_register(0x205, start_x);
+	tmp1 = (start_x + width - 1);
+	tw_write_register(0x206, tmp1 );
+
+	tmp = ((start_x & 0xff00) >> 8 << 6) | ((tmp1 & 0xff00) >> 8 << 4);
+	tw_write_register(0x24e, tmp);
+	tw_write_register(0x207, start_y);
+	tmp1 = start_y + height - 1;
+
+	tw_write_register(0x208, tmp1);
+
+	tmp = ((start_y & 0xff00) >> 8 << 2) | ((tmp1 & 0xff00) >> 8);
+
+	tw_write_register(0x209, tmp);
+
+	//Set OSG_DSTCTL           0 scratch 1 display   
+	if (dst == 1)
+		tmp = 0x4;				//To Display buffer
+	else
+		tmp = 0;					//scratch 
+
+	tw_write_register(0x24f, tmp | 0x1);
+
+
+
+
+	for (tmp1 = 0; tmp1< (height*width /2); tmp1++)
+	{
+		U8 pix, pix_data;
+		
+
+		pix = (bitmap[tmp1] & 0xf0) >> 4;
+
+		if (pix == 0) pix = 0xff;
+		else if (pix == 3) pix = color;
+		else if (pix == 1) pix = COLOR_BLACK;
+		else if (pix == 2) pix = COLOR_25_WHITE;
+		else if (pix == 4) pix = COLOR_WHITE;
+
+		tw_write_register(0x200, pix);
+
+		pix = (bitmap[tmp1] & 0xf);
+		if (pix == 0) pix = 0xff;
+		else if (pix == 3) pix = color;
+		else if (pix == 1) pix = COLOR_BLACK;
+		else if (pix == 2) pix = COLOR_25_WHITE;
+		else if (pix == 4) pix = COLOR_WHITE;
+		tw_write_register(0x200, pix);
+
+		WAIT_OSG_WRSTALL;
+	}
+	WAIT_OSG_IDLE;
+	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
+
+}
+
+
+
 void OSD256_clear_screen(U8 page)
 {
 
@@ -1852,7 +1928,7 @@ void OSD256_clear_screen(U8 page)
 
 }
 
-void OSD256_setpixel(U8 _pth, U16 start_X, U16 start_Y, U8 color)
+void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 {
 	unsigned char tmp;
 	U16 end_X, end_Y;
@@ -1882,7 +1958,7 @@ void OSD256_setpixel(U8 _pth, U16 start_X, U16 start_Y, U8 color)
 	if (end_X >= SCR_X_SIZE)  end_X = SCR_X_SIZE;
 	if (end_Y >= SCR_Y_SIZE)  end_Y = SCR_Y_SIZE;
 
-	tw_write_register(0x243, color); 				// Filling color
+	tw_write_register(0x243, COLOR_WHITE);				// Filling color
 	tw_write_register(0x241, 0x02);				// Set OSG operation mode to Block fill
 
 
@@ -1916,12 +1992,96 @@ void OSD256_setpixel(U8 _pth, U16 start_X, U16 start_Y, U8 color)
 
 	//WAIT_OSG_IDLE; //do we really need this ?
 }
+
+void OSD256_setpixel_fast(U16 start_X, U16 start_Y)
+{
+//	unsigned char tmp;
+	U16 end_X, end_Y;
+
+	U8 reg205, reg206, reg207, reg208, reg209;
+	U8 reg24e;
+
+	end_X = start_X + 1;
+	end_Y = start_Y + 1;
+
+	reg205 = start_X;
+	reg206 = end_X;
+	reg24e = ((start_X & 0xff00) >> 8 << 6) | ((end_X & 0xff00) >> 8 << 4);
+
+	reg207 = start_Y;
+	reg208 = end_Y;
+	reg209 = ((start_Y & 0xff00) >> 8 << 2) | ((end_Y & 0xff00) >> 8);
+
+	cnt = 0;
+	data_buf[cnt++] = reg205;
+	data_buf[cnt++] = reg206;
+	data_buf[cnt++] = reg207;
+	data_buf[cnt++] = reg208;
+	data_buf[cnt++] = reg209;
+	tw_write_buf(0x205, data_buf, cnt);
+
+
+	cnt = 0;
+	data_buf[cnt++] = reg24e;
+	data_buf[cnt++] = 0x4 | 0x1;       //start and to display buffer
+	tw_write_buf(0x24e, data_buf, cnt);
+
+	//WAIT_OSG_IDLE; //do we really need this ?
+}
+
+
 void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 {
+
+	//First check for special cases such as vertical or horizontal lines
+	if (x == x2)		//Vertical line !
+	{
+		if (y <= y2)
+		{
+			OSD256_Block_fill(_pth, DISPLAY, x, y, x2, y2, color);
+			return;
+		}
+		else
+		{
+			OSD256_Block_fill(_pth, DISPLAY, x, y2, x2, y, color);
+			return;
+		}
+	}
+	
+	if (y == y2)       //Horizontal line!
+	{
+		if (x <= x2)
+		{
+			OSD256_Block_fill(_pth, DISPLAY, x, y, x2, y2+1, color);		//A line must be at least 2 pixel tall to shown on both FIELD
+			return;
+		}
+		else
+		{
+			OSD256_Block_fill(_pth, DISPLAY, x2, y, x, y2+1, color);
+			return;
+		}
+	}
 
 	bool yLonger = false;
 	int shortLen = y2 - y;
 	int longLen = x2 - x;
+
+	U8 reg20a;
+
+	OSD256_set_drawcolor(color);
+	tw_write_register(0x241, 0x02);
+
+	if (BitSet(_pth, PTH_X))
+	{
+		reg20a = (OSD256_wr_page & 0x7) << 2;					//... y path 0x20, x Path 0x00
+	}
+	else
+	{
+		reg20a = 0x20;					//... y path 0x20, x Path 0x00
+	}
+	
+	tw_write_register(0x20a, reg20a);
+
 	if (abs(shortLen) > abs(longLen))
 	{
 		int swap = shortLen;
@@ -1942,7 +2102,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 			longLen += y;
 			for (int j = 0x8000 + (x << 16); y <= longLen; ++y)
 			{
-				OSD256_setpixel(_pth, j >> 16, y, color);
+				OSD256_setpixel_fast(j >> 16, y);
 				j += decInc;
 			}
 			return;
@@ -1950,7 +2110,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 		longLen += y;
 		for (int j = 0x8000 + (x << 16); y >= longLen; --y)
 		{
-			OSD256_setpixel(_pth,j >> 16, y, color);
+			OSD256_setpixel_fast(j >> 16, y);
 			j -= decInc;
 		}
 		return;
@@ -1961,7 +2121,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 		longLen += x;
 		for (int j = 0x8000 + (y << 16); x <= longLen; ++x)
 		{
-			OSD256_setpixel(_pth,x, j >> 16, color);
+			OSD256_setpixel_fast(x, j >> 16);
 			j += decInc;
 		}
 		return;
@@ -1969,11 +2129,12 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 	longLen += x;
 	for (int j = 0x8000 + (y << 16); x >= longLen; --x)
 	{
-		OSD256_setpixel(_pth, x, j >> 16, color);
+		OSD256_setpixel_fast( x, j >> 16);
 		j -= decInc;
 	}
 }
-void OSD256_Circle(int  xCenter, int yCenter, int radius, unsigned char color)
+/*
+void OSD256_Circle(int  xCenter, int yCenter, int radius)
 {
 	int tSwitch, y, x = 0;
 	int d;
@@ -1985,16 +2146,16 @@ void OSD256_Circle(int  xCenter, int yCenter, int radius, unsigned char color)
 	while (x <= y)
 	{
 
-		OSD256_setpixel(PTH_X,xCenter + x, yCenter + y, color);
-		OSD256_setpixel(PTH_X, xCenter + x, yCenter - y, color);
-		OSD256_setpixel(PTH_X, xCenter - x, yCenter + y, color);
-		OSD256_setpixel(PTH_X, xCenter - x, yCenter - y, color);
+		OSD256_setpixel(PTH_X,xCenter + x, yCenter + y);
+		OSD256_setpixel(PTH_X, xCenter + x, yCenter - y);
+		OSD256_setpixel(PTH_X, xCenter - x, yCenter + y);
+		OSD256_setpixel(PTH_X, xCenter - x, yCenter - y);
 
-		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter + x, color);
-		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter - x, color);
+		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter + x);
+		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter - x);
 
-		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter + x, color);
-		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter - x, color);
+		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter + x);
+		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter - x);
 
 		if (tSwitch < 0)
 		{
@@ -2007,4 +2168,9 @@ void OSD256_Circle(int  xCenter, int yCenter, int radius, unsigned char color)
 		}
 		x++;
 	}
+}
+*/
+void OSD256_set_drawcolor(U8 color)
+{
+	tw_write_register(0x243, color);
 }

@@ -88,52 +88,23 @@ void osd_bar_render(struct bar *b)
 void osd_gps_render(struct gps_widget_t *g)
 {
 
-    char q;
+	char color;
 
-    char _buf[32];
 
-    disp_color_background = BACKROUND;
-    if (g->sat <= g->sat_critical || g->hdop > g->hdop_critical)
-        disp_color = COLOR_RED | BLINK;
-    else
-        disp_color = g->color;
+	if (g->sat <= g->sat_critical || g->hdop > g->hdop_critical)
+	{
+		OSD256_Block_Transfer(SCRATCH, DISPLAY, 40, 300, g->x, g->y, g->x + 39, g->y + 39);
+		color = OSD256_FONT_RED;
+	}
+	else
+	{
+		OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 300, g->x, g->y, g->x + 39, g->y + 39);
+		color = OSD256_FONT_YELLOW;
 
-    tw_osd_rectangle(g->x, g->y, 22, 22, BACKROUND);
+	}
 
-    for (int y = 0; y < 32; y = y + 2)
-    {
-        for (int x = 0; x < 32; x++)
-        {
-            q = gps_image[y * 32 + x];
-            switch (q)
-            {
-            case 0xdd:
-                q = disp_color_background;
-                break;
-            case 0xff:
-                q = disp_color;
-                break;
-            case 0x00:
-                q = disp_color_shadow;
-                break;
-            }
-            _buf[x] = q;
-        }
-        tw_wr_osd_buffer(&_buf[0], 0);
-        tw_wr_osd_buffer(&_buf[4], 1);
-        tw_wr_osd_buffer(&_buf[8], 2);
-        tw_wr_osd_buffer(&_buf[12], 3);
-        tw_wr_osd_buffer(&_buf[16], 4);
-        tw_wr_osd_buffer(&_buf[20], 5);
-        tw_wr_osd_buffer(&_buf[24], 6);
-        tw_wr_osd_buffer(&_buf[28], 7);
-        tw_wr_display_from_buffer(g->x+1, g->y +2 + y / 2, 7);
-    }
-
-    font_type = FONT_16x8;
-    tw_printf(g->x + 11, g->y+2, "%u", g->sat);
-    font_type = FONT_8x8;
-    tw_printf(g->x + 11, g->y + 12, "%2.2f", g->hdop);
+    OSD256_printf(g->x + 42, g->y + 2,color,0, "%u", g->sat);
+    OSD256_printf(g->x + 42, g->y + 22,color,0, "%2.2f", g->hdop);
 }
 
 void osd_batt_volt_render(struct batt_volt_widget_t *bw)
@@ -497,9 +468,9 @@ void osd_center_marker()
 #define SCALE 6
 #define MINOR_TICK  5
 #define MAJOR_TICK  10
-#define ZERO_LINE 100
+#define ZERO_LINE 120
 #define MAJOR_LINE  50
-#define MINOR_LINE  10
+#define MINOR_LINE  8
 
 
 void render_horizon(struct horizon_t *h)
@@ -566,9 +537,16 @@ void render_horizon(struct horizon_t *h)
             y0 = cy + offset;
             offset = (size * sin_roll);
             y1 = y0 + offset;
-
-			OSD256_drawline(PTH_X, c1,x0, y0, x1, y1);
-
+			if (size == ZERO_LINE) 
+			{
+				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0-2, x1, y1-2);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0+2, x1, y1+2);
+			}
+			else
+			{
+				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+			}
             offset = (gap * cos_roll);
             x0 = cx - offset;
             offset = (size * cos_roll);
@@ -578,8 +556,17 @@ void render_horizon(struct horizon_t *h)
             y0 = cy - offset;
             offset = (size * sin_roll);
             y1 = y0 - offset;
+			if (size == ZERO_LINE)
+			{
+				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0+2, x1, y1+2);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0-2, x1, y1-2);
+			}
+			else
+			{
+				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
 
- 				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+			}
  
 				if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
             {

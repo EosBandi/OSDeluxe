@@ -84,7 +84,7 @@ void loop ()
 
 	tw_write_register(0x0c8, 0x03);
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
-	tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
+	//tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
 
     digitalWrite (LED_PIN, HIGH);
 
@@ -170,17 +170,18 @@ void loop ()
 	
 	OSD256_printf_slow(6, 15, COLOR_WHITE, 0, "firmware version 1.0 build 12345");
 
-
-
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 1/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 1);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 0, 865, 143);
+
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 2/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 1);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 144, 865, 287);
+
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 3/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_YELLOW, 0, 1);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 288, 865, 431);
+
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 4/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 60, 609, 119);
@@ -198,12 +199,31 @@ void loop ()
 	CreateScrathFntTab(SCRATCH, COLOR_GREEN, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 240, 609, 299);
 
-	//This must be the last one
+    //This must be the last one
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 8/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 0);
-	
+
+	OSD256_load_bitmap(SCRATCH, 0, 300, 40, 40, COLOR_GREEN, gps_icon);
+	OSD256_load_bitmap(SCRATCH, 40, 300, 40, 40, COLOR_RED, gps_icon);
+
+	OSD256_load_bitmap(SCRATCH, 80, 300, 32, 20, COLOR_GREEN, gps_state);
+	OSD256_load_bitmap(SCRATCH, 80, 320, 32, 20, COLOR_DARK_YELLOW, gps_state);
+	OSD256_load_bitmap(SCRATCH, 80, 340, 32, 20, COLOR_RED | BLINK, gps_state);
+	OSD256_load_bitmap(SCRATCH, 80, 360, 32, 20, COLOR_25_WHITE, gps_state);
+
+	OSD256_load_bitmap(SCRATCH, 112, 300, 32, 20, COLOR_GREEN, mag_state);
+	OSD256_load_bitmap(SCRATCH, 112, 320, 32, 20, COLOR_DARK_YELLOW, mag_state);
+	OSD256_load_bitmap(SCRATCH, 112, 340, 32, 20, COLOR_RED | BLINK, mag_state);
+	OSD256_load_bitmap(SCRATCH, 112, 360, 32, 20, COLOR_25_WHITE, mag_state);
+
+	OSD256_load_bitmap(SCRATCH, 144, 300, 32, 20, COLOR_GREEN, vibe_state);
+	OSD256_load_bitmap(SCRATCH, 144, 320, 32, 20, COLOR_DARK_YELLOW, vibe_state);
+	OSD256_load_bitmap(SCRATCH, 144, 340, 32, 20, COLOR_RED | BLINK, vibe_state);
+	OSD256_load_bitmap(SCRATCH, 144, 360, 32, 20, COLOR_25_WHITE, vibe_state);
+
+
 	OSD256_printf_slow(8, 19, COLOR_GREEN, 0, "            DONE              ");
-	
+
 	OSD256_clear_screen(0);
 
 	//From now on we assume that extended OSD functions are enabled...
@@ -212,31 +232,22 @@ void loop ()
 	unsigned long now;
 
 
-	OSD256_Circle(360, 288, 200, COLOR_WHITE);
-	while (1);
 
-	now = millis();
+
+
 
 	osd.horizon.x = 360;
 	osd.horizon.y = 288;
 
 	OSD256_wr_page = 0;
-	tw_osd_set_display_page(1);
-
-	for (int i = 0; i > -45; i--)
-	{
-		osd.horizon.roll = i;
-		osd.horizon.pitch = i;
-
-		OSD256_clear_screen(OSD256_wr_page);
-		render_horizon(&osd.horizon);
-		OSD256_wr_page = !OSD256_wr_page;
-		tw_osd_set_display_page(!OSD256_wr_page);
-	}
-
-	debug("Horizon render time: %u", millis() - now);
+	tw_osd_set_display_page(0);
 
 
+	osd_gps_render(&osd.gps);
+
+
+	OSD256_printf(300, 300, OSD256_FONT_WHITE, 0, "WIDD MESSZE EZT");
+	OSD256_printf(300, 400, OSD256_FONT_WHITE, 1, "WIDD MESSZE EZT");
 
 
 // eddig es ne tovabb
