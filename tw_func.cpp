@@ -151,7 +151,7 @@ void tw_init()
 
 
 	//Select OSD reading page and OSD overlay mode
-    tw_write_register (0x20F, 0x0F);
+    tw_write_register (0x20F, 0x0f);
 
 
     for (char i = 0; i < 18; i++)
@@ -230,7 +230,7 @@ tw_write_buf(0x040, tbl_pal_pg0_sfr1, sizeof(tbl_pal_pg0_sfr1));
 //    disp_color = COLOR_YELLOW;
 //    disp_color_background = COLOR_BLACK | MIX;
 }
-
+/*
 void tw_set_attrib (char _color, char _bgcolor, char _fontsize)
 {
     disp_color = _color;
@@ -295,7 +295,8 @@ void tw_printf (char posx, unsigned short posy, const char *format, ...)
 }
 
 
-/*****************************************************************************/
+/***************************************************************************
+**/
 
 unsigned char tw_read_register (unsigned int rdADDR)
 {
@@ -421,7 +422,7 @@ void tw_osd_set_display( char dp_field, char rec_field )
 }
 */
 
-void tw_osd_set_display_page(char rd_page)
+void OSD256_set_display_page(char rd_page)
 {
  char reg20f = 0;
 
@@ -430,6 +431,8 @@ void tw_osd_set_display_page(char rd_page)
  reg20f = reg20f + (rd_page << 4);
  tw_write_register(0x20f,reg20f);
 }
+
+/*
 
 void tw_switch_display_field()
 {
@@ -1199,7 +1202,7 @@ void tw_osd_out_char (unsigned char _pos_X, unsigned int _pos_Y, unsigned char _
     }
 }
 
-
+*/
 
 void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H)
 {
@@ -1261,16 +1264,6 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
 
 	}
 
-/*
-    tw_write_register (_ADDR_1++, _SCALE >> 8);
-    tw_write_register (_ADDR_1++, _SCALE);
-    tw_write_register (_ADDR_1++, _SCALE >> 8);
-    tw_write_register (_ADDR_1++, _SCALE);
-    tw_write_register (_ADDR_2++, _HL);
-    tw_write_register (_ADDR_2++, _HR);
-    tw_write_register (_ADDR_2++, _VT);
-    tw_write_register (_ADDR_2++, _VB);
-	*/
 	}
 
 void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _popup)
@@ -1321,7 +1314,7 @@ void tw_set_ch_input(char ch, char input)
     }
 }
 
-
+/*
 void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int xw, unsigned int yw)
 {
 	unsigned char low, up;
@@ -1359,8 +1352,8 @@ void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsign
 
 }
 
-
-
+*/
+/*
 void tw_clear_all_pages(void)
 {
     // Clear OSD on record path both fields
@@ -1371,7 +1364,7 @@ void tw_clear_all_pages(void)
 
     for (unsigned char i = 0; i < 6; i++)
     {
-        tw_osd_set_display_page(i);
+        OSD256_set_display_page(i);
         // Clear OSD on display path both fields
         tw_osd_fill_region(0, 0, 179, 287, 0xff, FLD_EVEN, OSD_PATH_DISP,i);
         tw_wait_for_osd_write(100);
@@ -1379,11 +1372,14 @@ void tw_clear_all_pages(void)
         tw_wait_for_osd_write(100);
     }
 
-    tw_osd_set_display_page(0);
+    OSD256_set_display_page(0);
 }
 
 
-//*******************************************************************************/
+//******************************************************************************
+*/
+
+
 #define FONT_X 16
 #define FONT_Y 20
 
@@ -1611,6 +1607,9 @@ void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y,
 
 	unsigned char reg40, tmp;
 
+
+	tw_write_register(0x20a, (OSD256_wr_page & 0x7) << 2);					//... y path 0x20, x Path 0x00
+
 	reg40 = tw_read_register(0x240);
 	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
 
@@ -1728,8 +1727,16 @@ void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned c
 	for (char a = 0; a < strlen(str); a++)
 	{
 		OSD256_putc(_posX, posy, str[a]-32, color,font);
-		if (font == 0)_posX = _posX + 16;
-		else _posX = _posX + 12;
+		if (font == 0)_posX = _posX + 15;
+	
+		else
+		{
+			if (str[a] == '.')
+				_posX = _posX + 9;
+			else
+				_posX = _posX + 13;
+		}
+
 	}
 }
 
@@ -1917,14 +1924,14 @@ void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height,
 
 
 
-void OSD256_clear_screen(U8 page)
+void OSD256_clear_screen(U8 _pth, U8 page)
 {
 
 	U8 tmp;
 	tmp = OSD256_wr_page;
 
 	OSD256_wr_page = page;
-	OSD256_Block_fill(PTH_X, DISPLAY, 0, 0, 719, 575, 0xff);
+	OSD256_Block_fill(_pth, DISPLAY, 0, 0, 719, 575, 0xff);
 	OSD256_wr_page = tmp;
 
 }

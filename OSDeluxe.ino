@@ -76,39 +76,26 @@ void setup ()
 void loop ()
 {
 
+	digitalWrite(LED_PIN, HIGH);
+
+
     tw_init ();
-	//init_scratch_memory();
 
 	osd.pip_page = 0;
-	//update_pip();
 
 	tw_write_register(0x0c8, 0x03);
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
 	//tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
 
-    digitalWrite (LED_PIN, HIGH);
 
+	//We will use these screens 
+	//Don't clear all since pages larger than 0 share memory with scratch table
+	OSD256_clear_screen(PTH_X, 0);
+	OSD256_clear_screen(PTH_X, 1);
+	OSD256_clear_screen(PTH_Y, 0);
 
-    rec_color_shadow = COLOR_REC_BLACK;
-    rec_color = COLOR_REC_WHITE;
-    rec_color_background = COLOR_REC_RED | REC_MIX;
-
-    disp_color = COLOR_YELLOW;
-    disp_color_background = COLOR_NONE;
-    disp_color_shadow = COLOR_BLACK;
-
-	tw_clear_all_pages();
-
-    OSD_path = OSD_PATH_DISP;
-    OSD_work_field = FLD_EVEN;
-
-    tw_osd_set_display_field(FLD_EVEN);
-	tw_osd_set_rec_field(FLD_EVEN);
-
-	tw_osd_set_display_page(0);
-
-    OSD_path = OSD_PATH_DISP;
-    OSD_work_field = FLD_EVEN;
+	
+	OSD256_set_display_page(0);
 
     default_settings();
     //save_settings();
@@ -123,10 +110,10 @@ void loop ()
 	//osd_center_marker();
 
 
-	OSD_work_field = FLD_ODD;
-	OSD_display_field = FLD_EVEN;
+//	OSD_work_field = FLD_ODD;
+//	OSD_display_field = FLD_EVEN;
 
-	tw_osd_set_display_field(OSD_display_field);
+//	tw_osd_set_display_field(OSD_display_field);
 
 
 	memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
@@ -134,20 +121,11 @@ void loop ()
 	osd.message_buffer_display_time = 0;
 
 
+	//This is for selecting different sets
 	osd.visible_osd_page = 0x01; //bit coded 
 	osd.pip_page = 0x00;
 
 	init_home();
-
-//Ezt is torolni
-//tw_osd_fill_region(0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
-//tw_wait_for_osd_write(20);
-//delay(2000);
-//font_type = FONT_OUTLINE_16x12;
-//disp_color = COLOR_WHITE;
-//debug("normal write start - %lu\n", millis());
-//tw_printf(20, 40, "IMU0: In flight calibration completed !");
-//debug("normal write end - %lu\n", millis());
 
 	get_parameter_count();
 	param_send_index = total_params;
@@ -155,152 +133,82 @@ void loop ()
 	//Display both fields !!!!
 	tw_write_register(0x20f, 0x0f);
 
-	//  Display width 54 character
-	//  012345678901234567890123456789012345678901234
-
-	OSD256_printf_slow(18, 10, COLOR_WHITE, 0, "OSDeluxe");
-	OSD256_printf_slow(9, 13, COLOR_WHITE, 0, "C");
-	OSD256_printf_slow(10, 13, COLOR_BLUE, 0, "O");
-	OSD256_printf_slow(11, 13, COLOR_GREEN, 0, "L");
-	OSD256_printf_slow(12, 13, COLOR_RED, 0, "O");
-	OSD256_printf_slow(13, 13, COLOR_YELLOW, 0, "R");
-
-	OSD256_printf_slow(15, 13, COLOR_WHITE, 0, "PIP OSD for ARDU");
-	OSD256_printf_slow(31, 13, COLOR_YELLOW, 0, "PILOT");
-	
-	OSD256_printf_slow(6, 15, COLOR_WHITE, 0, "firmware version 1.0 build 12345");
+	OSD256_wr_page = 0;
 
 
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 1/8...");
-	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 1);
-	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 0, 865, 143);
+	//Commented out for quick start, need to run at every powerup
+	//init_font_tables();
+	//init_bitmaps();
 
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 2/8...");
-	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 1);
-	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 144, 865, 287);
-
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 3/8...");
-	CreateScrathFntTab(SCRATCH, COLOR_YELLOW, 0, 1);
-	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 288, 865, 431);
-
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 4/8...");
-	CreateScrathFntTab(SCRATCH, COLOR_RED, 0, 0);
-	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 60, 609, 119);
-
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 5/8...");
-	CreateScrathFntTab(SCRATCH, COLOR_RED, BLINK, 0);
-	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 120, 609, 179);
-
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 6/8...");
-	CreateScrathFntTab(SCRATCH, COLOR_YELLOW, 0, 0);
-	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 180, 609, 239);
-
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 7/8...");
-
-	CreateScrathFntTab(SCRATCH, COLOR_GREEN, 0, 0);
-	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 240, 609, 299);
-
-    //This must be the last one
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 8/8...");
-	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 0);
-	
-	
-
-	init_bitmaps();
-
-	OSD256_printf_slow(8, 19, COLOR_GREEN, 0, "            DONE              ");
-
-	OSD256_clear_screen(0);
-
+	OSD256_clear_screen(PTH_X,0);
+	OSD256_clear_screen(PTH_X,1);
 
 	//From now on we assume that extended OSD functions are enabled...
 	tw_write_register(0x240, 0x01);
 
 	unsigned long now;
 
-	//CreateScrathFntTab(DISPLAY, COLOR_WHITE, 0, 0);
 
-
-	OSD256_wr_page = 0;
-	tw_osd_set_display_page(0);
-	//osd_gps_render(&osd.gps);
-	//osd_status_render(&osd.stat);
-
-	OSD256_box(PTH_X, 10, 10, 100, 100, COLOR_GREEN);
-
-	osd.batt1_cap.max_capacity = 99999;
-	osd.batt1_cap.remaining_capacity = 100;
-
-	osd_batt_cap_render(&osd.batt1_cap);
-
-	osd.alt.altitude = 145;
-
-	osd_altitude_render(&osd.alt);
-
-
-// eddig es ne tovabb
-	while (1);
+	OSD256_wr_page = 1;
+	OSD256_set_display_page(0);
 
 
 
 
+
+
+
+
+
+//Main loop
 while (1)
 {
 	now = millis();
 
 	read_mavlink();
 
-
-    tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
-    tw_wait_for_osd_write(20);
+	OSD256_clear_screen(PTH_X, OSD256_wr_page);
 
 	now = millis();
-	debug("start\n");
     if (osd.horizon.visible & osd.visible_osd_page) render_horizon(&osd.horizon);
-	debug("%ul\n", millis() - now);
 
 	if (osd.gps.visible & osd.visible_osd_page) osd_gps_render( &osd.gps );
-	debug("%ul\n", millis() - now);
-
-	if (osd.batt1_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
-	debug("%ul\n", millis() - now);
-	if (osd.batt2_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
-	debug("%ul\n", millis() - now);
-
-	if (osd.batt1_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
-	debug("%ul\n", millis() - now);
-	if (osd.batt2_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
-	debug("%ul\n", millis() - now);
-
-	if (osd.batt1_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
-	debug("%ul\n", millis() - now);
-	if (osd.batt2_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
-	debug("%ul\n", millis() - now);
 
 	if (osd.stat.visible & osd.visible_osd_page) osd_status_render(&osd.stat);
-	debug("%ul\n", millis() - now);
 
+	if (osd.batt1_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
+
+	if (osd.batt2_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
+
+	if (osd.batt1_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
+
+	if (osd.batt2_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
+
+	if (osd.batt1_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
+
+	if (osd.batt2_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
+	
 	if (osd.alt.visible & osd.visible_osd_page) osd_altitude_render(&osd.alt);
-	debug("%ul\n", millis() - now);
 
 	if (osd.vario.visible & osd.visible_osd_page) osd_vario_render(&osd.vario);
-	debug("%ul\n", millis() - now);
 
 	if (osd.home_w.visible & osd.visible_osd_page) osd_home_render(&osd.home_w);
-	debug("%ul\n", millis() - now);
 
 	if (osd.mode.visible & osd.visible_osd_page) osd_mode_render(&osd.mode);
-	debug("%ul\n", millis() - now);
 
 	if (osd.pull.visible & osd.visible_osd_page) osd_pull_render(&osd.pull);
-	debug("%ul\n", millis() - now);
 
     if (osd.msg_widget.visible & osd.visible_osd_page)  message_buffer_render();
-	debug("%ul\n", millis() - now);
+
 
 	//if (osd.msg_list_widget.visible & osd.visible_osd_page) message_list_render();
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
+
+	//Switch working page for smooth redraw
+	OSD256_set_display_page(OSD256_wr_page);
+	if (OSD256_wr_page == 0) OSD256_wr_page = 1;
+	else OSD256_wr_page = 0;
 
 
 	//Control channel 1 - Control PIP mode
@@ -362,18 +270,6 @@ while (1)
 		}
     }
 	*/
-    //Switch OSD_work_field for smooth redraw
-    if (OSD_work_field == FLD_ODD){
-        OSD_work_field = FLD_EVEN;
-        OSD_display_field = FLD_ODD;
-    } else {
-        OSD_work_field = FLD_ODD;
-        OSD_display_field = FLD_EVEN;
-    }
-
-    tw_osd_set_display_field(OSD_display_field);
-
- 
 
     //check heartbeat
     heartbeat_validation();

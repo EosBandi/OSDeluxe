@@ -32,6 +32,7 @@ enum bitmap_names_t {
 };
 
 
+void init_font_tables();
 void init_bitmaps();
 void OSD256_display_bitmap(bitmap_names_t bitmap_idx, unsigned int startx, unsigned int starty);
 

@@ -83,9 +83,9 @@ enum flight_mode {
 
 
  struct bar {
-     unsigned char  x;  // x position (4 pixels 0-180)
+     unsigned short  x;  // x position (4 pixels 0-180)
      unsigned short y;  // y position (field 0-288)
-     unsigned char  w;  // width in 4pixels
+     unsigned short  w;  // width in 4pixels
      unsigned short h;  // height
      float max;         // maximum displayable value    
      float min;         // minimum displayable value
@@ -215,13 +215,14 @@ struct horizon_t {
 struct mode_widget_t {
     unsigned short mode_x;
     unsigned short mode_y;
+	char		   mode_centered;
 
     unsigned short fs_x;
     unsigned short fs_y;
-
+	char		   fs_centered;
     unsigned short arm_x;
     unsigned short arm_y;
-
+	char		   arm_centered;
 
     bool mix;
     unsigned char mode; //from mavlink

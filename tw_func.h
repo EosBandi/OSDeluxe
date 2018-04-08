@@ -259,7 +259,7 @@ void tw_set_ch_input(char ch, char input);
 
 void tw_osd_set_display_field( char dp_field);
 void tw_osd_set_rec_field( char rec_field);
-void tw_osd_set_display_page(char rd_page);
+void OSD256_set_display_page(char rd_page);
 void tw_switch_display_field();
 
 
@@ -292,7 +292,7 @@ void OSD256_printf(unsigned short posx, unsigned short posy, char color, char fo
 
 void OSD256_printf_slow(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...);
 
-void OSD256_clear_screen(U8 page);
+void OSD256_clear_screen(U8 _pth, U8 page);
 
 void OSD256_set_drawcolor(U8 color);
 void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y);

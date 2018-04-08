@@ -24,7 +24,7 @@
 
 #include "OSDeluxe.h"
 
-char sVoltFormat[] = "%5.2fv";
+char sVoltFormat[] = "%5.2fV";
 char sCapFormat[] =  "%5.0f\x5b";
 
 
@@ -34,6 +34,7 @@ void osd_bar_render(struct bar *b)
     float val;      //value to display, constrained to max and min
     int iw, rw, yw, tw;
 	char color, mix;
+
 
 	if (b->mix) mix = MIX;
 
@@ -123,6 +124,7 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw)
 void osd_batt_cap_render(struct batt_cap_widget_t *bw)
 {
 
+
 	bw->cap.x = bw->x;
 	bw->cap.y = bw->y;
 	bw->cap.w = 96;
@@ -147,23 +149,15 @@ void osd_batt_cap_render(struct batt_cap_widget_t *bw)
 
 void osd_batt_curr_render(struct batt_curr_widget_t *bw)
 {
-
-	if (bw->box) {
-		tw_osd_rectangle(bw->x, bw->y, 30, 10, BACKROUND);
-		disp_color_background = BACKROUND;
-	} else 
-	{
-		tw_osd_rectangle(bw->x, bw->y, 30, 10, 0xff);
-		disp_color_background = 0xff;
-
-	}
-	if (bw->mix) disp_color = COLOR_YELLOW | MIX;
-	else disp_color = COLOR_YELLOW;
-	tw_printf(bw->x + 2, bw->y + 2, "%5.1f\x84\x85", bw->current);
+	OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW,0,"%5.1fA", bw->current);
 }
 
 void osd_status_render( struct status_widget_t *s)
 {
+//debug("%u - %u - %u - %u - %u\n", s->x, s->y, s->vibe_status, s->visible, osd.visible_osd_page);
+
+
+
 
 // Display notification bars
  switch (s->gps_status)
@@ -218,23 +212,12 @@ switch (s->vibe_status)
 
 void osd_pull_render(struct pull_widget_t *pw)
 {
+	char color;
 
-	unsigned char mix;
+	if (pw->pull >= pw->warning) color = OSD256_FONT_RED;
+	else color = OSD256_FONT_YELLOW;
 
-	if (pw->mix)
-		mix = MIX;
-	else
-		mix = 0;
-
-	font_type = FONT_16x8;
-	disp_color = COLOR_YELLOW | mix;
-	disp_color_background = BACKROUND;
-	disp_color_shadow = COLOR_BLACK | mix;
-
-	if (pw->pull >= pw->warning) disp_color = COLOR_RED | mix;
-
-	tw_osd_rectangle(pw->x, pw->y, 29, 10, BACKROUND);
-	tw_printf(pw->x + 1, pw->y + 2, "%2.2f N", pw->pull);
+	OSD256_printf(pw->x, pw->y,color, 0, "%2.2f N", pw->pull);
 
 }
 
@@ -258,37 +241,33 @@ void osd_vario_render(struct vario_widget_t *vw)
     else
         mix = 0;
 
-    tw_osd_rectangle(vw->x, vw->y, vw->w, vw->h, COLOR_WHITE | mix);
-    tw_osd_rectangle(vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 2, BACKROUND);
+    OSD256_box(PTH_X,vw->x, vw->y, vw->w, vw->h, COLOR_WHITE | mix);
+	OSD256_box(PTH_X, vw->x + 1, vw->y + 1, vw->w - 2, vw->h - 2, BACKROUND);
 
     f = vw->h / 2;
     fh = abs(f * val / vw->vario_max);
 
     if (vw->vario >= 0)
     {
-        tw_osd_rectangle(vw->x + 1, vw->y + f - fh, vw->w - 2, fh, COLOR_GREEN);
+		OSD256_box(PTH_X, vw->x + 1, vw->y + f - fh, vw->w - 2, fh, COLOR_GREEN);
     }
     else
     {
-        tw_osd_rectangle(vw->x + 1, vw->y + f, vw->w - 2, fh, COLOR_RED);
+		OSD256_box(PTH_X, vw->x + 1, vw->y + f, vw->w - 2, fh, COLOR_RED);
     }
-    font_type = FONT_8x8;
-    disp_color_background = BACKROUND;
-    disp_color = COLOR_YELLOW;
-    
     switch (vw->num_pos)
     {
     case POS_RIGHT:
-        tw_printf(vw->x + vw->w + 1, vw->y + f - 4, "% 5.1fm/s", vw->vario);
+        OSD256_printf(vw->x + vw->w + 1, vw->y + f - 4,OSD256_FONT_YELLOW,1 ,"% 4.1fm/s", vw->vario);
         break;
     case POS_LEFT:
-        tw_printf(vw->x - 16, vw->y + f - 4, "% 5.1fm/s", vw->vario);
+		OSD256_printf(vw->x - 16, vw->y + f - 4,OSD256_FONT_YELLOW,1, "% 4.1fm/s", vw->vario);
         break;
     case POS_ABOVE:
-        tw_printf(vw->x - 5, vw->y -8  , "% 5.1fm/s", vw->vario);
+        OSD256_printf(vw->x - 20, vw->y - 25  , OSD256_FONT_YELLOW, 1, "% 4.1", vw->vario);
         break;
     case POS_BELOW:
-        tw_printf(vw->x - 5, vw->y+vw->h +2  , "% 5.1fm/s", vw->vario);
+        OSD256_printf(vw->x - 20, vw->y+vw->h +2  , OSD256_FONT_YELLOW, 1, "% 4.1f", vw->vario);
         break;
     }
 }
@@ -297,24 +276,18 @@ void osd_home_render(struct home_widget_t *hw)
 {
 
     struct polygon home_arrow;
-    struct point home_arrow_points[5] = { { 0, -10 }, { +10, +10 }, { 0, -2 }, { -10, +10 } };
+    struct point home_arrow_points[5] = { { 0, -20 }, { +20, +20 }, { 0, -2 }, { -20, +20 } };
     home_arrow.len = 4;
+
     home_arrow.points = home_arrow_points;
+    transform_polygon(&home_arrow, hw->x , hw->y, hw->orientation);
+    draw_polygon(&home_arrow, COLOR_WHITE);
 
-    transform_polygon(&home_arrow, hw->x*SCREEN_SCALE , hw->y, hw->orientation);
-    //tw_osd_rectangle(hw->x-10, hw->y-20 ,20 ,40 , COLOR_NONE);
-    tw_set_osd_buf(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
-    draw_polygon(&home_arrow);
-
-    font_type = FONT_16x8;
-    disp_color = COLOR_YELLOW;
-    disp_color_background = BACKROUND;
-    disp_color_shadow = COLOR_BLACK;
 
     if (osd.home.lock == HOME_LOCKED)
-        tw_printf(hw->x-12, hw->y+19,"% 4u m", hw->home_distance);
+        OSD256_printf(hw->x-56, hw->y+35, OSD256_FONT_YELLOW, 0 , "% 4u m", hw->home_distance);
     else
-        tw_printf(hw->x-12, hw->y+19,"no home");
+        OSD256_printf(hw->x-56, hw->y+35, OSD256_FONT_YELLOW, 0,"no home");
 
 }
 
@@ -498,167 +471,131 @@ void render_horizon(struct horizon_t *h)
 void osd_mode_render(struct mode_widget_t *mw)
 {
 
-    char mode[17];
-    unsigned char mix = 0;
-    unsigned char tmp_field;
-    unsigned int cust_mode;
+	char mode[17];
+	unsigned char mix = 0;
+	unsigned char tmp_field;
+	unsigned int cust_mode;
 
-    if (osd.displayed_mode != mw->mode)
-    {
-        osd.displayed_mode = mw->mode;
+	if (mw->mix) mix = MIX;
 
-        if (mw->mix) mix = MIX;
+	cust_mode = mw->mode;
 
-        cust_mode = mw->mode;
+	if (osd.mav_type != MAV_TYPE_FIXED_WING) cust_mode += 100;
 
-        if (osd.mav_type != MAV_TYPE_FIXED_WING) cust_mode += 100;
+	switch (cust_mode)
+	{
+	case PLANE_MODE_MANUAL:
+		strcpy(mode, "Manual");
+		break;
+	case PLANE_MODE_CIRCLE:
+	case COPTER_MODE_CIRCLE:
+		strcpy(mode, "Circle");
+		break;
+	case PLANE_MODE_STABILIZE:
+	case COPTER_MODE_STABILIZE:
+		strcpy(mode, "Stabilize");
+		break;
+	case PLANE_MODE_TRAINING:
+		strcpy(mode, "Training");
+		break;
+	case PLANE_MODE_ACRO:
+	case COPTER_MODE_ACRO:
+		strcpy(mode, "Acro");
+		break;
+	case PLANE_MODE_FBWA:
+		strcpy(mode, "Fly-By-Wire A");
+		break;
+	case PLANE_MODE_FBWB:
+		strcpy(mode, "Fly-By-Wire B");
+		break;
+	case PLANE_MODE_CRUISE:
+		strcpy(mode, "Cruise");
+		break;
+	case PLANE_MODE_AUTOTUNE:
+	case COPTER_MODE_AUTOTUNE:
+		strcpy(mode, "Auto tune");
+		break;
+	case PLANE_MODE_AUTO:
+	case COPTER_MODE_AUTO:
+		strcpy(mode, "Auto");
+		break;
+	case PLANE_MODE_RTL:
+	case COPTER_MODE_RTL:
+		strcpy(mode, "RTL");
+		break;
+	case PLANE_MODE_LOITER:
+	case COPTER_MODE_LOITER:
+		strcpy(mode, "Loiter");
+		break;
+	case PLANE_MODE_INIT:
+		strcpy(mode, "Initializing");
+		break;
+	case PLANE_MODE_GUIDED:
+	case COPTER_MODE_GUIDED:
+		strcpy(mode, "Guided");
+		break;
+	case COPTER_MODE_ALTHOLD:
+		strcpy(mode, "Altitude hold");
+		break;
+	case COPTER_MODE_LAND:
+		strcpy(mode, "Land");
+		break;
+	case COPTER_MODE_OF_LOITER:
+		strcpy(mode, "OF Loiter");
+		break;
+	case COPTER_MODE_DRIFT:
+		strcpy(mode, "Drift");
+		break;
+	case COPTER_MODE_SPORT:
+		strcpy(mode, "Sport");
+		break;
+	case COPTER_MODE_FLIP:
+		strcpy(mode, "Flip");
+		break;
+	case COPTER_MODE_POSHOLD:
+		strcpy(mode, "Position hold");
+		break;
+	default:
+		strcpy(mode, "Unknown Mode");
+		break;
+	}
+	if (mw->mode_centered)
+	{
+		int l = (float)strlen(mode) * 12;
+		OSD256_printf(mw->mode_x - (l / 2), mw->mode_y, OSD256_FONT_WHITE, 1, "%s", mode);
+	}
+	else OSD256_printf(mw->mode_x, mw->mode_y, OSD256_FONT_WHITE, 1, "%s", mode);
 
-        switch (cust_mode)
-        {
-        case PLANE_MODE_MANUAL:
-            strcpy(mode, "Manual");
-            break;
-        case PLANE_MODE_CIRCLE:
-        case COPTER_MODE_CIRCLE:
-            strcpy(mode, "Circle");
-            break;
-        case PLANE_MODE_STABILIZE:
-        case COPTER_MODE_STABILIZE:
-            strcpy(mode, "Stabilize");
-            break;
-        case PLANE_MODE_TRAINING:
-            strcpy(mode, "Training");
-            break;
-        case PLANE_MODE_ACRO:
-        case COPTER_MODE_ACRO:
-            strcpy(mode, "Acro");
-            break;
-        case PLANE_MODE_FBWA:
-            strcpy(mode, "Fly-By-Wire A");
-            break;
-        case PLANE_MODE_FBWB:
-            strcpy(mode, "Fly-By-Wire B");
-            break;
-        case PLANE_MODE_CRUISE:
-            strcpy(mode, "Cruise");
-            break;
-        case PLANE_MODE_AUTOTUNE:
-        case COPTER_MODE_AUTOTUNE:
-            strcpy(mode, "Auto tune");
-            break;
-        case PLANE_MODE_AUTO:
-        case COPTER_MODE_AUTO:
-            strcpy(mode, "Auto");
-            break;
-        case PLANE_MODE_RTL:
-        case COPTER_MODE_RTL:
-            strcpy(mode, "RTL");
-            break;
-        case PLANE_MODE_LOITER:
-        case COPTER_MODE_LOITER:
-            strcpy(mode, "Loiter");
-            break;
-        case PLANE_MODE_INIT:
-            strcpy(mode, "Initializing");
-            break;
-        case PLANE_MODE_GUIDED:
-        case COPTER_MODE_GUIDED:
-            strcpy(mode, "Guided");
-            break;
-        case COPTER_MODE_ALTHOLD:
-            strcpy(mode, "Altitude hold");
-            break;
-        case COPTER_MODE_LAND:
-            strcpy(mode, "Land");
-            break;
-        case COPTER_MODE_OF_LOITER:
-            strcpy(mode, "OF Loiter");
-            break;
-        case COPTER_MODE_DRIFT:
-            strcpy(mode, "Drift");
-            break;
-        case COPTER_MODE_SPORT:
-            strcpy(mode, "Sport");
-            break;
-        case COPTER_MODE_FLIP:
-            strcpy(mode, "Flip");
-            break;
-        case COPTER_MODE_POSHOLD:
-            strcpy(mode, "Position hold");
-            break;
-        default:
-            strcpy(mode, "Unknown Mode");
-            break;
-        }
 
-        tmp_field = OSD_work_field;
-        OSD_path = OSD_PATH_REC;
-        OSD_work_field = FLD_EVEN;
+	if (osd.system_status == MAV_STATE_CRITICAL)
+	{
+		if (mw->fs_centered) OSD256_printf(mw->fs_x-67, mw->fs_y, OSD256_FONT_RED_BLINK, 0, "FAILSAFE!");
+		else OSD256_printf(mw->fs_x, mw->fs_y, OSD256_FONT_RED_BLINK, 0, "FAILSAFE!");
+	}
 
-        tw_osd_rectangle(mw->mode_x / 2 - 15, mw->mode_y, 30, 13, 0xff);
-        font_type = FONT_OUTLINE_16x12;
-        rec_color = COLOR_REC_WHITE;
-        rec_color_background = COLOR_REC_NONE;
-        rec_color_shadow = COLOR_REC_BLACK;
-        int l = (float)strlen(mode);
-        tw_printf(mw->mode_x/2 -l+1, mw->mode_y, "%s", mode);
 
-        OSD_path = OSD_PATH_DISP;
-        OSD_work_field = tmp_field;
-    }
+	if (osd.arming_status == 0)
+	{
+		if (mw->arm_centered) OSD256_printf(mw->arm_x - 60 , mw->arm_y, OSD256_FONT_RED, 0, "Disarmed");
+		else OSD256_printf(mw->arm_x, mw->arm_y, OSD256_FONT_RED, 0, "Disarmed");
 
-    if (osd.system_status == MAV_STATE_CRITICAL)
-    {
-        disp_color = COLOR_RED | BLINK;
-        disp_color_background = COLOR_NONE;
-        disp_color_shadow = COLOR_BLACK | BLINK;
-        tw_printf(mw->fs_x - (13), mw->fs_y + 13, "FAILSAFE!");
-    }
+		osd.armed_start_time == 0;
+	}
+	else  //Arming status 1 ARMED
+	{
+		if (osd.armed_start_time == 0)
+		{
+			osd.armed_start_time = millis();
+			osd.home.lock = HOME_WAIT;
+			mavlink_seen[MAVLINK_MSG_ID_MISSION_ITEM] = 0xffff;
+		}
+		else if (millis() < (osd.armed_start_time + 8000))
+		{
+			if (mw->arm_centered) OSD256_printf(mw->arm_x - 37, mw->arm_y, OSD256_FONT_RED_BLINK, 0, "ARMED");
+			else OSD256_printf(mw->arm_x, mw->arm_y, OSD256_FONT_RED_BLINK, 0, "ARMED");
+		}
+	}
 
-    if (osd.displayed_arming_status != osd.arming_status)
-    {
-        osd.displayed_arming_status = osd.arming_status;
-        font_type = FONT_OUTLINE_16x12;
-        tmp_field = OSD_work_field;
-        OSD_path = OSD_PATH_REC;
-        OSD_work_field = FLD_EVEN;
-
-        rec_color = COLOR_REC_RED;
-        rec_color_background = COLOR_REC_NONE;
-        rec_color_shadow = COLOR_REC_BLACK;
-        tw_osd_rectangle(mw->arm_x / 2 - 7, mw->arm_y + 26, 20, 13, 0xff);
-
-        if (osd.arming_status)
-        {
-            rec_color = COLOR_REC_RED | REC_BLINK;
-            rec_color_shadow = COLOR_REC_BLACK | REC_BLINK;
-            tw_printf(mw->arm_x / 2 - 4, mw->arm_y + 26, "ARMED");
-            osd.armed_start_time = millis();
-            osd.home.lock = HOME_WAIT;
-            mavlink_seen[MAVLINK_MSG_ID_MISSION_ITEM] = 0xffff;
-        }
-        else
-        {
-            tw_printf(mw->arm_x / 2 - 7, mw->arm_y + 26, "Disarmed");
-        }
-
-        OSD_path = OSD_PATH_DISP;
-        OSD_work_field = tmp_field;
-    }
-
-    if (osd.armed_start_time != 0 && osd.arming_status)
-    {
-        if (millis() > (osd.armed_start_time + 10000))
-        {
-            tmp_field = OSD_work_field;
-            OSD_path = OSD_PATH_REC;
-            OSD_work_field = FLD_EVEN;
-            tw_osd_rectangle(mw->arm_x / 2 - 7, mw->arm_y + 26, 20, 13, 0xff);
-            OSD_path = OSD_PATH_DISP;
-            OSD_work_field = tmp_field;
-            osd.armed_start_time = 0;
-        }
-    }
 }
 
 void rc_control()
@@ -711,73 +648,49 @@ void message_buffer_add_line(char *message, char severity)
 
 void message_buffer_render()
 {
-
 	long display_time = 5000;
 	long now;
-	char temp_fld;
-
-	temp_fld = OSD_work_field;
-	OSD_work_field = FLD_EVEN;
+	char color;
 
 	now = millis();
 
 	if (osd.message_buffer_line > 0) display_time = 3000; // 3sec if there are more messages in the buffer
 
-	if (now < (osd.message_buffer_display_time + display_time))
-	{
-		OSD_work_field = temp_fld;
-		return;
-	}
+	// buffer line 0 is the actual displayed, message buffer starts from 1. 
+	// message buffer line contains the last line of the buffer.
 
-	if (osd.clear_req)
+	
+	//Check if the display time is ellapsed
+	if ( now > (osd.message_buffer_display_time + display_time))
 	{
-		OSD_path = OSD_PATH_REC;
-		tw_osd_rectangle(osd.msg_widget.x, osd.msg_widget.y, 85, 11, 0xff);
-		OSD_path = OSD_PATH_DISP;
-		osd.clear_req = false;
-	}
-
-	if (osd.message_buffer_line > 0)
-	{
-		osd.message_buffer_display_time = now;
-		for (int i = 1; i < MESSAGE_BUFFER_LINES; i++)
+		//Time is ellapsed for the current message, check if we have new message(s) in the buffer
+		if (osd.message_buffer_line > 0)
 		{
-			strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 0
-			osd.message_severity[i - 1] = osd.message_severity[i];
+			//Prepare message to be displayed at the next cycle
+			osd.message_buffer_display_time = now;
+			for (int i = 1; i < MESSAGE_BUFFER_LINES; i++)
+			{
+				strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 0
+				osd.message_severity[i - 1] = osd.message_severity[i];
+			}
+			osd.message_buffer_line--;
 		}
-		osd.message_buffer_line--;
-
-
-		rec_color = COLOR_REC_WHITE;
-		rec_color_shadow = COLOR_REC_BLACK;
-		if (osd.message_severity[0] <= 3)
+		else
 		{
-			rec_color = COLOR_REC_RED;
-			rec_color_shadow = COLOR_REC_BLACK;
-		}
-		if (osd.message_severity[0] <= 2)
-		{
-			rec_color = COLOR_REC_RED;
-			rec_color_shadow = COLOR_REC_BLACK;
+			osd.message_buffer_display_time = 0; //Nothing to display
 		}
 
-
-		rec_color_background = COLOR_REC_GREEN | REC_MIX;
-		font_type = FONT_OUTLINE_16x12;
-
-		OSD_path = OSD_PATH_REC;
-		tw_printf(osd.msg_widget.x, osd.msg_widget.y, "%s", osd.message_buffer[0]);
-		OSD_path = OSD_PATH_DISP;
-
-		osd.clear_req = true;
-		OSD_work_field = temp_fld;
-		return;
 	}
+	else //time is not up yet, so display the message at the top of the buffer
+	{
 
-	OSD_work_field = temp_fld;
+		color = OSD256_FONT_WHITE;
+		if (osd.message_severity[0] <= 3) color = OSD256_FONT_RED;
+
+		OSD256_printf(osd.msg_widget.x, osd.msg_widget.y,color, 1, "%s", osd.message_buffer[0]);
+	}
 
 }
-
 void message_list_render()
 {
 	font_type = FONT_OUTLINE_16x12;
