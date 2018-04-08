@@ -25,9 +25,8 @@
 #ifndef _PARAMS_H_
 #define _PARAMS_H_
 
-#define PARAM(n, t, p, c) { .name = n, .type = t, .value = (void *) p, .cbk = c }
-#define PARAM_END { .name = "" }
-
+extern unsigned int total_params;
+extern unsigned int param_send_index;
 
 struct param_value {
     union {
@@ -46,9 +45,23 @@ struct param_def {
     char name[17];
     unsigned char type;
     void *value;
+	void(*cbk)(void);
 };
 
+extern struct param_def parameters[];
 
+void get_parameter_count();
+unsigned int get_parameter_index(char *name);
+float cast2float(void *value, unsigned char type);
+void cast2param(struct param_def *p, float v);
+float get_parameter_value(int idx, char *name);
+void send_param_list();
+int params_set_value(char *name, float value, unsigned char trigger_cbk);
+void update_channel_onoff();
+void update_vin_settings();
+void update_vout_settings();
+void update_pip();
+void update_test_byte();
 
 
 #endif

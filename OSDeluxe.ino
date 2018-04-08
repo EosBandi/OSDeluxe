@@ -58,7 +58,7 @@ void setup ()
     delay (500);
 
     // Setup for Master mode, pins 18/19, external pullups, 400kHz, 10ms default timeout
-    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 3000000, I2C_OP_MODE_IMM);
+    Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 4000000, I2C_OP_MODE_IMM);
     Wire.setDefaultTimeout (10000); // 10ms
 
 
@@ -76,225 +76,194 @@ void setup ()
 void loop ()
 {
 
+	digitalWrite(LED_PIN, HIGH);
+
+
     tw_init ();
 
-    
-    tw_ch_settings (1, 1, 0);
-    tw_ch_settings (2, 1, 1);
-    tw_ch_settings (3, 1, 1);
-    tw_ch_settings (4, 1, 1);
+	osd.pip_page = 0;
+
+	tw_write_register(0x0c8, 0x03);
+	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
+	//tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
 
 
-    tw_ch_set_window (1, 0, 0, 180);
-    tw_ch_set_window (2, 4, 0 , 64);
-    tw_ch_set_window (3, 116, 0, 64);
-    tw_ch_set_window (4, 68, 0, 48);
-/*
-    tw_write_register(0x081,0xff);
-    tw_write_register(0x082,0xff);
+	//We will use these screens 
+	//Don't clear all since pages larger than 0 share memory with scratch table
+	OSD256_clear_screen(PTH_X, 0);
+	OSD256_clear_screen(PTH_X, 1);
+	OSD256_clear_screen(PTH_Y, 0);
 
-    tw_write_register(0x083,0xff);
-    tw_write_register(0x084,0xff);
-
-    tw_write_register(0x130,0x00);
-    tw_write_register(0x131,0xb4);
-    tw_write_register(0x132,0x00);
-    tw_write_register(0x133,0x90);
-    
-*/
-
-    tw_set_ch_input(1,INPUT_CH_1);
-    tw_set_ch_input(2,INPUT_CH_2);
-    tw_set_ch_input(3,INPUT_CH_3);
-    tw_set_ch_input(4,INPUT_CH_4);
-
-
-    tw_write_register(0x0c8,0x03);
-            
-
-    digitalWrite (LED_PIN, HIGH);
-
-    rec_color_shadow = COLOR_REC_BLACK;
-    rec_color = COLOR_REC_WHITE;
-    rec_color_background = COLOR_REC_RED | REC_MIX;
-
-    disp_color = COLOR_YELLOW;
-    disp_color_background = COLOR_NONE;
-    disp_color_shadow = COLOR_BLACK;
-
-
-    tw_clear_all_pages();
-    /*
-    // Clear OSD on display path both fields
-    tw_osd_fill_region (0, 0, 179, 287, 0xff, FLD_EVEN, OSD_PATH_DISP);
-    tw_wait_for_osd_write (100);
-    tw_osd_fill_region (0, 0, 179, 287, 0xff, FLD_ODD, OSD_PATH_DISP);
-    tw_wait_for_osd_write (100);
-    // Clear OSD on record path both fields
-    tw_osd_fill_region (0, 0, 89, 287, 0xff, FLD_EVEN, OSD_PATH_REC);
-    tw_wait_for_osd_write (100);
-    tw_osd_fill_region (0, 0, 89, 287, 0xff, FLD_ODD, OSD_PATH_REC);
-    tw_wait_for_osd_write (100);
-*/
-    OSD_path = OSD_PATH_DISP;
-    OSD_work_field = FLD_EVEN;
-
-    tw_osd_set_display_field(FLD_EVEN);
-    tw_osd_set_rec_field(FLD_EVEN);
-    tw_osd_set_display_page(0);
-
-    OSD_path = OSD_PATH_DISP;
-    OSD_work_field = FLD_EVEN;
+	
+	OSD256_set_display_page(0);
 
     default_settings();
     //save_settings();
     //load_settings();
 
-// Prerender 
-
-osd.displayed_mode = -1;        // Signal startup
-osd_center_marker();
+	update_pip();
 
 
-OSD_work_field = FLD_ODD;
-OSD_display_field = FLD_EVEN;
+	osd.displayed_mode = -1;        // Signal startup
+	
+									
+	//osd_center_marker();
 
-memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
-osd.message_buffer_line = 0;
-osd.message_buffer_display_time = 0;
 
-init_home();
+//	OSD_work_field = FLD_ODD;
+//	OSD_display_field = FLD_EVEN;
 
-long t, l;
+//	tw_osd_set_display_field(OSD_display_field);
 
+
+	memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
+	osd.message_buffer_line = 0;
+	osd.message_buffer_display_time = 0;
+
+
+	//This is for selecting different sets
+	osd.visible_osd_page = 0x01; //bit coded 
+	osd.pip_page = 0x00;
+
+	init_home();
+
+	get_parameter_count();
+	param_send_index = total_params;
+
+	//Display both fields !!!!
+	tw_write_register(0x20f, 0x0c);
+
+	OSD256_wr_page = 0;
+
+
+	//Commented out for quick start, need to run at every powerup
+	//init_font_tables();
+	init_bitmaps();
+
+	OSD256_clear_screen(PTH_X,0);
+	OSD256_clear_screen(PTH_X,1);
+
+	//From now on we assume that extended OSD functions are enabled...
+	tw_write_register(0x240, 0x01);
+
+	unsigned long now;
+
+
+	OSD256_wr_page = 1;
+	//OSD256_wr_page = 0;
+
+	OSD256_set_display_page(0);
+	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 575);
+	//while (1);
+
+//Main loop
 while (1)
 {
+	now = millis();
 
-    tw_osd_fill_region (0, 0, 179, 287, 0xff, OSD_work_field, OSD_PATH_DISP, 0);
-    tw_wait_for_osd_write(20);
+	read_mavlink();
 
+	OSD256_clear_screen(PTH_X, OSD256_wr_page);
 
-    if (osd.horizon.visible) render_horizon(&osd.horizon);
+	now = millis();
 
+	osd_center_marker();
 
-    osd_gps_render( &osd.gps );
-    osd_battery_prerender(&osd.bat);
-    osd_home_prerender(&osd.home_w);
-    osd_battery_render(&osd.bat);
-    osd_status_render(&osd.stat);
-    osd_altitude_render(&osd.alt);
-    osd_vario_render(&osd.vario);
-    osd_home_render(&osd.home_w);
-    osd_mode_render(&osd.mode);
+    if (osd.horizon.visible & osd.visible_osd_page) render_horizon(&osd.horizon);
 
-	osd_pull_render(&osd.pull);
+	if (osd.gps.visible & osd.visible_osd_page) osd_gps_render( &osd.gps );
 
-    message_buffer_render();
+	if (osd.stat.visible & osd.visible_osd_page) osd_status_render(&osd.stat);
+
+	if (osd.batt1_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
+
+	if (osd.batt2_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
+
+	if (osd.batt1_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
+
+	if (osd.batt2_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
+
+	if (osd.batt1_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
+
+	if (osd.batt2_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
+	
+	if (osd.alt.visible & osd.visible_osd_page) osd_altitude_render(&osd.alt);
+
+	if (osd.vario.visible & osd.visible_osd_page) osd_vario_render(&osd.vario);
+
+	if (osd.home_w.visible & osd.visible_osd_page) osd_home_render(&osd.home_w);
+
+	if (osd.mode.visible & osd.visible_osd_page) osd_mode_render(&osd.mode);
+
+	if (osd.pull.visible & osd.visible_osd_page) osd_pull_render(&osd.pull);
+
+    if (osd.msg_widget.visible & osd.visible_osd_page)  message_buffer_render();
+
+	if (osd.gs.visible & osd.visible_osd_page) osd_groundspeed_render(&osd.gs);
+
+	//debug("Loop time:%lu\n", millis() - now);
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
+	//Switch working page for smooth redraw
+	OSD256_set_display_page(OSD256_wr_page);
+	if (OSD256_wr_page == 0) OSD256_wr_page = 1;
+	else OSD256_wr_page = 0;
+
+
+	//Control channel 1 - Control PIP mode
     if (osd.ctr_saved_state[0] != osd.ctr_state[0])
     {
         // There is a change in ctr1 state
         osd.ctr_saved_state[0] = osd.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
-        switch (osd.ctr_state[0])
-        {
+    	osd.pip_page = osd.ctr_state[0];
 
-		//Default view
-		// 1-front 2-right 3-left 4-Back 
-        case 0:
-            tw_set_ch_input(1, INPUT_CH_1);
-            tw_set_ch_input(2, INPUT_CH_2);
-            tw_set_ch_input(3, INPUT_CH_3);
-            tw_set_ch_input(4, INPUT_CH_4);
-            break;
-		// 1-back,2-right, 3-left, 4-front
-        case 1:
-            tw_set_ch_input(1, INPUT_CH_4);
-            tw_set_ch_input(2, INPUT_CH_2);
-            tw_set_ch_input(3, INPUT_CH_3);
-            tw_set_ch_input(4, INPUT_CH_1);
-            break;
-        case 2:
-            tw_set_ch_input(1, INPUT_CH_4);
-            tw_set_ch_input(2, INPUT_CH_2);
-            tw_set_ch_input(3, INPUT_CH_3);
-            tw_set_ch_input(4, INPUT_CH_1);
-            break;
-        }
+		for (unsigned char i = 1; i < 5; i++)
+		{
+			tw_ch_set_input(i, osd.video_channels[osd.pip_page][i].input);
+
+			tw_ch_settings(i, osd.video_channels[osd.pip_page][i].enable,
+				osd.video_channels[osd.pip_page][i].popup);
+
+			tw_ch_set_window(i, osd.video_channels[osd.pip_page][i].pos_h,
+				osd.video_channels[osd.pip_page][i].pos_v,
+				osd.video_channels[osd.pip_page][i].len_h);
+		}
+		
     }
+
+    //Control channel 2 - OSD widgets page
 
     if (osd.ctr_saved_state[1] != osd.ctr_state[1])
     {
         // There is a change in ctr1 state
         osd.ctr_saved_state[1] = osd.ctr_state[1]; // Save it, to prevent unneccessary state changes in the main loop
-        switch (osd.ctr_state[1])
-        {
-        case 0:
-			//All four windows are visible
-            tw_ch_settings(1, 1, 0);
-            tw_ch_settings(2, 1, 1);
-            tw_ch_settings(3, 1, 1);
-            tw_ch_settings(4, 1, 1);
-            break;
-        case 2:
-			//only first screen
-            tw_ch_settings(1, 1, 0);
-            tw_ch_settings(2, 0, 1);
-            tw_ch_settings(3, 0, 1);
-            tw_ch_settings(4, 0, 1);
-            break;
-        case 1:
-			//Disable fourth smalles screen
-            tw_ch_settings(1, 1, 0);
-            tw_ch_settings(2, 1, 1);
-            tw_ch_settings(3, 1, 1);
-            tw_ch_settings(4, 0, 1);
-            break;
-        }
+
+		//visible_osd_page is a bit coded value bit represents the one page (1 - page 1, 2-page 2, 4-page 3, 8-page 4.... up to page 5)
+		osd.visible_osd_page = 0x01 << osd.ctr_state[1];
+
     }
-
-    if (osd.ctr_saved_state[2] != osd.ctr_state[2])
-    {
-        // There is a change in ctr1 state
-        osd.ctr_saved_state[2] = osd.ctr_state[2]; // Save it, to prevent unneccessary state changes in the main loop
-        switch (osd.ctr_state[2])
-        {
-        case 0:
-            tw_osd_set_display_page(0);
-            tw_osd_set_rec_field(FLD_EVEN);
-			osd.horizon.visible = true;
-            break;
-        case 1:
-			tw_osd_set_display_page(0);
-			tw_osd_set_rec_field(FLD_EVEN);
-			osd.horizon.visible = false;
-			break;
-		case 2:
-			tw_osd_set_display_page(1);
-			tw_osd_set_rec_field(FLD_ODD);
-			osd.horizon.visible = false;
-			break;
-		}
-    }
-
-    //Switch OSD_work_field for smooth redraw
-    if (OSD_work_field == FLD_ODD){
-        OSD_work_field = FLD_EVEN;
-        OSD_display_field = FLD_ODD;
-    } else {
-        OSD_work_field = FLD_ODD;
-        OSD_display_field = FLD_EVEN;
-    }
-
-    tw_osd_set_display_field(OSD_display_field);
-
-    read_mavlink();
 
     //check heartbeat
     heartbeat_validation();
+
+	//Send five params at once, to speed up parameter download time
+	if (param_send_index != total_params)
+	{
+		for (int i = 0; i < 8; i++)send_param_list();
+	}
+	
+	//Send out mavlink heartbeat
+	if ((millis() - last_heartbeat_sent) >= 1000)
+	{
+		heartbeat_out();
+		last_heartbeat_sent = millis();
+	}
+
+
+
     if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
-    if ( (osd.bat.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
+    if ( (osd.batt1_cap.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
 
 	if (Serial2.available() == 0) 
 	{
@@ -321,6 +290,32 @@ while (1)
 		}
 	}
 
+	//0x111 enhance mode.... keep looking
+    //0x57 coring for shapening
+	//a7 0d instead of 0x0c
+
+
+	//0x1a2 50 vagy 90 Y path megjelenitese :D
+
+
+	if (Serial.available() != 0)
+	{
+		char ch = Serial.read();
+		if (ch == '1') {
+			tw_write_register(0x1a8, 0x25);
+			debug("ON\n");
+		}
+		else 
+		{
+			tw_write_register(0x1a8,0x20);
+
+			debug("OFF\n");
+		}
+	}
+
+	//debug("Looptime : %ul\n", millis() - now);
+	//debug("Loop time: %lu\n", millis() - now);
+	//debug("Bytes waiting: %u\n", Serial1.available());
 
 
 

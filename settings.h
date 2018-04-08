@@ -28,33 +28,71 @@
 #define CHANNEL_MODES 6
 #define MESSAGE_BUFFER_LINES 20
 
-#define RC_STATE0 1300
-#define RC_STATE1 1700
+#define RC_STATE0 0
+#define RC_STATE1 1231
+#define RC_STATE2 1361
+#define RC_STATE3 1491
+#define RC_STATE4 1621
+#define RC_STATE5 1750
 
 
 
 struct osd_settings {
 
-    channel_setting video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero) ???
+	vin_params_t vin_params[4];					// Video in
+
+
+	unsigned char ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
+
+	bool color_bar_x = false;
+	bool color_bar_y = false;
+
+	bool color_kill_x = false;
+	bool color_kill_y = false;
+
+	char vout1_gain = 7;  //YX
+	char vout2_gain = 7;  //CX
+	char vout3_gain = 7;  //YY
+
+
+
+
+    channel_setting_t video_channels[CHANNEL_MODES][5]; // ch 1-ch4 (no zero) ???
+
     gps_widget_t gps;
-    battery_widget_t bat;
+
+	batt_volt_widget_t batt1_v;
+	batt_volt_widget_t batt2_v;
+
+	batt_cap_widget_t batt1_cap;
+	batt_cap_widget_t batt2_cap;
+	batt_curr_widget_t batt1_curr;
+	batt_curr_widget_t batt2_curr;
+
+
     status_widget_t stat;
     alt_widget_t alt;
+	gs_widget_t gs;
+
     vario_widget_t vario;
     home_widget_t home_w;
     horizon_t horizon;
     mode_widget_t mode;
 
 	pull_widget_t pull;
-    
+
+	message_widget_t msg_widget;
+	message_list_widget_t msg_list_widget;
+
+	char center_cross_visible = 0x01;
 
 
     //Global variables
     unsigned char mav_type;             //MAV type from mavlink heartbeat;
     unsigned char base_mode;            //It comes from the arming...
     int           heading;
-    int           airspeed;
-    int           groundspeed;
+    float           airspeed;
+    float           groundspeed;
     int           throttle;
     bool          arming_status;
     home_data_t     home;
@@ -65,25 +103,30 @@ struct osd_settings {
     int           ekfcompass;
     int           ekfterrain;
 
-
-    unsigned char ctr_ch[4];
+	unsigned char ctr_ch[4];
     unsigned char ctr_state[4];
     unsigned char ctr_saved_state[4];
+
+	unsigned char visible_osd_page;			//The OSD page to show. (bit coded)
+	unsigned char pip_page;
 
     unsigned int           rcin[17];
     unsigned int           rc_rssi;
 
     char         system_status;   //Se MAVLINK_STATE enum 
 
+	char           message_buffer[MESSAGE_BUFFER_LINES][52];               //20 line of 52 character message_buffer
+    char           message_severity[MESSAGE_BUFFER_LINES];
+    char           message_buffer_line;
+    unsigned short message_buffer_display_line;
+    long           message_buffer_display_time;
+    bool           message_display; //we have message to display in the buffer
+    bool           clear_req;
 
+	char		  message_archive[MESSAGE_BUFFER_LINES][52];
+	char		  message_archive_severity[MESSAGE_BUFFER_LINES];
+	char		  message_archive_line = 0;
 
-    char          message_buffer[MESSAGE_BUFFER_LINES][52];               //20 line of 52 character message_buffer
-    char          message_severity[MESSAGE_BUFFER_LINES];
-    char          message_buffer_line;
-    char          message_buffer_display_line;
-    long          message_buffer_display_time;
-    bool          message_display; //we have message to display in the buffer
-    bool          clear_req;
 
     bool          displayed_arming_status;
     unsigned long armed_start_time;
@@ -92,7 +135,8 @@ struct osd_settings {
 
     unsigned long last_capacity_query;
     unsigned long last_outgoing_heartbeat;
-    //unsigned long 
+    
+	char test_byte;
    
 };
 
@@ -100,7 +144,6 @@ struct osd_settings {
 void default_settings();
 void load_settings();
 void save_settings();
-void message_buffer_add_line(char *message, char severity);
-void message_buffer_render(void);
+
 
 #endif

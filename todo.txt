@@ -1,0 +1,1 @@
+0x041 and 0x042 video output gain setting !

@@ -32,6 +32,7 @@
 extern mavlink_system_t mavlink_system; //Ardupilot:7,1  Pixhawk:100,50
 extern mavlink_message_t msg; 
 extern mavlink_status_t mv_status;
+extern unsigned long last_heartbeat_sent;		//Timestamp of the last heartbeat sent out by the OSD
 
 extern unsigned long mavlink_seen[256];          //Timestamp of the [id] message last seen.
 

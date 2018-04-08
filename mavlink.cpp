@@ -24,11 +24,12 @@
 
 #include "osdeluxe.h"
 
-extern mavlink_system_t mavlink_system = { OSD_SYS_ID, 111 }; // Ardupilot:7,1  Pixhawk:100,50
-extern mavlink_message_t msg;
-extern mavlink_status_t mv_status;
+mavlink_system_t mavlink_system = { OSD_SYS_ID, 111 }; // Ardupilot:7,1  Pixhawk:100,50
+mavlink_message_t msg;
+mavlink_status_t mv_status;
 
 unsigned long mavlink_seen[256]; // Timestamp of the [id] message last seen.
+unsigned long last_heartbeat_sent;		//Timestamp of the last heartbeat sent out by the OSD
 
 void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 {
@@ -104,11 +105,10 @@ bool last_motor_armed = false;
 uint8_t base_mode = 0;
 
 // true when we have received at least 1 MAVLink packet
-static bool mavlink_active;
-static uint8_t crlf_count = 0;
+bool mavlink_active;
 
-static int packet_drops = 0;
-static int parse_error = 0;
+int packet_drops = 0;
+int parse_error = 0;
 
 #define MAX_STREAMS 7
 
@@ -122,13 +122,14 @@ void heartbeat_validation(void)
 {
     unsigned long now;
 
+
     now = millis();
-    // if no mavlink update for 2 secs, show waring and request mavlink rate again
+    // if no mavlink update for 3 secs, show warning and request mavlink rate again
     if (now > (last_mav_beat + 3000))
     {
         if (waitingMAVBeats && (now > (last_nobeat_message + 5000)) )         //Do not flood message queue with No heartbeat messages
         {
-            message_buffer_add_line("No MAVLink heartbeat received!", 1);
+            message_buffer_add_line("No MAVLink heartbeat received!", 1);     //TODO:Move strings to an external definition
             last_nobeat_message = now;
         }
         heatbeat_start_time = 0;
@@ -157,7 +158,7 @@ void request_mavlink_rates(void)
                                                     MAV_DATA_STREAM_EXTRA1,
                                                     MAV_DATA_STREAM_EXTRA2,
                                                     MAV_DATA_STREAM_EXTRA3 };
-    uint16_t MAVRates[MAX_STREAMS] = { 0x01, 0x05, 0x05, 0x02, 0x0A, 0x05, 0x02 };
+    uint16_t MAVRates[MAX_STREAMS] = { 0x01, 0x05, 0x05, 0x02, 0x0a, 0x05, 0x02 };
 
     for (uint32_t i = 0; i < MAX_STREAMS; i++)
     {
@@ -178,6 +179,8 @@ void read_mavlink()
 {
     mavlink_message_t msg;
     mavlink_status_t mv_status;
+
+	int mm = 0;
 
     // grabing data
     while (Serial1.available() > 0)
@@ -237,10 +240,11 @@ void read_mavlink()
                 osd.horizon.pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
                 osd.horizon.roll = ToDeg(mavlink_msg_attitude_get_roll(&msg));
                 // osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
+				mm++;
                 break;
             }
 
-            case MAVLINK_MSG_ID_VFR_HUD:
+			case MAVLINK_MSG_ID_VFR_HUD:
             {
                 //osd.home.orientation = mavlink_msg_vfr_hud_get_heading(&msg);
                 osd.airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
@@ -249,16 +253,19 @@ void read_mavlink()
                 osd.throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
                 osd.alt.altitude = mavlink_msg_vfr_hud_get_alt(&msg);
                 osd.vario.vario = mavlink_msg_vfr_hud_get_climb(&msg);
+
             }
             break;
 
             case MAVLINK_MSG_ID_SYS_STATUS:
             {
 
-                osd.bat.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
-                osd.bat.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
-                osd.bat.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
-                //debug("%5.1f\n",osd.bat.current);
+                osd.batt1_v.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
+                osd.batt1_curr.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
+                osd.batt1_cap.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
+				if (osd.batt1_cap.remaining_capacity == 255) osd.batt1_cap.remaining_capacity = 100;
+
+
             }
             break;
 
@@ -283,12 +290,18 @@ void read_mavlink()
                 osd.rcin[16] = mavlink_msg_rc_channels_get_chan16_raw(&msg);
                 osd.rc_rssi = mavlink_msg_rc_channels_get_rssi(&msg);
 
-                //set up ctr_state1 variables
+				//ctr_state[] contains the actual switch state of a given control channel
+				//ctr_chp[]   contains the rc channel id for pip and osd_page channels
+
+                //set up ctr_state variables
                 for (int i=0;i<4;i++)
                 {
-                    if (osd.rcin[osd.ctr_ch[i]] <= RC_STATE0) osd.ctr_state[i] = 0;
-                    else if (osd.rcin[osd.ctr_ch[i]] <= RC_STATE1) osd.ctr_state[i] = 1;
-                    else osd.ctr_state[i] = 2;
+                    if (osd.rcin[osd.ctr_ch[i]] < RC_STATE1) osd.ctr_state[i] = 0;
+                    else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE2) osd.ctr_state[i] = 1;
+					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE3) osd.ctr_state[i] = 2;
+					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE4) osd.ctr_state[i] = 3;
+					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE5) osd.ctr_state[i] = 4;
+                    else osd.ctr_state[i] = 5;
                 }
 
             }
@@ -311,6 +324,10 @@ void read_mavlink()
                 osd.gps.sat = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
                 osd.gps.fix = mavlink_msg_gps_raw_int_get_fix_type(&msg);
 
+				//osd.gps.hdop = 1.2;
+				//osd.gps.sat = 8;
+				//osd.gps.fix = GPS_FIX_TYPE_3D_FIX;
+
                 osd.stat.gps_status = STATUS_OK;
                 if (osd.gps.fix < GPS_FIX_TYPE_3D_FIX)
                 {
@@ -318,13 +335,13 @@ void read_mavlink()
                     break;
                 }
 
-                if (osd.gps.sat <= 5 || osd.gps.hdop > 2.5)
+                if (osd.gps.sat <= osd.gps.sat_critical || osd.gps.hdop > osd.gps.hdop_critical)
                 {
                     osd.stat.gps_status = STATUS_CRITICAL;
                     break;
                 }
 
-                if (osd.gps.sat <= 7 || osd.gps.hdop > 1.5)
+                if (osd.gps.sat <= osd.gps.sat_warn || osd.gps.hdop > osd.gps.hdop_warn)
                 {
                     osd.stat.gps_status = STATUS_WARNING;
                     break;
@@ -351,12 +368,12 @@ void read_mavlink()
                     osd.home.home_coord.lat = DEG2RAD(mavlink_msg_mission_item_get_x(&msg));
                     osd.home.home_coord.lon = DEG2RAD(mavlink_msg_mission_item_get_y(&msg));
                     osd.home.home_alt = (int)mavlink_msg_mission_item_get_z(&msg);
-                    // debug("Mission item received:%f, %f\n",osd.home.home_coord.lat, osd.home.home_coord.lon );
                 }
             }
                 break;
 
-            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+
+			case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
             {
                 osd.home.uav_coord.lat = DEG2RAD(mavlink_msg_global_position_int_get_lat(&msg) / 10000000.0);
                 osd.home.uav_coord.lon = DEG2RAD(mavlink_msg_global_position_int_get_lon(&msg) / 10000000.0);
@@ -373,11 +390,8 @@ void read_mavlink()
                     osd.home.direction -= osd.home.uav_heading;
                     if (osd.home.direction < 0) osd.home.direction += 360;
                     osd.home.distance = earth_distance(&osd.home.home_coord, &osd.home.uav_coord);
-
                     osd.home_w.home_distance = osd.home.distance;
                     osd.home_w.orientation = osd.home.direction;
-
-
                 }
             }
             break;
@@ -391,7 +405,8 @@ void read_mavlink()
                 osd.ekfterrain = (int)(mavlink_msg_ekf_status_report_get_terrain_alt_variance(&msg) * 100);
 
                 osd.stat.ekf_status = STATUS_OK;
-                if (osd.ekfvel > 50 ||
+
+				if (osd.ekfvel > 50 ||
                     osd.ekfposh > 50 ||
                     osd.ekfposv > 50 ||
                     osd.ekfcompass > 50 ||
@@ -402,146 +417,123 @@ void read_mavlink()
                     osd.ekfposv > 80 ||
                     osd.ekfcompass > 80 ||
                     osd.ekfterrain > 80) osd.stat.ekf_status = STATUS_CRITICAL;
-                    
-
             }
             break;
 			
+			//Process incoming parameter values (queried by the OSD)
             case MAVLINK_MSG_ID_PARAM_VALUE:
             {
                 char param_name[17];
                 mavlink_msg_param_value_get_param_id(&msg,(char *)param_name);
-                //debug("%s :",param_name);
                 if ( strcmp(param_name,"BATT_CAPACITY") == 0 )
                 {
-                    osd.bat.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
-                    //debug("%i\n", osd.bat.max_capacity);
+                    osd.batt1_cap.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
                 }
+				debug("Battery capacity received\n");
+
             }
-			
+			break;
+			case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
+			{
+				unsigned char sys, comp;
+
+				sys = mavlink_msg_param_request_list_get_target_system(&msg);
+				comp = mavlink_msg_param_request_list_get_target_component(&msg);
+
+				if ((sys != OSD_SYS_ID) || (comp != MAV_COMP_ID_OSD))
+					break;
+
+				param_send_index = 0; //init sending
+
+
+			}
+			break;
+			case MAVLINK_MSG_ID_PARAM_SET:
+			{
+				unsigned char sys, comp;
+				mavlink_message_t msg2;
+				unsigned int len;
+				char param_name[17];
+				float param_value;
+				int idx;
+
+				sys = mavlink_msg_param_set_get_target_system(&msg);
+				comp = mavlink_msg_param_set_get_target_component(&msg);
+
+				if ((sys != OSD_SYS_ID) || (comp != MAV_COMP_ID_OSD))
+					break;
+				
+				len = mavlink_msg_param_set_get_param_id(&msg, param_name);
+				param_name[16] = '\0';
+
+				param_value = mavlink_msg_param_set_get_param_value(&msg);
+
+				//debug("set_param: %s - %f\n", param_name, param_value);
+
+				idx = params_set_value(param_name, param_value, 1);
+
+				/* broadcast new parameter value */
+				mavlink_msg_param_value_pack(OSD_SYS_ID, MAV_COMP_ID_OSD, &msg2,
+					param_name, param_value, MAVLINK_TYPE_FLOAT,
+					total_params, idx);
+				mavlink_send_msg(&msg2);
+
+			}
+
+
+
             default:
                 // Do nothing
                 break;
             }
+			//Check for timeslot expiry
+			//Abandon MavLink reading if we used up our timeslot.
+
         }
-        // delayMicroseconds(138);
-        // next one
     }
     // Update global packet drops counter
     packet_drops += mv_status.packet_rx_drop_count;
     parse_error += mv_status.parse_error;
+
+	//debug("Attitude messages processed:%u\n", mm);
 }
+
+
+void send_param_list()
+{
+
+	if (param_send_index == total_params) return;
+
+	mavlink_message_t msg;
+	float param_value;
+	char param_name[17];
+
+	param_value = get_parameter_value(param_send_index, param_name);
+	mavlink_msg_param_value_pack(OSD_SYS_ID, MAV_COMP_ID_OSD, &msg,
+		param_name, param_value, MAVLINK_TYPE_FLOAT,
+		total_params, param_send_index++);
+	mavlink_send_msg(&msg);
+}
+
+
 
 
 
 void mavlink_send_msg(mavlink_message_t *msg)
 {
-    unsigned char i;
+
     unsigned int len;
     unsigned char buf[MAVLINK_MAX_PACKET_LEN];
 
     len = mavlink_msg_to_send_buffer(buf, msg);
     
-    Serial1.write(buf, len) == 0;
+    Serial1.write(buf, len);
 
 }
 
 
 
 
-
-
-// line 0 is a display line
-void message_buffer_add_line(char *message, char severity)
-{
-    // Check if we are standing at the last line of the buffer.
-    if (osd.message_buffer_line == MESSAGE_BUFFER_LINES - 1)
-    {
-        for (int i = 2; i < MESSAGE_BUFFER_LINES; i++)
-        {
-            strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 1
-            osd.message_severity[i - 1] = osd.message_severity[i];
-        }
-    }
-    else
-    {
-        osd.message_buffer_line++;
-    }
-
-    strcpy(osd.message_buffer[osd.message_buffer_line], message);
-    osd.message_severity[osd.message_buffer_line] = severity;
-}
-
-
-void message_buffer_render()
-{
-
-    long display_time = 5000;
-    long now;
-    char temp_fld;
-
-    temp_fld = OSD_work_field;
-    OSD_work_field = FLD_EVEN;
-
-    now = millis();
-
-    if (osd.message_buffer_line > 0) display_time = 3000; // 3sec if there are more messages in the buffer
-
-    if (now < (osd.message_buffer_display_time + display_time))
-    {
-        OSD_work_field = temp_fld;
-        return;
-    }
-
-    if (osd.clear_req)
-    {
-        OSD_path = OSD_PATH_REC;
-        tw_osd_rectangle(4, 218, 85, 11, 0xff);
-        OSD_path = OSD_PATH_DISP;
-        osd.clear_req = false;
-    }
-
-    if (osd.message_buffer_line > 0)
-    {
-        osd.message_buffer_display_time = now;
-        for (int i = 1; i < MESSAGE_BUFFER_LINES; i++)
-        {
-            strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 0
-            osd.message_severity[i - 1] = osd.message_severity[i];
-        }
-        osd.message_buffer_line--;
- 
-
-        rec_color = COLOR_REC_WHITE;
-        rec_color_shadow = COLOR_REC_BLACK;
-        if (osd.message_severity[0] <= 3)
-        {
-            rec_color = COLOR_REC_RED;
-            rec_color_shadow = COLOR_REC_BLACK;
-        }
-        if (osd.message_severity[0] <= 2)
-        {
-            rec_color = COLOR_REC_RED;
-            rec_color_shadow = COLOR_REC_BLACK;
-        }
-
-
-        rec_color_background = COLOR_REC_GREEN | REC_MIX; 
-        font_type = FONT_OUTLINE_16x12; 
-
-        OSD_path = OSD_PATH_REC;
-        //tw_osd_rectangle(5,218,75,10,0xff);
-        tw_printf(4, 218, "%s", osd.message_buffer[0]);
-        OSD_path = OSD_PATH_DISP;
-        
-        osd.clear_req = true;
-        OSD_work_field = temp_fld;
-        return;
-    }
-
-        OSD_work_field = temp_fld;
-
-}
 
 unsigned long mavdata_age(unsigned int id)
 {

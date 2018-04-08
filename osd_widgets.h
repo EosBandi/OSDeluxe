@@ -83,9 +83,9 @@ enum flight_mode {
 
 
  struct bar {
-     unsigned char  x;  // x position (4 pixels 0-180)
+     unsigned short  x;  // x position (4 pixels 0-180)
      unsigned short y;  // y position (field 0-288)
-     unsigned char  w;  // width in 4pixels
+     unsigned short  w;  // width in 4pixels
      unsigned short h;  // height
      float max;         // maximum displayable value    
      float min;         // minimum displayable value
@@ -93,38 +93,63 @@ enum flight_mode {
      float warn_yellow; // yellow warning threshold <=
      float warn_red;    // red warning threshold <=
      bool mix;          // alpha blending enabled 
+	 bool box;			// outside box
      bartype bar_type;  // bar type - multicolor or single color
-     char *format;    // printf format string to diasplay value
+     char *format;      // printf format string to diasplay value
  };
 
 struct gps_widget_t {
     unsigned short x;
     unsigned short y;
     unsigned char sat;
-    unsigned char sat_warn;
+    unsigned char sat_warn;			//Warning level, makes the status yellow (It belongs to the status widget, but for PARAMS it easier to put here
+	unsigned char sat_critical;     //Critical level, makes status red, and gps indicator also red
     float         hdop;
-    float         hdop_warn;
+    float         hdop_warn;		//Warning level see above (hdop above this)
+	float		  hdop_critical;	//Critical level see above  (hdop above this)
     unsigned char  fix;
     unsigned char color;
+	unsigned char visible;
 };
 
-struct battery_widget_t {
-    unsigned short x;
-    unsigned short y;
-    struct bar volt;
-    struct bar cap;
-    float  current;
-    float  voltage;
-    int remaining_capacity;
-    int max_capacity;
-    unsigned char cells;
-    float min_cell_voltage;
-    float max_cell_voltage;
-    float red_cell_voltage;
-    float yellow_cell_voltage;
-    bartype bar_type;
-    bool mix;
-    unsigned char display_members; //TODO: add posibility to switch off certain elements 
+
+struct batt_volt_widget_t {
+	unsigned short x;
+	unsigned short y;
+	struct bar volt;
+	float voltage;
+	unsigned char cells;
+	float min_cell_voltage;
+	float max_cell_voltage;
+	float red_cell_voltage;
+	float yellow_cell_voltage;
+	bartype bar_type;
+	bool mix;
+	bool box;
+	unsigned char visible;
+};
+
+
+struct batt_cap_widget_t {
+	unsigned short x;
+	unsigned short y;
+	struct bar cap;
+	unsigned char remaining_capacity;
+	int max_capacity;
+	bartype bar_type;
+	bool mix;
+	bool box;
+	unsigned char visible;
+};
+
+
+struct batt_curr_widget_t {
+	unsigned short x;
+	unsigned short y;
+	float current;
+	bool mix;
+	bool box;
+	unsigned char visible;
 };
 
 struct status_widget_t {
@@ -136,6 +161,7 @@ struct status_widget_t {
     status_info vibe_status;
 
     bool mix;
+	unsigned char visible;
 };
 
 struct alt_widget_t {
@@ -143,7 +169,15 @@ struct alt_widget_t {
     unsigned short y;
     float altitude;
     bool mix;
+	unsigned char visible;
 };
+
+struct gs_widget_t {
+	unsigned short x;
+	unsigned short y;
+	unsigned char visible;
+};
+
 
 struct pull_widget_t {
 	unsigned short x;
@@ -151,6 +185,7 @@ struct pull_widget_t {
 	float pull;
 	bool mix;
 	float warning;			//Warning level in Newtons
+	unsigned char visible;
 };
 
 
@@ -163,6 +198,7 @@ struct vario_widget_t {
     float vario;
     float vario_max;
     bool mix;
+	unsigned char visible;
 };
 
 struct home_widget_t {
@@ -170,6 +206,7 @@ struct home_widget_t {
     unsigned short y;
     float orientation;
     unsigned int home_distance;    
+	unsigned char visible;
 };
 
 struct horizon_t {
@@ -179,22 +216,43 @@ struct horizon_t {
     int pitch;
     int roll;
 
-	bool visible;
+	unsigned char visible;
 };
 
 struct mode_widget_t {
     unsigned short mode_x;
     unsigned short mode_y;
+	char		   mode_centered;
 
     unsigned short fs_x;
     unsigned short fs_y;
-
+	char		   fs_centered;
     unsigned short arm_x;
     unsigned short arm_y;
-
+	char		   arm_centered;
 
     bool mix;
     unsigned char mode; //from mavlink
+	unsigned char visible;
+
+};
+
+struct message_widget_t {
+
+	unsigned short  x;
+	unsigned short  y;
+	bool mix;
+
+	unsigned char visible;
+
+};
+
+struct message_list_widget_t {
+	unsigned short x;
+	unsigned short y;
+	bool mix;
+	
+	unsigned char visible;
 };
 
 extern struct alt_widget_t aw;
@@ -206,34 +264,25 @@ extern struct vario_widget_t vw;
 extern struct home_widget_t hw;
 extern struct horizon_t hor;
 
-void osd_bar_prerender(struct bar *b);
-void osd_bar(struct bar *b);
-void osd_gps_prerender(struct gps_widget_t *g);
+void osd_bar_render(struct bar *b);
 void osd_gps_render(struct gps_widget_t *g);
-
-void osd_battery_prerender( struct battery_widget_t *bw);
+void osd_batt_volt_render(struct batt_volt_widget_t *bw);
+void osd_batt_cap_render(struct batt_cap_widget_t *bw);
 void osd_battery_render( struct battery_widget_t *bw);
-
-void osd_status_prerender( struct status_widget_t *s);
+void osd_batt_curr_render(struct batt_curr_widget_t *bw);
 void osd_status_render( struct status_widget_t *s);
-
-void osd_altitude_prerender( struct alt_widget_t *aw);
 void osd_altitude_render( struct alt_widget_t *aw);
-
-void osd_vario_prerender(struct vario_widget_t *vw);
+void osd_groundspeed_render(struct gs_widget_t *gs);
 void osd_vario_render(struct vario_widget_t *vw);
-
-void osd_home_prerender(struct home_widget_t *hw);
 void osd_home_render(struct home_widget_t *hw);
-
 void osd_center_marker();
-
 void render_horizon(struct horizon_t *horizon);
 void osd_mode_render( struct mode_widget_t *mw);
-
-void osd_pull_prerender(struct pull_widget_t *pw);
 void osd_pull_render(struct pull_widget_t *pw);
-
 void rc_control(void);
+
+void message_buffer_add_line(char *message, char severity);
+void message_buffer_render(void);
+void message_list_render();
 
 #endif
