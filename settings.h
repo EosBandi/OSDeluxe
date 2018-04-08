@@ -72,6 +72,8 @@ struct osd_settings {
 
     status_widget_t stat;
     alt_widget_t alt;
+	gs_widget_t gs;
+
     vario_widget_t vario;
     home_widget_t home_w;
     horizon_t horizon;
@@ -82,13 +84,15 @@ struct osd_settings {
 	message_widget_t msg_widget;
 	message_list_widget_t msg_list_widget;
 
-    
+	char center_cross_visible = 0x01;
+
+
     //Global variables
     unsigned char mav_type;             //MAV type from mavlink heartbeat;
     unsigned char base_mode;            //It comes from the arming...
     int           heading;
-    int           airspeed;
-    int           groundspeed;
+    float           airspeed;
+    float           groundspeed;
     int           throttle;
     bool          arming_status;
     home_data_t     home;

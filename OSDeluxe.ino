@@ -65,7 +65,7 @@ void setup ()
 	//Open USB serial port for debug and UI
     Serial.begin (115200);
 	//Open Serial1 port for MavLink communication
-    Serial1.begin(921600);
+    Serial1.begin(115200);
 	//Open Serial 2 port for input from weight cell
 	Serial2.begin(115200);
 
@@ -131,14 +131,14 @@ void loop ()
 	param_send_index = total_params;
 
 	//Display both fields !!!!
-	tw_write_register(0x20f, 0x0f);
+	tw_write_register(0x20f, 0x0c);
 
 	OSD256_wr_page = 0;
 
 
 	//Commented out for quick start, need to run at every powerup
 	//init_font_tables();
-	//init_bitmaps();
+	init_bitmaps();
 
 	OSD256_clear_screen(PTH_X,0);
 	OSD256_clear_screen(PTH_X,1);
@@ -150,15 +150,11 @@ void loop ()
 
 
 	OSD256_wr_page = 1;
+	//OSD256_wr_page = 0;
+
 	OSD256_set_display_page(0);
-
-
-
-
-
-
-
-
+	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 575);
+	//while (1);
 
 //Main loop
 while (1)
@@ -170,6 +166,9 @@ while (1)
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
 
 	now = millis();
+
+	osd_center_marker();
+
     if (osd.horizon.visible & osd.visible_osd_page) render_horizon(&osd.horizon);
 
 	if (osd.gps.visible & osd.visible_osd_page) osd_gps_render( &osd.gps );
@@ -200,8 +199,9 @@ while (1)
 
     if (osd.msg_widget.visible & osd.visible_osd_page)  message_buffer_render();
 
+	if (osd.gs.visible & osd.visible_osd_page) osd_groundspeed_render(&osd.gs);
 
-	//if (osd.msg_list_widget.visible & osd.visible_osd_page) message_list_render();
+	//debug("Loop time:%lu\n", millis() - now);
 
     //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
 
@@ -220,7 +220,7 @@ while (1)
 
 		for (unsigned char i = 1; i < 5; i++)
 		{
-			tw_set_ch_input(i, osd.video_channels[osd.pip_page][i].input);
+			tw_ch_set_input(i, osd.video_channels[osd.pip_page][i].input);
 
 			tw_ch_settings(i, osd.video_channels[osd.pip_page][i].enable,
 				osd.video_channels[osd.pip_page][i].popup);
@@ -243,33 +243,6 @@ while (1)
 		osd.visible_osd_page = 0x01 << osd.ctr_state[1];
 
     }
-
-	/*
-	//Control channel 3 - display pages
-    if (osd.ctr_saved_state[2] != osd.ctr_state[2])
-    {
-        // There is a change in ctr1 state
-        osd.ctr_saved_state[2] = osd.ctr_state[2]; // Save it, to prevent unneccessary state changes in the main loop
-        switch (osd.ctr_state[2])
-        {
-        case 0:
-            tw_osd_set_display_page(0);
-            tw_osd_set_rec_field(FLD_EVEN);
-			osd.horizon.visible = true;
-            break;
-        case 1:
-			tw_osd_set_display_page(0);
-			tw_osd_set_rec_field(FLD_EVEN);
-			osd.horizon.visible = false;
-			break;
-		case 2:
-			tw_osd_set_display_page(1);
-			tw_osd_set_rec_field(FLD_ODD);
-			osd.horizon.visible = false;
-			break;
-		}
-    }
-	*/
 
     //check heartbeat
     heartbeat_validation();
@@ -320,16 +293,21 @@ while (1)
 	//0x111 enhance mode.... keep looking
     //0x57 coring for shapening
 	//a7 0d instead of 0x0c
+
+
+	//0x1a2 50 vagy 90 Y path megjelenitese :D
+
+
 	if (Serial.available() != 0)
 	{
 		char ch = Serial.read();
 		if (ch == '1') {
-			tw_write_register(0x111, 0x08);
+			tw_write_register(0x1a8, 0x25);
 			debug("ON\n");
 		}
 		else 
 		{
-			tw_write_register(0x111,0x00);
+			tw_write_register(0x1a8,0x20);
 
 			debug("OFF\n");
 		}

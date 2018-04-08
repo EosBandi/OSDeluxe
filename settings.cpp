@@ -110,7 +110,7 @@ void default_settings()
     osd.gps.color = COLOR_YELLOW;
     osd.gps.sat = 0;
     osd.gps.hdop = 999;
-	osd.gps.visible = 0x01;
+	osd.gps.visible = 0x00;
     
 
 	osd.batt1_v.x = 600;
@@ -184,6 +184,10 @@ void default_settings()
     osd.alt.altitude = 0;
 	osd.alt.visible = 0x01;
 
+	osd.gs.x = 150;
+	osd.gs.y = 544;
+	osd.gs.visible = 0x01;
+
     osd.vario.x = 685;
     osd.vario.y = 188;
     osd.vario.h = 200;
@@ -195,7 +199,7 @@ void default_settings()
 	osd.vario.visible = 0x01;
 
     osd.home_w.x = 360;
-    osd.home_w.y = 500;
+    osd.home_w.y = 509;
     osd.home_w.orientation = 0;
     osd.home_w.home_distance = 0;
 	osd.home_w.visible = 0x01;
@@ -203,7 +207,7 @@ void default_settings()
 
     osd.horizon.x = 360;
     osd.horizon.y = 288;
-	osd.horizon.visible = 0x01;
+	osd.horizon.visible = 0x00;
 
 
    osd.mode.mode_x =  360;

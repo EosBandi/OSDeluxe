@@ -73,7 +73,6 @@ void osd_bar_render(struct bar *b)
         color = OSD256_FONT_RED_BLINK;
     else
         color = OSD256_FONT_YELLOW;
-
     OSD256_printf(b->x-2, b->y + b->h + 2, color, 0, b->format, b->val);
 }
 
@@ -131,6 +130,7 @@ void osd_batt_cap_render(struct batt_cap_widget_t *bw)
 	bw->cap.h = 20;
 
 	bw->cap.max = bw->max_capacity;
+	//debug("remaining:%u\n", bw->remaining_capacity);
 	bw->cap.min = 0;
 	if (bw->remaining_capacity >= 0)
 		bw->cap.val = bw->max_capacity * ((float)bw->remaining_capacity / 100);
@@ -226,6 +226,13 @@ void osd_altitude_render( struct alt_widget_t *aw)
  OSD256_printf(aw->x, aw->y,OSD256_FONT_YELLOW,0, "\x5c\x5d%dm", (int)aw->altitude);
 } 
 
+void osd_groundspeed_render(struct gs_widget_t *gs)
+{
+	OSD256_printf(gs->x, gs->y, OSD256_FONT_YELLOW, 0, "\x5f %.0f\x7b\x7c", osd.groundspeed * 3.6);
+}
+
+
+
 void osd_vario_render(struct vario_widget_t *vw)
 {
 
@@ -291,6 +298,20 @@ void osd_home_render(struct home_widget_t *hw)
 
 }
 
+
+void osd_center_marker()
+{
+
+	OSD256_box(PTH_X, 340, 285, 40, 7, COLOR_BLACK | MIX);
+	OSD256_box(PTH_X, 340, 287, 40, 3, COLOR_WHITE | MIX);
+
+	OSD256_box(PTH_X, 358, 268, 5, 40, COLOR_BLACK | MIX);
+	OSD256_box(PTH_X, 359, 268, 3, 40, COLOR_WHITE | MIX);
+
+}
+
+
+/*
 void osd_center_marker()
 {
     unsigned char temp_path;
@@ -354,7 +375,7 @@ void osd_center_marker()
 
 
 }
-
+*/
 #define RANGE 250
 #define SCALE 6
 #define MINOR_TICK  5
@@ -691,12 +712,24 @@ void message_buffer_render()
 	}
 
 }
+
+
 void message_list_render()
 {
-	font_type = FONT_OUTLINE_16x12;
 
 	for (char i = 0; i < MESSAGE_BUFFER_LINES; i++)
 	{
-		tw_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 12, "%s", osd.message_archive[i]);
+		OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 24, OSD256_FONT_WHITE, 1, "%s", osd.message_archive[i]);
 	}
+}
+
+
+
+void ils_render()
+{
+
+
+
+
+
 }

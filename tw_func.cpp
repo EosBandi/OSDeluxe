@@ -45,15 +45,14 @@ void tw_init()
 	//Enable black background for channels with no video
 	tw_write_register(0x0c3, 0xf0);
 
-
-
+	
 
 
 	static unsigned char pg1_a0_video_path[] =
 	{
 		0x60,		// a0  bit67-INX - bit54-INY 
 		0x11,		// a1  1 CBVS output for both VAOYX and VAOCX DAV
-		0x90,		// a2  1 CVBS display path for VAOYY (bit7 must be 1)
+		0x90,		// a2  1 CVBS display path for VAOYY (bit7 must be 1) //90
 		0x00,		// a3  Digital output setting (0 disable)
 		0x80,		// a4  Enable Master mode 
 		0x20,		// a5  Vertical sync delay (0x20 - default)
@@ -95,9 +94,9 @@ void tw_init()
 
 												//    |       ch1      ||      ch2       ||     ch3        ||     c4
 												//	   0x60  0x61  0x62  0x63  0x64  0x65  0x66  0x67  0x68  0x69  0x6a  0x6b
-	static unsigned char pg1_60_channel_settings[] = { 0x90, 0x02, 0x00, 0x91, 0x02, 0x00, 0x93, 0x02, 0x00, 0x94, 0x02, 0x00 };
+	static unsigned char pg1_60_channel_settings[] = { 0xc0, 0x02, 0x00, 0xc1, 0x02, 0x00, 0xc2, 0x02, 0x00, 0xc3, 0x02, 0x00, 0x00,0xe4 };
 	
-	//tw_write_buf(0x160, pg1_60_channel_settings, sizeof(pg1_60_channel_settings));
+	tw_write_buf(0x160, pg1_60_channel_settings, sizeof(pg1_60_channel_settings));
 
 	tw_write_register(0x105, 0b00000100); // bypass mode when video loss is detected
 
@@ -282,47 +281,6 @@ void tw_write_buf (unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCN
     Wire.endTransmission ();
 }
 
-
-void tw_wait_for_osd_write(int timeout)
-{
- 
- unsigned char reg;
- int count = 0 ;
-
-_rep:
- reg = tw_read_register(0x20A);
- count++;
- if((reg & 0x80) && (count < timeout)) goto _rep ;
-
-
-}
-
-
-void tw_osd_set_display_field( char dp_field)
-{
-  char reg20f;
-  
-  reg20f = tw_read_register(0x20f);
-  reg20f = reg20f & 0b11110011;
-  reg20f = reg20f + (dp_field << 2);
-  //reg20f = reg20f + (rec_field);
-  tw_write_register(0x20f,reg20f);
-
-}
-
-void tw_osd_set_rec_field(char rec_field)
-{
-  char reg20f;
-  
-  reg20f = tw_read_register(0x20f);
-  reg20f = reg20f & 0b11111100;
-//  reg20f = reg20f + (dp_field << 2);
-  reg20f = reg20f + (rec_field);
-  tw_write_register(0x20f,reg20f);
-
-}
-
-
 void OSD256_set_display_page(char rd_page)
 {
  char reg20f = 0;
@@ -404,7 +362,7 @@ void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _po
     tw_write_register (0x110 + (_ch - 1) * 0x08, value);
 }
 
-void tw_set_ch_input(char ch, char input)
+void tw_ch_set_input(char ch, char input)
 {
 
 	unsigned char inp;
@@ -441,8 +399,13 @@ void tw_set_ch_input(char ch, char input)
     }
 }
 
-#define FONT_X 16
-#define FONT_Y 20
+
+#define FONT0_X 16
+#define FONT0_Y 20
+
+#define FONT1_X 16
+#define FONT1_Y 24
+
 
 #define U8 unsigned char
 #define U16 unsigned int
@@ -497,7 +460,7 @@ void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 
 	tw_write_register(0x205, tmp1);
 
-	tmp1 = tmp1 + FONT_X - 1;
+	tmp1 = tmp1 + FONT0_X - 1;
 	tw_write_register(0x206, tmp1);
 
 	tmp = ((tmp1 & 0xff00) >> 8 << 6) | ((tmp1 & 0xff00) >> 8 << 4);
@@ -506,7 +469,7 @@ void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 	tw_write_register(0x207, _pos_y);
 
 
-	tmp1 = _pos_y + FONT_Y - 1;
+	tmp1 = _pos_y + FONT0_Y - 1;
 
 
 	tw_write_register(0x208, tmp1);
@@ -528,7 +491,7 @@ void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 
 	
 
-	for (tmp = 0; tmp<FONT_Y; tmp++)
+	for (tmp = 0; tmp<FONT0_Y; tmp++)
 	{
 		U8 pix, pix_data;
 		U8 i, j, mask;
@@ -843,7 +806,7 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 	tw_write_register(0x20a, 0x0);					        //... y path 0x20, x Path 0x00
 	tmp1 = _pos_x << 4;										//... (_pos_x)*4 -> 4 pixel * 4 -> 16 pixel char
 	
-	_pos_y = _pos_y * 24;		
+	_pos_y = _pos_y * FONT1_Y;		
 
 	reg40 = tw_read_register(0x240);
 	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
@@ -852,7 +815,7 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 
 	tw_write_register(0x205, tmp1);
 
-	tmp1 = tmp1 + FONT_X - 1;
+	tmp1 = tmp1 + FONT1_X - 1;
 
 	tw_write_register(0x206, tmp1);
 
@@ -862,7 +825,7 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 	tw_write_register(0x207, _pos_y);
 
 
-	tmp1 = _pos_y + 24 - 1;
+	tmp1 = _pos_y + FONT1_Y - 1;
 
 	tw_write_register(0x208, tmp1);
 	tmp = ((_pos_y & 0xff00) >> 8 << 2) | ((tmp1 & 0xff00) >> 8);
@@ -1200,11 +1163,26 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 		j -= decInc;
 	}
 }
-/*
-void OSD256_Circle(int  xCenter, int yCenter, int radius)
+
+void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius)
 {
 	int tSwitch, y, x = 0;
 	int d;
+	U8 reg20a;
+
+	OSD256_set_drawcolor(color);
+	tw_write_register(0x241, 0x02);
+
+	if (BitSet(_pth, PTH_X))
+	{
+		reg20a = (OSD256_wr_page & 0x7) << 2;					//... y path 0x20, x Path 0x00
+	}
+	else
+	{
+		reg20a = 0x20;					//... y path 0x20, x Path 0x00
+	}
+
+	tw_write_register(0x20a, reg20a);
 
 	d = yCenter - xCenter;
 	y = radius;
@@ -1213,16 +1191,16 @@ void OSD256_Circle(int  xCenter, int yCenter, int radius)
 	while (x <= y)
 	{
 
-		OSD256_setpixel(PTH_X,xCenter + x, yCenter + y);
-		OSD256_setpixel(PTH_X, xCenter + x, yCenter - y);
-		OSD256_setpixel(PTH_X, xCenter - x, yCenter + y);
-		OSD256_setpixel(PTH_X, xCenter - x, yCenter - y);
+		OSD256_setpixel_fast(xCenter + x, yCenter + y);
+		OSD256_setpixel_fast(xCenter + x, yCenter - y);
+		OSD256_setpixel_fast(xCenter - x, yCenter + y);
+		OSD256_setpixel_fast(xCenter - x, yCenter - y);
 
-		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter + x);
-		OSD256_setpixel(PTH_X, yCenter + y - d, yCenter - x);
+		OSD256_setpixel_fast(yCenter + y - d, yCenter + x);
+		OSD256_setpixel_fast(yCenter + y - d, yCenter - x);
 
-		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter + x);
-		OSD256_setpixel(PTH_X, yCenter - y - d, yCenter - x);
+		OSD256_setpixel_fast(yCenter - y - d, yCenter + x);
+		OSD256_setpixel_fast(yCenter - y - d, yCenter - x);
 
 		if (tSwitch < 0)
 		{
@@ -1236,7 +1214,6 @@ void OSD256_Circle(int  xCenter, int yCenter, int radius)
 		x++;
 	}
 }
-*/
 void OSD256_set_drawcolor(U8 color)
 {
 	tw_write_register(0x243, color);

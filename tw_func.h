@@ -230,54 +230,18 @@ void tw_init();
 void tw_write_buf(unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT);
 
 
-void tw_osd_out_char(unsigned char _pos_X, unsigned int _pos_Y, unsigned char _chr);
-void tw_puts(char *str, unsigned short posx, unsigned short posy);
-void tw_wr_osd_buffer(char *buf, char address);
-void tw_wr_display_from_buffer(unsigned char _pos_X, unsigned int _pos_Y, char length);
-
-void OSD_Circle(int  xCenter, int yCenter, int radius, unsigned char color, unsigned char _field);
-
-void OSD_Line(unsigned int  x1, unsigned int y1, unsigned int  x2, unsigned int  y2, unsigned char color, unsigned char _field);
-
-
-void tw_printf(char posx, unsigned short posy, const char *format, ...);
-
-//void TW2823_OSD_fill_region_pre (unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned char color, unsigned char _field);
-void tw_set_osd_buf(char b1, char b2, char b3, char b4);
-
-//void tw_osd_drawline(unsigned char x1, unsigned short y1, unsigned char x2, unsigned short y2);
-void tw_osd_drawline(int x, int y, int x2, int y2);
-void tw_osd_drawline256(int x, int y, int x2, int y2);
 
 void tw_write_register(unsigned int wrADDR, unsigned char content);
 unsigned char tw_read_register(unsigned int rdADDR);
-void tw_wait_for_osd_write(int timeout);
 
 void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H);
 void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _popup);
-void tw_set_ch_input(char ch, char input);
+void tw_ch_set_input(char ch, char input);
 
-void tw_osd_set_display_field( char dp_field);
-void tw_osd_set_rec_field( char rec_field);
 void OSD256_set_display_page(char rd_page);
-void tw_switch_display_field();
 
 
-void tw_clear_all_pages(void);
 
-void tw_osd_qsetpixel(unsigned int x, unsigned int y);
-void tw_osd_setpixel(unsigned int x, unsigned int y, unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4);
-
-void tw_osd_fill_region(unsigned int x1,unsigned int y1,unsigned int x2,unsigned int y2, unsigned char color, unsigned char _field, unsigned char path, unsigned char rd_page);
-
-void tw_osd_rectangle(unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
-
-
-void tw_ext_set_pos_registers(unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y);
-void tw_ext_block_move_scratch_to_osd(unsigned int hpos, unsigned int vpos, unsigned int width, unsigned int height, unsigned int src_hpos, unsigned int src_vpos);
-
-void tw_ext_putchar(unsigned int x, unsigned int y, char chr);
-void init_scratch_memory();
 
 void WriteOSD256Fnt0(unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _indx, U8 color, U8 attrib);
 void WriteOSD256Fnt1(unsigned char dst, unsigned char _pos_x, unsigned int _pos_y, unsigned char _indx, U8 color, U8 attrib);
@@ -298,7 +262,7 @@ void OSD256_set_drawcolor(U8 color);
 void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y);
 void OSD256_setpixel_fast(U16 start_x, U16 start_Y);
 void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2);
-void OSD256_Circle(int  xCenter, int yCenter, int radius);
+void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius);
 void OSD256_box(char _pth, unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
 
 void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height, U8 color, const char *bitmap);

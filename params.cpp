@@ -389,7 +389,7 @@ void update_pip()
 {
 	for (char i = 1; i<5; i++)
 	{
-		tw_set_ch_input(i, osd.video_channels[osd.pip_page][i].input);
+		tw_ch_set_input(i, osd.video_channels[osd.pip_page][i].input);
 	
 		tw_ch_settings(i, osd.video_channels[osd.pip_page][i].enable,
 			osd.video_channels[osd.pip_page][i].popup);

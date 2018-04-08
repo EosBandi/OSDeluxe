@@ -134,7 +134,7 @@ struct batt_cap_widget_t {
 	unsigned short x;
 	unsigned short y;
 	struct bar cap;
-	int remaining_capacity;
+	unsigned char remaining_capacity;
 	int max_capacity;
 	bartype bar_type;
 	bool mix;
@@ -171,6 +171,13 @@ struct alt_widget_t {
     bool mix;
 	unsigned char visible;
 };
+
+struct gs_widget_t {
+	unsigned short x;
+	unsigned short y;
+	unsigned char visible;
+};
+
 
 struct pull_widget_t {
 	unsigned short x;
@@ -265,6 +272,7 @@ void osd_battery_render( struct battery_widget_t *bw);
 void osd_batt_curr_render(struct batt_curr_widget_t *bw);
 void osd_status_render( struct status_widget_t *s);
 void osd_altitude_render( struct alt_widget_t *aw);
+void osd_groundspeed_render(struct gs_widget_t *gs);
 void osd_vario_render(struct vario_widget_t *vw);
 void osd_home_render(struct home_widget_t *hw);
 void osd_center_marker();

@@ -244,7 +244,7 @@ void read_mavlink()
                 break;
             }
 
-            case MAVLINK_MSG_ID_VFR_HUD:
+			case MAVLINK_MSG_ID_VFR_HUD:
             {
                 //osd.home.orientation = mavlink_msg_vfr_hud_get_heading(&msg);
                 osd.airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
@@ -253,6 +253,7 @@ void read_mavlink()
                 osd.throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
                 osd.alt.altitude = mavlink_msg_vfr_hud_get_alt(&msg);
                 osd.vario.vario = mavlink_msg_vfr_hud_get_climb(&msg);
+
             }
             break;
 
@@ -262,6 +263,9 @@ void read_mavlink()
                 osd.batt1_v.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
                 osd.batt1_curr.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
                 osd.batt1_cap.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
+				if (osd.batt1_cap.remaining_capacity == 255) osd.batt1_cap.remaining_capacity = 100;
+
+
             }
             break;
 
@@ -364,12 +368,12 @@ void read_mavlink()
                     osd.home.home_coord.lat = DEG2RAD(mavlink_msg_mission_item_get_x(&msg));
                     osd.home.home_coord.lon = DEG2RAD(mavlink_msg_mission_item_get_y(&msg));
                     osd.home.home_alt = (int)mavlink_msg_mission_item_get_z(&msg);
-                    // debug("Mission item received:%f, %f\n",osd.home.home_coord.lat, osd.home.home_coord.lon );
                 }
             }
                 break;
 
-            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+
+			case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
             {
                 osd.home.uav_coord.lat = DEG2RAD(mavlink_msg_global_position_int_get_lat(&msg) / 10000000.0);
                 osd.home.uav_coord.lon = DEG2RAD(mavlink_msg_global_position_int_get_lon(&msg) / 10000000.0);
@@ -425,6 +429,8 @@ void read_mavlink()
                 {
                     osd.batt1_cap.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
                 }
+				debug("Battery capacity received\n");
+
             }
 			break;
 			case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:

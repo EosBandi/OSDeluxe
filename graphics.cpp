@@ -25,21 +25,6 @@
 
 #include "OSDeluxe.h"
 
-//void draw_circle(int xm, int ym, int r)
-//{
-//   int x = -r, y = 0, err = 2-2*r; /* II. Quadrant */
-//   do {
-//      tw_osd_qsetpixel(xm-x, ym+y); /*   I. Quadrant */
-//      tw_osd_qsetpixel(xm-y, ym-x); /*  II. Quadrant */
-//      tw_osd_qsetpixel(xm+x, ym-y); /* III. Quadrant */
-//      tw_osd_qsetpixel(xm+y, ym+x); /*  IV. Quadrant */
-//      r = err;
-//      if (r <= y) err += ++y*2+1;           /* e_xy+e_y < 0 */
-//      if (r > x || err > y) err += ++x*2+1; /* e_xy+e_x > 0 or no 2nd y-step */
-//   } while (x < 0);
-//}
-//
-
 
 void transform_polygon(struct polygon *p, int x, int y, int rot)
 {
