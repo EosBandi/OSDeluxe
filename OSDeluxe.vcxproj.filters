@@ -774,6 +774,9 @@
     <ClInclude Include="mavlink_gen\protocol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="bitmaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics.cpp">
@@ -804,6 +807,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tw_func.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitmaps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

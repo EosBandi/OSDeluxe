@@ -24,18 +24,18 @@
 
 #include "OSDeluxe.h"
 
-char sVoltFormat[] = "%5.1f\x82\x83";
-char sCapFormat[] =  "%5.0f\x80\x81";
+char sVoltFormat[] = "%5.2fv";
+char sCapFormat[] =  "%5.0f\x5b";
 
 
 void osd_bar_render(struct bar *b)
 {
 
     float val;      //value to display, constrained to max and min
-    
-    unsigned char mix; // Transparent background value
     int iw, rw, yw, tw;
+	char color, mix;
 
+	if (b->mix) mix = MIX;
 
     val = b->val;
     if (b->val > b->max) val = b->max;
@@ -46,43 +46,34 @@ void osd_bar_render(struct bar *b)
     yw = (float)iw * ((b->warn_yellow - b->min) / (b->max - b->min));
     tw = (float)iw * ((val - b->min) / (b->max - b->min));
 
-    if (b->mix)
-        mix = MIX;
-    else
-        mix = 0;
 
-
-    OSD_path = OSD_PATH_DISP;
     //Outside
-    if (b->box) tw_osd_rectangle(b->x, b->y, b->w, b->h + 10, BACKROUND);
-    tw_osd_rectangle(b->x + 1, b->y + 1, b->w - 2, b->h - 2, COLOR_WHITE | mix);
+	OSD256_box(PTH_X, b->x, b->y, b->w, b->h, COLOR_WHITE | mix);
 
     if (b->bar_type == BAR_MULTICOLOR)
     {
         // Colored markers;
-        tw_osd_rectangle(b->x + 2, b->y + 2, iw, b->h - 4, COLOR_GREEN | mix);
-        tw_osd_rectangle(b->x + 2, b->y + 2, yw, b->h - 4, COLOR_YELLOW | mix);
-        tw_osd_rectangle(b->x + 2, b->y + 2, rw, b->h - 4, COLOR_RED | mix);
-        if (tw > 0) tw_osd_rectangle(b->x + 2 + tw, b->y + 2, iw - tw, b->h - 4, COLOR_BLACK | mix);
+		OSD256_box(PTH_X, b->x + 2, b->y + 2, iw, b->h - 4, COLOR_GREEN | mix);
+		OSD256_box(PTH_X, b->x + 2, b->y + 2, yw, b->h - 4, COLOR_YELLOW | mix);
+		OSD256_box(PTH_X, b->x + 2, b->y + 2, rw, b->h - 4, COLOR_RED | mix);
+        if (tw > 0) OSD256_box(PTH_X, b->x + 2 + tw, b->y + 2, iw - tw, b->h - 4, COLOR_BLACK | mix);
     }
     else
     {
-        unsigned char bar_color = COLOR_GREEN;
+        char bar_color = COLOR_GREEN;
+
         if (val <= b->warn_yellow) bar_color = COLOR_YELLOW | mix;
         if (val <= b->warn_red) bar_color = COLOR_RED | mix | BLINK;
-        tw_osd_rectangle(b->x + 2, b->y + 2, b->w - 4, b->h - 4, COLOR_BLACK | mix);
-        tw_osd_rectangle(b->x + 2, b->y + 2, tw, b->h - 4, bar_color | mix);
+		OSD256_box(PTH_X, b->x + 2, b->y + 2, b->w - 4, b->h - 4, COLOR_BLACK | mix);
+		OSD256_box(PTH_X, b->x + 2, b->y + 2, tw, b->h - 4, bar_color | mix);
     }
 
-    if (b->box) disp_color_background = BACKROUND;
-	else disp_color_background = 0xff;
-
     if (b->val <= b->warn_red)
-        disp_color = COLOR_RED | BLINK;
+        color = OSD256_FONT_RED_BLINK;
     else
-        disp_color = COLOR_YELLOW;
-    font_type = FONT_16x8;
-    tw_printf(b->x + 2, b->y + b->h + 2, b->format, b->val);
+        color = OSD256_FONT_YELLOW;
+
+    OSD256_printf(b->x-2, b->y + b->h + 2, color, 0, b->format, b->val);
 }
 
 void osd_gps_render(struct gps_widget_t *g)
@@ -93,12 +84,12 @@ void osd_gps_render(struct gps_widget_t *g)
 
 	if (g->sat <= g->sat_critical || g->hdop > g->hdop_critical)
 	{
-		OSD256_Block_Transfer(SCRATCH, DISPLAY, 40, 300, g->x, g->y, g->x + 39, g->y + 39);
+		OSD256_display_bitmap(BMP_GPS_ICON_RED, g->x, g->y);
 		color = OSD256_FONT_RED;
 	}
 	else
 	{
-		OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 300, g->x, g->y, g->x + 39, g->y + 39);
+		OSD256_display_bitmap(BMP_GPS_ICON_GREEN, g->x, g->y);
 		color = OSD256_FONT_YELLOW;
 
 	}
@@ -112,8 +103,8 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw)
 
 	bw->volt.x = bw->x;
 	bw->volt.y = bw->y;
-	bw->volt.w = 30;
-	bw->volt.h = 10;
+	bw->volt.w = 96;
+	bw->volt.h = 20;
 
 	bw->volt.max = bw->max_cell_voltage * bw->cells;
 	bw->volt.min = bw->min_cell_voltage * bw->cells;
@@ -134,8 +125,8 @@ void osd_batt_cap_render(struct batt_cap_widget_t *bw)
 
 	bw->cap.x = bw->x;
 	bw->cap.y = bw->y;
-	bw->cap.w = 30;
-	bw->cap.h = 10;
+	bw->cap.w = 96;
+	bw->cap.h = 20;
 
 	bw->cap.max = bw->max_capacity;
 	bw->cap.min = 0;
@@ -174,112 +165,54 @@ void osd_batt_curr_render(struct batt_curr_widget_t *bw)
 void osd_status_render( struct status_widget_t *s)
 {
 
-#define BAR_W 7
-#define BAR_H 16
-
-unsigned char bar_color;
-unsigned char mix;
-
-  if (s->mix)
-        mix = MIX;
-    else
-        mix = 0;
-
- tw_osd_rectangle(s->x,s->y, 3*BAR_W + 8 , BAR_H, BACKROUND); //background
- 
- font_type = FONT_SHADOW_8x8;
-
- // Display notification bars
+// Display notification bars
  switch (s->gps_status)
  {
  case STATUS_OK:
-     bar_color = COLOR_GREEN | mix;
-     disp_color = COLOR_75_WHITE | mix;
-     disp_color_background = COLOR_GREEN | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
+	 OSD256_display_bitmap(BMP_GPS_STATE_GREEN, s->x, s->y);
      break;
  case STATUS_WARNING:
-     bar_color = COLOR_DARK_YELLOW | mix;
-     disp_color = COLOR_75_WHITE | mix;
-     disp_color_background = COLOR_DARK_YELLOW | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_GPS_STATE_YELLOW, s->x, s->y);
+	 break;
  case STATUS_CRITICAL:
-     bar_color = COLOR_RED | mix | BLINK;
-     disp_color = COLOR_YELLOW | mix;
-     disp_color_background = COLOR_RED | mix | BLINK;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_GPS_STATE_RED, s->x, s->y);
+	 break;
  case STATUS_NONE:
-     bar_color = COLOR_BLACK | mix;
-     disp_color = COLOR_WHITE | mix;
-     disp_color_background = COLOR_BLACK | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_GPS_STATE_GRAY, s->x, s->y);
+	 break;
  }
- tw_osd_rectangle(s->x + 2, s->y + 2, BAR_W, BAR_H - 4, bar_color);
- tw_printf(s->x + 2 + (BAR_W / 2) - 2, s->y + 5, "GPS");
 
  switch (s->ekf_status)
  {
  case STATUS_OK:
-     bar_color = COLOR_GREEN | mix;
-     disp_color = COLOR_75_WHITE | mix;
-     disp_color_background = COLOR_GREEN | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
+	 OSD256_display_bitmap(BMP_EKF_STATE_GREEN, s->x + 34, s->y);
      break;
  case STATUS_WARNING:
-     bar_color = COLOR_DARK_YELLOW | mix;
-     disp_color = COLOR_75_WHITE | mix;
-     disp_color_background = COLOR_DARK_YELLOW | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_EKF_STATE_YELLOW, s->x + 34, s->y);
+	 break;
  case STATUS_CRITICAL:
-     bar_color = COLOR_RED | mix | BLINK;
-     disp_color = COLOR_YELLOW | mix;
-     disp_color_background = COLOR_RED | mix | BLINK;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_EKF_STATE_RED, s->x + 34, s->y);
+	 break;
  case STATUS_NONE:
-     bar_color = COLOR_BLACK | mix;
-     disp_color = COLOR_WHITE | mix;
-     disp_color_background = COLOR_BLACK | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_EKF_STATE_GRAY, s->x + 34, s->y);
+	 break;
  }
-
- tw_osd_rectangle(s->x+2 + BAR_W + 2, s->y+2, BAR_W,BAR_H-4, bar_color);
- tw_printf(s->x+2 + BAR_W + 2+ (BAR_W/2)-2, s->y+5,"EKF");
 
 switch (s->vibe_status)
  {
  case STATUS_OK:
-     bar_color = COLOR_GREEN | mix;
-     disp_color = COLOR_75_WHITE | mix;
-     disp_color_background = COLOR_GREEN | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_VIB_STATE_GREEN, s->x + 68, s->y);
+	 break;
  case STATUS_WARNING:
-     bar_color = COLOR_DARK_YELLOW | mix;
-     disp_color = COLOR_75_WHITE | mix;
-     disp_color_background = COLOR_DARK_YELLOW | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_VIB_STATE_YELLOW, s->x + 68, s->y);
+	 break;
  case STATUS_CRITICAL:
-     bar_color = COLOR_RED | mix | BLINK;
-     disp_color = COLOR_YELLOW | mix;
-     disp_color_background = COLOR_RED | mix | BLINK;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_VIB_STATE_RED, s->x + 68, s->y);
+	 break;
  case STATUS_NONE:
-     bar_color = COLOR_BLACK | mix;
-     disp_color = COLOR_WHITE | mix;
-     disp_color_background = COLOR_BLACK | mix;
-     disp_color_shadow = COLOR_BLACK | mix;
-     break;
+	 OSD256_display_bitmap(BMP_VIB_STATE_GRAY, s->x + 68, s->y);
+	 break;
  }
- tw_osd_rectangle(s->x+2 + BAR_W + 2 + BAR_W + 2, s->y+2, BAR_W,BAR_H-4, bar_color);
- tw_printf(s->x+6 + 2*BAR_W+ (BAR_W/2)-2, s->y+5,"VIB");
  
 }
 
@@ -307,22 +240,7 @@ void osd_pull_render(struct pull_widget_t *pw)
 
 void osd_altitude_render( struct alt_widget_t *aw)
 {
-
-unsigned char mix;
-
-  if (aw->mix)
-        mix = MIX;
-    else
-        mix = 0;
-
- font_type = FONT_16x8;
- disp_color = COLOR_YELLOW | mix;
- disp_color_background = BACKROUND;
- disp_color_shadow = COLOR_BLACK | mix;
-
- tw_osd_rectangle(aw->x, aw->y, 29,10, BACKROUND);
- tw_printf(aw->x+1, aw->y+2, "\x86\x87%4dm", (int)aw->altitude);
-
+ OSD256_printf(aw->x, aw->y,OSD256_FONT_YELLOW,0, "\x5c\x5d%dm", (int)aw->altitude);
 } 
 
 void osd_vario_render(struct vario_widget_t *vw)

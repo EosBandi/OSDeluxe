@@ -84,6 +84,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bitmaps.h" />
     <ClInclude Include="graphics.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -360,6 +361,7 @@
     <ClInclude Include="__vm\.OSDeluxe.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bitmaps.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="home_calc.cpp" />
     <ClCompile Include="horizon.cpp" />

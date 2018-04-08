@@ -170,6 +170,7 @@ void loop ()
 	
 	OSD256_printf_slow(6, 15, COLOR_WHITE, 0, "firmware version 1.0 build 12345");
 
+
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 1/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 1);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 610, 0, 865, 143);
@@ -202,52 +203,39 @@ void loop ()
     //This must be the last one
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 8/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_WHITE, 0, 0);
+	
+	
 
-	OSD256_load_bitmap(SCRATCH, 0, 300, 40, 40, COLOR_GREEN, gps_icon);
-	OSD256_load_bitmap(SCRATCH, 40, 300, 40, 40, COLOR_RED, gps_icon);
-
-	OSD256_load_bitmap(SCRATCH, 80, 300, 32, 20, COLOR_GREEN, gps_state);
-	OSD256_load_bitmap(SCRATCH, 80, 320, 32, 20, COLOR_DARK_YELLOW, gps_state);
-	OSD256_load_bitmap(SCRATCH, 80, 340, 32, 20, COLOR_RED | BLINK, gps_state);
-	OSD256_load_bitmap(SCRATCH, 80, 360, 32, 20, COLOR_25_WHITE, gps_state);
-
-	OSD256_load_bitmap(SCRATCH, 112, 300, 32, 20, COLOR_GREEN, mag_state);
-	OSD256_load_bitmap(SCRATCH, 112, 320, 32, 20, COLOR_DARK_YELLOW, mag_state);
-	OSD256_load_bitmap(SCRATCH, 112, 340, 32, 20, COLOR_RED | BLINK, mag_state);
-	OSD256_load_bitmap(SCRATCH, 112, 360, 32, 20, COLOR_25_WHITE, mag_state);
-
-	OSD256_load_bitmap(SCRATCH, 144, 300, 32, 20, COLOR_GREEN, vibe_state);
-	OSD256_load_bitmap(SCRATCH, 144, 320, 32, 20, COLOR_DARK_YELLOW, vibe_state);
-	OSD256_load_bitmap(SCRATCH, 144, 340, 32, 20, COLOR_RED | BLINK, vibe_state);
-	OSD256_load_bitmap(SCRATCH, 144, 360, 32, 20, COLOR_25_WHITE, vibe_state);
-
+	init_bitmaps();
 
 	OSD256_printf_slow(8, 19, COLOR_GREEN, 0, "            DONE              ");
 
 	OSD256_clear_screen(0);
+
 
 	//From now on we assume that extended OSD functions are enabled...
 	tw_write_register(0x240, 0x01);
 
 	unsigned long now;
 
+	//CreateScrathFntTab(DISPLAY, COLOR_WHITE, 0, 0);
 
-
-
-
-
-	osd.horizon.x = 360;
-	osd.horizon.y = 288;
 
 	OSD256_wr_page = 0;
 	tw_osd_set_display_page(0);
+	//osd_gps_render(&osd.gps);
+	//osd_status_render(&osd.stat);
 
+	OSD256_box(PTH_X, 10, 10, 100, 100, COLOR_GREEN);
 
-	osd_gps_render(&osd.gps);
+	osd.batt1_cap.max_capacity = 99999;
+	osd.batt1_cap.remaining_capacity = 100;
 
+	osd_batt_cap_render(&osd.batt1_cap);
 
-	OSD256_printf(300, 300, OSD256_FONT_WHITE, 0, "WIDD MESSZE EZT");
-	OSD256_printf(300, 400, OSD256_FONT_WHITE, 1, "WIDD MESSZE EZT");
+	osd.alt.altitude = 145;
+
+	osd_altitude_render(&osd.alt);
 
 
 // eddig es ne tovabb

@@ -37,8 +37,9 @@ unsigned char OSD256_font_color;
 
 FontType font_type; // Global variable to hold current font_type
 
-unsigned char last_reg209 = 0;
-unsigned char last_reg24e = 0;
+
+
+
 
 void tw_init()
 {
@@ -1727,7 +1728,7 @@ void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned c
 	for (char a = 0; a < strlen(str); a++)
 	{
 		OSD256_putc(_posX, posy, str[a]-32, color,font);
-		if (font == 0)_posX = _posX + 14;
+		if (font == 0)_posX = _posX + 16;
 		else _posX = _posX + 12;
 	}
 }
@@ -2174,3 +2175,9 @@ void OSD256_set_drawcolor(U8 color)
 {
 	tw_write_register(0x243, color);
 }
+
+void OSD256_box(char _pth, unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color)
+{
+	OSD256_Block_fill(_pth, DISPLAY, x, y, x + w - 1, y + h - 1, color);
+};
+

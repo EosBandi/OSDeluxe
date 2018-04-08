@@ -160,6 +160,7 @@ struct vin_params_t
 
 
 
+
 extern unsigned char cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
 extern unsigned char OSD_work_field, OSD_display_field;
@@ -285,7 +286,7 @@ void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16
 
 void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y, U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y);
 void OSD256_putc(U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font);
-void OSD256_Scratch_Buffer_Select(unsigned char number);
+
 void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned char color);
 void OSD256_printf(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...);
 
@@ -298,6 +299,7 @@ void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y);
 void OSD256_setpixel_fast(U16 start_x, U16 start_Y);
 void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2);
 void OSD256_Circle(int  xCenter, int yCenter, int radius);
+void OSD256_box(char _pth, unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);
 
 void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height, U8 color, const char *bitmap);
 
@@ -305,5 +307,9 @@ unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
 void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);
 
 void CreateScrathFntTab(unsigned char dst, U8 color, U8 attrib, U8 font);
+
+
+
+
 
 #endif
