@@ -137,7 +137,7 @@ void loop ()
 
 
 	//Commented out for quick start, need to run at every powerup
-	//init_font_tables();
+	init_font_tables();
 	init_bitmaps();
 
 	OSD256_clear_screen(PTH_X,0);
@@ -155,20 +155,7 @@ void loop ()
 	OSD256_set_display_page(0);
 	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 575);
 
-	/*
-	for (int i = -50; i < 20; i++) {
-		OSD256_clear_screen(PTH_X, OSD256_wr_page);
-		osd.vx = i;
-		osd.vy = 0;
-		movement_render(&osd.move);
-		OSD256_set_display_page(OSD256_wr_page);
-		if (OSD256_wr_page == 0) OSD256_wr_page = 1;
-		else OSD256_wr_page = 0;
-	}
-	while (1);
 
-
-	*/
 
 //Main loop
 while (1)
