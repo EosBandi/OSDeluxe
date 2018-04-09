@@ -73,6 +73,7 @@ struct osd_settings {
     status_widget_t stat;
     alt_widget_t alt;
 	gs_widget_t gs;
+	throttle_widget_t thr;
 
     vario_widget_t vario;
     home_widget_t home_w;
@@ -83,6 +84,8 @@ struct osd_settings {
 
 	message_widget_t msg_widget;
 	message_list_widget_t msg_list_widget;
+
+	move_widget_t move;
 
 	char center_cross_visible = 0x01;
 
@@ -102,6 +105,13 @@ struct osd_settings {
     int           ekfposv;
     int           ekfcompass;
     int           ekfterrain;
+
+	float			  vx;			// X speed in m/s
+	float			  vy;			// Y speed in m/s
+	float			  yaw;			// Yaw in rad
+	float			  cos_yaw, sin_yaw;
+
+
 
 	unsigned char ctr_ch[4];
     unsigned char ctr_state[4];

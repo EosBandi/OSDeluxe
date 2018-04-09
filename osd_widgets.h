@@ -178,6 +178,12 @@ struct gs_widget_t {
 	unsigned char visible;
 };
 
+struct throttle_widget_t {
+	unsigned short x;
+	unsigned short y;
+	unsigned char  visible;
+};
+
 
 struct pull_widget_t {
 	unsigned short x;
@@ -188,6 +194,14 @@ struct pull_widget_t {
 	unsigned char visible;
 };
 
+struct move_widget_t {
+	unsigned short x;
+	unsigned short y;
+	unsigned char  size;
+	float		   max;
+	char		   visible;
+
+};
 
 struct vario_widget_t {
     unsigned short x;
@@ -280,6 +294,8 @@ void render_horizon(struct horizon_t *horizon);
 void osd_mode_render( struct mode_widget_t *mw);
 void osd_pull_render(struct pull_widget_t *pw);
 void rc_control(void);
+void osd_throttle_render(struct throttle_widget_t *t);
+void movement_render(move_widget_t *m);
 
 void message_buffer_add_line(char *message, char severity);
 void message_buffer_render(void);

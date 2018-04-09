@@ -154,20 +154,34 @@ void loop ()
 
 	OSD256_set_display_page(0);
 	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 575);
-	//while (1);
+
+	/*
+	for (int i = -50; i < 20; i++) {
+		OSD256_clear_screen(PTH_X, OSD256_wr_page);
+		osd.vx = i;
+		osd.vy = 0;
+		movement_render(&osd.move);
+		OSD256_set_display_page(OSD256_wr_page);
+		if (OSD256_wr_page == 0) OSD256_wr_page = 1;
+		else OSD256_wr_page = 0;
+	}
+	while (1);
+
+
+	*/
 
 //Main loop
 while (1)
 {
-	now = millis();
-
 	read_mavlink();
 
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
 
 	now = millis();
+	
+	if (osd.center_cross_visible & osd.visible_osd_page) osd_center_marker();
 
-	osd_center_marker();
+	if (osd.move.visible & osd.visible_osd_page) movement_render(&osd.move);
 
     if (osd.horizon.visible & osd.visible_osd_page) render_horizon(&osd.horizon);
 
@@ -201,9 +215,7 @@ while (1)
 
 	if (osd.gs.visible & osd.visible_osd_page) osd_groundspeed_render(&osd.gs);
 
-	//debug("Loop time:%lu\n", millis() - now);
-
-    //tw_printf(10,50,"ch1:%u, ch2:%u, ch3:%u. ch4:%u", osd.ctr_state[0],osd.ctr_state[1],osd.ctr_state[2],osd.ctr_state[3]);
+	if (osd.thr.visible & osd.visible_osd_page) osd_throttle_render(&osd.thr);
 
 	//Switch working page for smooth redraw
 	OSD256_set_display_page(OSD256_wr_page);
@@ -313,7 +325,7 @@ while (1)
 		}
 	}
 
-	//debug("Looptime : %ul\n", millis() - now);
+	debug("Looptime : %lu\n", millis() - now);
 	//debug("Loop time: %lu\n", millis() - now);
 	//debug("Bytes waiting: %u\n", Serial1.available());
 

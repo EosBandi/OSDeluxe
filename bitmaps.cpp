@@ -16,6 +16,10 @@ struct bitmap_t bitmaps[] = {
 	{ 929, 60,32,20, COLOR_DARK_YELLOW, vibe_state },			// 11 BMP_VIB_STATE_YELLOW
 	{ 929, 80,32,20, COLOR_RED | BLINK, vibe_state },			// 12 BMP_VIB_STATE_RED
 	{ 929, 100,32,20, COLOR_25_WHITE, vibe_state },				// 13 BMP_VIB_STATE_GRAY
+	{ 0,  300,16,15,    COLOR_WHITE, small_ball },				// 14 BMP_BALL_WHITE
+	{ 16, 300,16,15,    COLOR_GREEN, small_ball },				// 15 BMP_BALL_GREEN
+	{ 32, 300,16,15,    COLOR_RED, small_ball },				// 16 BMP_BALL_RED
+	{ 48, 300,16,15,    COLOR_BLUE, small_ball }				// 17 BMP_BALL_BLUE
 };
 
 
@@ -26,7 +30,6 @@ void init_bitmaps()
 	for (char i = 0; i < tmp; i++)
 	{
 		OSD256_load_bitmap(SCRATCH, bitmaps[i].startx, bitmaps[i].starty, bitmaps[i].width, bitmaps[i].height, bitmaps[i].color, bitmaps[i].image);
-		debug("Bitmap %u init..\n", i);
 	}
 }
 

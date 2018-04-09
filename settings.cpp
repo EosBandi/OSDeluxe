@@ -72,9 +72,9 @@ void default_settings()
 
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[0][1] = { 1, 1, 0, 0, 0, 180 };
-	osd.video_channels[0][2] = { 2, 0, 1, 0, 0, 64 };
-	osd.video_channels[0][3] = { 3, 0, 1, 116, 0, 64 };
-	osd.video_channels[0][4] = { 4, 0, 1, 64, 0, 52 };
+	osd.video_channels[0][2] = { 2, 1, 1, 0, 0, 64 };
+	osd.video_channels[0][3] = { 3, 1, 1, 116, 0, 64 };
+	osd.video_channels[0][4] = { 4, 1, 1, 64, 0, 52 };
 	
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[1][1] = { 1, 1, 0, 0, 0, 180 };
@@ -188,6 +188,10 @@ void default_settings()
 	osd.gs.y = 544;
 	osd.gs.visible = 0x01;
 
+	osd.thr.x = 450;
+	osd.thr.y = 544;
+	osd.thr.visible = 0x01;
+
     osd.vario.x = 685;
     osd.vario.y = 188;
     osd.vario.h = 200;
@@ -240,7 +244,7 @@ void default_settings()
    osd.ctr_ch[3] = 13;
     
 	osd.pull.x = 7;
-	osd.pull.y = 105;
+	osd.pull.y = 215;
 	osd.pull.mix = false;
 	osd.pull.pull = 0;
 	osd.pull.warning = 7*9.8f;
@@ -255,6 +259,13 @@ void default_settings()
 	osd.msg_list_widget.y = 20;
 	osd.msg_list_widget.mix = false;
 	osd.msg_list_widget.visible = 0x01;
+
+
+	osd.move.x = 7;
+	osd.move.y = 250;
+	osd.move.size = 100;
+	osd.move.max = 1.0f;
+	osd.move.visible = 0x01;
 
 
 }

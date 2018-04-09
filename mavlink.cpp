@@ -158,7 +158,7 @@ void request_mavlink_rates(void)
                                                     MAV_DATA_STREAM_EXTRA1,
                                                     MAV_DATA_STREAM_EXTRA2,
                                                     MAV_DATA_STREAM_EXTRA3 };
-    uint16_t MAVRates[MAX_STREAMS] = { 0x01, 0x05, 0x05, 0x02, 0x0a, 0x05, 0x02 };
+    uint16_t MAVRates[MAX_STREAMS] = { 0x01, 0x05, 0x05, 0x05, 0x0a, 0x05, 0x02 };
 
     for (uint32_t i = 0; i < MAX_STREAMS; i++)
     {
@@ -169,6 +169,7 @@ void request_mavlink_rates(void)
 
 void request_mavlink_battery_capacity(void)
 {
+	debug("Battery capacity requested\n");
 //    mavlink_msg_param_request_read_send(MAVLINK_COMM_0,mavlink_system.sysid, mavlink_system.compid, "BATT_CAPACITY",-1);
     mavlink_msg_param_request_read_send(MAVLINK_COMM_0,0, 0, "BATT_CAPACITY",-1);
 }
@@ -179,9 +180,6 @@ void read_mavlink()
 {
     mavlink_message_t msg;
     mavlink_status_t mv_status;
-
-	int mm = 0;
-
     // grabing data
     while (Serial1.available() > 0)
     {
@@ -239,8 +237,9 @@ void read_mavlink()
             {
                 osd.horizon.pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
                 osd.horizon.roll = ToDeg(mavlink_msg_attitude_get_roll(&msg));
-                // osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
-				mm++;
+                osd.yaw = mavlink_msg_attitude_get_yaw(&msg);
+				osd.cos_yaw = cos(osd.yaw);
+				osd.sin_yaw = sin(osd.yaw);
                 break;
             }
 
@@ -372,13 +371,16 @@ void read_mavlink()
             }
                 break;
 
-
 			case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
             {
                 osd.home.uav_coord.lat = DEG2RAD(mavlink_msg_global_position_int_get_lat(&msg) / 10000000.0);
                 osd.home.uav_coord.lon = DEG2RAD(mavlink_msg_global_position_int_get_lon(&msg) / 10000000.0);
                 osd.home.uav_alt = (int)(mavlink_msg_global_position_int_get_alt(&msg) / 1000);
                 osd.home.uav_heading = (int)(mavlink_msg_global_position_int_get_hdg(&msg) / 100);
+
+				osd.vx = (float)mavlink_msg_global_position_int_get_vx(&msg) / 100.0f;
+				osd.vy = (float)mavlink_msg_global_position_int_get_vy(&msg) / 100.0f;
+
 
                 // Do home widget calculation
                 // TODO: Check if we have home widget enabled

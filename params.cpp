@@ -80,7 +80,6 @@ struct param_def parameters[] = {
 	PARAM("VARIO_WIDTH", MAV_PARAM_TYPE_UINT16, &osd.vario.w, NULL),
 	PARAM("VARIO_NUMPOS", MAV_PARAM_TYPE_UINT8, &osd.vario.num_pos, NULL),
 	PARAM("VARIO_MAXIMUM", MAV_PARAM_TYPE_REAL32, &osd.vario.vario_max, NULL),
-	PARAM("VARIO_MIX", MAV_PARAM_TYPE_UINT8, &osd.vario.mix, NULL),
 
 	PARAM("GPS_POSX", MAV_PARAM_TYPE_UINT16, &osd.gps.x, NULL),
 	PARAM("GPS_POSY", MAV_PARAM_TYPE_UINT16, &osd.gps.y, NULL),
@@ -98,8 +97,6 @@ struct param_def parameters[] = {
 	PARAM("BAT1V_YELWCELLV", MAV_PARAM_TYPE_REAL32, &osd.batt1_v.yellow_cell_voltage, NULL),
 	PARAM("BAT1V_REDCELLV", MAV_PARAM_TYPE_REAL32, &osd.batt1_v.red_cell_voltage, NULL),
 	PARAM("BAT1V_BARTYPE", MAV_PARAM_TYPE_UINT8, &osd.batt1_v.bar_type, NULL),
-	PARAM("BAT1V_MIX", MAV_PARAM_TYPE_UINT8, &osd.batt1_v.mix, NULL),
-	PARAM("BAT1V_BOX", MAV_PARAM_TYPE_UINT8, &osd.batt1_v.box, NULL),
 
 	PARAM("BAT2V_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt2_v.x, NULL),
 	PARAM("BAT2V_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt2_v.y, NULL),
@@ -109,43 +106,29 @@ struct param_def parameters[] = {
 	PARAM("BAT2V_YELWCELLV", MAV_PARAM_TYPE_REAL32, &osd.batt2_v.yellow_cell_voltage, NULL),
 	PARAM("BAT2V_REDCELLV", MAV_PARAM_TYPE_REAL32, &osd.batt2_v.red_cell_voltage, NULL),
 	PARAM("BAT2V_BARTYPE", MAV_PARAM_TYPE_UINT8, &osd.batt2_v.bar_type, NULL),
-	PARAM("BAT2V_MIX", MAV_PARAM_TYPE_UINT8, &osd.batt2_v.mix, NULL),
-	PARAM("BAT2V_BOX", MAV_PARAM_TYPE_UINT8, &osd.batt2_v.box, NULL),
 
 	PARAM("BAT1CAP_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt1_cap.x, NULL),
 	PARAM("BAT1CAP_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt1_cap.y, NULL),
 	PARAM("BAT1CAP_BARTYPE", MAV_PARAM_TYPE_UINT8, &osd.batt1_cap.bar_type, NULL),
-	PARAM("BAT1CAP_MIX", MAV_PARAM_TYPE_UINT8, &osd.batt1_cap.mix, NULL),
-	PARAM("BAT1CAP_BOX", MAV_PARAM_TYPE_UINT8, &osd.batt1_cap.box, NULL),
 
 	PARAM("BAT2CAP_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt2_cap.x, NULL),
 	PARAM("BAT2CAP_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt2_cap.y, NULL),
 	PARAM("BAT2CAP_BARTYPE", MAV_PARAM_TYPE_UINT8, &osd.batt2_cap.bar_type, NULL),
-	PARAM("BAT2CAP_MIX", MAV_PARAM_TYPE_UINT8, &osd.batt2_cap.mix, NULL),
-	PARAM("BAT2CAP_BOX", MAV_PARAM_TYPE_UINT8, &osd.batt2_cap.box, NULL),
 
 	PARAM("BAT1CUR_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt1_curr.x, NULL),
 	PARAM("BAT1CUR_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt1_curr.y, NULL),
-	PARAM("BAT1CUR_MIX", MAV_PARAM_TYPE_UINT8, &osd.batt1_curr.mix, NULL),
-	PARAM("BAT1CUR_BOX", MAV_PARAM_TYPE_UINT8, &osd.batt1_curr.box, NULL),
 
 	PARAM("BAT2CUR_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt2_curr.x, NULL),
 	PARAM("BAT2CUR_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt2_curr.y, NULL),
-	PARAM("BAT2CUR_MIX", MAV_PARAM_TYPE_UINT8, &osd.batt2_curr.mix, NULL),
-	PARAM("BAT2CUR_BOX", MAV_PARAM_TYPE_UINT8, &osd.batt2_curr.box, NULL),
 
 	PARAM("STATUS_POSX", MAV_PARAM_TYPE_UINT16, &osd.stat.x, NULL),
 	PARAM("STATUS_POSY", MAV_PARAM_TYPE_UINT16, &osd.stat.y, NULL),
-	PARAM("STATUS_MIX", MAV_PARAM_TYPE_UINT8, &osd.stat.mix, NULL),
-
 
 	PARAM("ALT_POSX", MAV_PARAM_TYPE_UINT16, &osd.alt.x, NULL),
 	PARAM("ALT_POSY", MAV_PARAM_TYPE_UINT16, &osd.alt.y, NULL),
-	PARAM("ALT_MIX", MAV_PARAM_TYPE_UINT8, &osd.alt.mix, NULL),
 
 	PARAM("PULL_POSX", MAV_PARAM_TYPE_UINT16, &osd.pull.x, NULL),
 	PARAM("PULL_POSY", MAV_PARAM_TYPE_UINT16, &osd.pull.y, NULL),
-	PARAM("PULL_MIX", MAV_PARAM_TYPE_UINT8, &osd.pull.mix, NULL),
 	PARAM("PULL_WARNING", MAV_PARAM_TYPE_REAL32, &osd.pull.warning, NULL),
 
 	PARAM("HOME_POSX", MAV_PARAM_TYPE_UINT16, &osd.home_w.x, NULL),
@@ -160,9 +143,20 @@ struct param_def parameters[] = {
 	PARAM("ARM_POSX", MAV_PARAM_TYPE_UINT16, &osd.mode.arm_x, NULL),
 	PARAM("ARM_POSY", MAV_PARAM_TYPE_UINT16, &osd.mode.arm_y, NULL),
 
-
 	PARAM("MESSAGE_POSX", MAV_PARAM_TYPE_UINT16, &osd.msg_widget.x, NULL),
 	PARAM("MESSAGE_POSY", MAV_PARAM_TYPE_UINT16, &osd.msg_widget.y, NULL),
+
+	PARAM("GS_POSX", MAV_PARAM_TYPE_UINT16, &osd.gs.x, NULL),
+	PARAM("GS_POSY", MAV_PARAM_TYPE_UINT16, &osd.gs.y, NULL),
+
+	PARAM("THROTTLE_POSX", MAV_PARAM_TYPE_UINT16, &osd.thr.x, NULL),
+	PARAM("THROTTLE_POSY", MAV_PARAM_TYPE_UINT16, &osd.thr.y, NULL),
+
+	PARAM("MOVE_POSX", MAV_PARAM_TYPE_UINT16, &osd.move.x, NULL),
+	PARAM("MOVE_POSY", MAV_PARAM_TYPE_UINT16, &osd.move.y, NULL),
+	PARAM("MOVE_SIZE", MAV_PARAM_TYPE_UINT16, &osd.move.size, NULL),
+	PARAM("MOVE_MAX",  MAV_PARAM_TYPE_REAL32, &osd.move.max, NULL),
+
 
 	PARAM("CTR_RC_CH_1", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[0], NULL),
 	PARAM("CTR_RC_CH_2", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[1], NULL),
@@ -191,6 +185,10 @@ struct param_def parameters[] = {
 	PARAM("PAGE_MODE", MAV_PARAM_TYPE_UINT8, &osd.mode.visible, NULL),
 	PARAM("PAGE_PULL", MAV_PARAM_TYPE_UINT8, &osd.pull.visible, NULL),
 	PARAM("PAGE_MESSAGE", MAV_PARAM_TYPE_UINT8, &osd.msg_widget.visible, NULL),
+	PARAM("PAGE_GS", MAV_PARAM_TYPE_UINT8, &osd.gs.visible, NULL),
+	PARAM("PAGE_THROTTLE", MAV_PARAM_TYPE_UINT8, &osd.thr.visible, NULL),
+	PARAM("PAGE_MOVE", MAV_PARAM_TYPE_UINT8, &osd.move.visible, NULL),
+	PARAM("PAGE_CENTER_M", MAV_PARAM_TYPE_UINT8, &osd.center_cross_visible , NULL),
 
 	PARAM("VOUT_COLOR_BAR", MAV_PARAM_TYPE_UINT8, &osd.color_bar_x, &update_vout_settings),
 	PARAM("VOUT_COLOR_KILL", MAV_PARAM_TYPE_UINT8, &osd.color_kill_x, &update_vout_settings),

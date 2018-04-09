@@ -231,6 +231,10 @@ void osd_groundspeed_render(struct gs_widget_t *gs)
 	OSD256_printf(gs->x, gs->y, OSD256_FONT_YELLOW, 0, "\x5f %.0f\x7b\x7c", osd.groundspeed * 3.6);
 }
 
+void osd_throttle_render(struct throttle_widget_t *t)
+{
+	OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "Th %u", osd.rcin[3]);
+}
 
 
 void osd_vario_render(struct vario_widget_t *vw)
@@ -310,72 +314,6 @@ void osd_center_marker()
 
 }
 
-
-/*
-void osd_center_marker()
-{
-    unsigned char temp_path;
-    unsigned char reg209;
-
-    temp_path = OSD_path;
-    OSD_path = OSD_PATH_REC;
-
-
-    //tw_set_osd_buf(0xff,0x01,0x10,0xff);
-    tw_set_osd_buf(0xff,0x89,0x98,0xff);
-    cnt = 0;
-    data_buf[cnt++] = 45; // start HPOS
-    data_buf[cnt++] = 45; // end   HPOS
-    data_buf[cnt++] = 135; // start VPOS
-    data_buf[cnt++] = 155; // end VPOS
-    reg209 = 0x00;
-    if (OSD_work_field == FLD_EVEN) reg209 = 0b00001000;
-    data_buf[cnt++] = reg209;
-    data_buf[cnt++] = 0b11100000;
-    tw_write_buf(0x205, data_buf, cnt);
-    tw_wait_for_osd_write(50);
-    
-    //tw_set_osd_buf(0x00,0x00,0x00,0x00);
-    tw_set_osd_buf(0x88,0x88,0x88,0x88);
-    cnt = 0;
-    data_buf[cnt++] = 43; // start HPOS
-    data_buf[cnt++] = 47; // end   HPOS
-    data_buf[cnt++] = 144; // start VPOS
-    data_buf[cnt++] = 146; // end VPOS
-    reg209 = 0x00;
-    if (OSD_work_field == FLD_EVEN) reg209 = 0b00001000;
-    data_buf[cnt++] = reg209;
-    data_buf[cnt++] = 0b11100000;
-    tw_write_buf(0x205, data_buf, cnt);
-    tw_wait_for_osd_write(50);
-
-    //tw_set_osd_buf(0x11,0x11,0x11,0x11);
-    tw_set_osd_buf(0x99,0x99,0x99,0x99);
-    cnt = 0;
-    data_buf[cnt++] = 43; // start HPOS
-    data_buf[cnt++] = 47; // end   HPOS
-    data_buf[cnt++] = 145; // start VPOS
-    data_buf[cnt++] = 145; // end VPOS
-    reg209 = 0x00;
-    if (OSD_work_field == FLD_EVEN) reg209 = 0b00001000;
-    data_buf[cnt++] = reg209;
-    data_buf[cnt++] = 0b11100000;
-    tw_write_buf(0x205, data_buf, cnt);
-    tw_wait_for_osd_write(50);
-
-    //tw_osd_setpixel(45 * SCREEN_SCALE,144,0x00,0x01,0x10,0x00);
-    //tw_osd_setpixel(45 * SCREEN_SCALE,146,0x00,0x01,0x10,0x00);
-    //tw_osd_setpixel(45 * SCREEN_SCALE,145,0x11,0x11,0x11,0x11);
-    
-    tw_osd_setpixel(45 * SCREEN_SCALE,144,0x88,0x89,0x98,0x88);
-    tw_osd_setpixel(45 * SCREEN_SCALE,146,0x88,0x89,0x98,0x88);
-    tw_osd_setpixel(45 * SCREEN_SCALE,145,0x99,0x99,0x99,0x99);
-
-    OSD_path = temp_path;
-
-
-}
-*/
 #define RANGE 250
 #define SCALE 6
 #define MINOR_TICK  5
@@ -582,10 +520,10 @@ void osd_mode_render(struct mode_widget_t *mw)
 	}
 	if (mw->mode_centered)
 	{
-		int l = (float)strlen(mode) * 12;
-		OSD256_printf(mw->mode_x - (l / 2), mw->mode_y, OSD256_FONT_WHITE, 1, "%s", mode);
+		int l = (float)strlen(mode) * 15;
+		OSD256_printf(mw->mode_x - (l / 2), mw->mode_y, OSD256_FONT_YELLOW, 0, "%s", mode);
 	}
-	else OSD256_printf(mw->mode_x, mw->mode_y, OSD256_FONT_WHITE, 1, "%s", mode);
+	else OSD256_printf(mw->mode_x, mw->mode_y, OSD256_FONT_YELLOW, 0, "%s", mode);
 
 
 	if (osd.system_status == MAV_STATE_CRITICAL)
@@ -725,11 +663,78 @@ void message_list_render()
 
 
 
-void ils_render()
+void movement_render(move_widget_t *m)
 {
 
+	// osd.vx x movement in 100*m/s
+	// osd.vy y movement in 100*m/s
+	// osd.move.max maximum in normal m/s -> must convert to *100
+
+	U16 s;
+	U16 centerx, centery;
+	int offsetx, offsety;
+	float maximum;
+	bitmap_names_t bitmap = BMP_BALL_WHITE;
+	float v_pitch, v_roll;
+
+	//Convert Global Frame Vx Vy to vehicle frame v_pitch and v_roll;
+
+	v_roll  = osd.vy * osd.cos_yaw - osd.vx * osd.sin_yaw; // body roll vel
+	v_pitch = osd.vy * osd.sin_yaw + osd.vx * osd.cos_yaw; // body pitch vel
 
 
+//	debug("yaw: %f cos y:%f sin y:%f\n",osd.yaw, osd.cos_yaw, osd.sin_yaw);
+//	debug("vx: %f, vy: %f\n", osd.vx, osd.vy);
+//	debug("vroll: %f, vpitch: %f\n", v_roll, v_pitch);
+
+	s = m->size - 1;
+	centerx = m->x + (s + 1) / 2 - 7;
+	centery = m->y + (s + 1) / 2 - 7;
+
+	maximum = osd.move.max;
+	
+
+
+	offsety = (v_pitch / maximum) * (s + 1) / 2;
+	offsetx = (v_roll / maximum) * (s + 1) / 2;
+
+	if ((offsetx == 0) && (offsety == 0)) bitmap = BMP_BALL_GREEN;
+
+	if (offsetx > (m->size / 2))
+	{
+		offsetx = m->size / 2;
+		bitmap = BMP_BALL_BLUE;
+	}
+	else if (offsetx < (-(m->size / 2)))
+	{
+		offsetx = -(m->size / 2);
+		bitmap = BMP_BALL_BLUE;
+	}
+
+	if (offsety >(m->size / 2))
+	{
+		offsety = m->size / 2;
+		bitmap = BMP_BALL_BLUE;
+	}
+	else if (offsety < (-(m->size / 2)))
+	{
+		offsety = -(m->size / 2);
+		bitmap = BMP_BALL_BLUE;
+	}
+
+
+	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y, m->x + s, m->y);
+	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y + s, m->x + s, m->y + s);
+
+	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y, m->x, m->y + s);
+	OSD256_drawline(PTH_X, COLOR_WHITE, m->x + s, m->y, m->x + s, m->y + s);
+
+	OSD256_drawline(PTH_X, COLOR_WHITE, m->x + (s+1)/2, m->y, m->x + (s+1)/2, m->y + s);
+	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y + (s+1)/2, m->x + s, m->y + (s+1)/2);
+	OSD256_Circle(PTH_X, COLOR_75_WHITE, m->x+s/2, m->y+s/2, m->size / 4);
+
+	//reverse y offset
+	OSD256_display_bitmap(bitmap, centerx+offsetx, centery-offsety);
 
 
 }
