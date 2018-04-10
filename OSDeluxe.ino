@@ -131,7 +131,7 @@ void loop ()
 	param_send_index = total_params;
 
 	//Display both fields !!!!
-	tw_write_register(0x20f, 0x0c);
+	tw_write_register(0x20f, 0x0f);
 
 	OSD256_wr_page = 0;
 
@@ -166,6 +166,8 @@ while (1)
 
 	now = millis();
 	
+	OSD256_box(PTH_Y, 0, 540, 719, 28, COLOR_50_WHITE | MIX);
+
 	if (osd.center_cross_visible & osd.visible_osd_page) osd_center_marker();
 
 	if (osd.move.visible & osd.visible_osd_page) movement_render(&osd.move);
@@ -252,13 +254,14 @@ while (1)
 		for (int i = 0; i < 8; i++)send_param_list();
 	}
 	
+	/*
 	//Send out mavlink heartbeat
 	if ((millis() - last_heartbeat_sent) >= 1000)
 	{
 		heartbeat_out();
 		last_heartbeat_sent = millis();
 	}
-
+	*/
 
 
     if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
