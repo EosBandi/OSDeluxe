@@ -215,15 +215,15 @@ void read_mavlink()
                 //Ok it is from an arupilot UAV, go ahead a process
                 mavbeat = 1;                        // heartbeat is received
                 last_mav_beat = millis();
-                osd.mav_type = mav_type;            // We already has this
+                g.mav_type = mav_type;            // We already has this
                 osd.mode.mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
-                osd.base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
-                osd.system_status = mavlink_msg_heartbeat_get_system_status(&msg);
+                g.base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
+                g.system_status = mavlink_msg_heartbeat_get_system_status(&msg);
 
-                if (getBit(osd.base_mode, 7))
-                    osd.arming_status = true;
+                if (getBit(g.base_mode, 7))
+                    g.arming_status = true;
                 else
-                    osd.arming_status = false;
+                    g.arming_status = false;
 
                 if (waitingMAVBeats == 1)
                 {
@@ -237,19 +237,19 @@ void read_mavlink()
             {
                 osd.horizon.pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
                 osd.horizon.roll = ToDeg(mavlink_msg_attitude_get_roll(&msg));
-                osd.yaw = mavlink_msg_attitude_get_yaw(&msg);
-				osd.cos_yaw = cos(osd.yaw);
-				osd.sin_yaw = sin(osd.yaw);
+                g.yaw = mavlink_msg_attitude_get_yaw(&msg);
+				g.cos_yaw = cos(g.yaw);
+				g.sin_yaw = sin(g.yaw);
                 break;
             }
 
 			case MAVLINK_MSG_ID_VFR_HUD:
             {
                 //osd.home.orientation = mavlink_msg_vfr_hud_get_heading(&msg);
-                osd.airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
-                osd.groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
-                osd.heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
-                osd.throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
+                g.airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
+                g.groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
+                g.heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
+                g.throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
                 osd.alt.altitude = mavlink_msg_vfr_hud_get_alt(&msg);
                 osd.vario.vario = mavlink_msg_vfr_hud_get_climb(&msg);
 
@@ -271,23 +271,23 @@ void read_mavlink()
             case MAVLINK_MSG_ID_RC_CHANNELS:
             {
 
-                osd.rcin[1] = mavlink_msg_rc_channels_get_chan1_raw(&msg);
-                osd.rcin[2] = mavlink_msg_rc_channels_get_chan2_raw(&msg);
-                osd.rcin[3] = mavlink_msg_rc_channels_get_chan3_raw(&msg);
-                osd.rcin[4] = mavlink_msg_rc_channels_get_chan4_raw(&msg);
-                osd.rcin[5] = mavlink_msg_rc_channels_get_chan5_raw(&msg);
-                osd.rcin[6] = mavlink_msg_rc_channels_get_chan6_raw(&msg);
-                osd.rcin[7] = mavlink_msg_rc_channels_get_chan7_raw(&msg);
-                osd.rcin[8] = mavlink_msg_rc_channels_get_chan8_raw(&msg);
-                osd.rcin[9] = mavlink_msg_rc_channels_get_chan9_raw(&msg);
-                osd.rcin[10] = mavlink_msg_rc_channels_get_chan10_raw(&msg);
-                osd.rcin[11] = mavlink_msg_rc_channels_get_chan11_raw(&msg);
-                osd.rcin[12] = mavlink_msg_rc_channels_get_chan12_raw(&msg);
-                osd.rcin[13] = mavlink_msg_rc_channels_get_chan13_raw(&msg);
-                osd.rcin[14] = mavlink_msg_rc_channels_get_chan14_raw(&msg);
-                osd.rcin[15] = mavlink_msg_rc_channels_get_chan15_raw(&msg);
-                osd.rcin[16] = mavlink_msg_rc_channels_get_chan16_raw(&msg);
-                osd.rc_rssi = mavlink_msg_rc_channels_get_rssi(&msg);
+                g.rcin[1] = mavlink_msg_rc_channels_get_chan1_raw(&msg);
+                g.rcin[2] = mavlink_msg_rc_channels_get_chan2_raw(&msg);
+                g.rcin[3] = mavlink_msg_rc_channels_get_chan3_raw(&msg);
+                g.rcin[4] = mavlink_msg_rc_channels_get_chan4_raw(&msg);
+                g.rcin[5] = mavlink_msg_rc_channels_get_chan5_raw(&msg);
+                g.rcin[6] = mavlink_msg_rc_channels_get_chan6_raw(&msg);
+                g.rcin[7] = mavlink_msg_rc_channels_get_chan7_raw(&msg);
+                g.rcin[8] = mavlink_msg_rc_channels_get_chan8_raw(&msg);
+                g.rcin[9] = mavlink_msg_rc_channels_get_chan9_raw(&msg);
+                g.rcin[10] = mavlink_msg_rc_channels_get_chan10_raw(&msg);
+                g.rcin[11] = mavlink_msg_rc_channels_get_chan11_raw(&msg);
+                g.rcin[12] = mavlink_msg_rc_channels_get_chan12_raw(&msg);
+                g.rcin[13] = mavlink_msg_rc_channels_get_chan13_raw(&msg);
+                g.rcin[14] = mavlink_msg_rc_channels_get_chan14_raw(&msg);
+                g.rcin[15] = mavlink_msg_rc_channels_get_chan15_raw(&msg);
+                g.rcin[16] = mavlink_msg_rc_channels_get_chan16_raw(&msg);
+                g.rc_rssi = mavlink_msg_rc_channels_get_rssi(&msg);
 
 				//ctr_state[] contains the actual switch state of a given control channel
 				//ctr_chp[]   contains the rc channel id for pip and osd_page channels
@@ -295,12 +295,12 @@ void read_mavlink()
                 //set up ctr_state variables
                 for (int i=0;i<4;i++)
                 {
-                    if (osd.rcin[osd.ctr_ch[i]] < RC_STATE1) osd.ctr_state[i] = 0;
-                    else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE2) osd.ctr_state[i] = 1;
-					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE3) osd.ctr_state[i] = 2;
-					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE4) osd.ctr_state[i] = 3;
-					else if (osd.rcin[osd.ctr_ch[i]] < RC_STATE5) osd.ctr_state[i] = 4;
-                    else osd.ctr_state[i] = 5;
+                    if (g.rcin[osd.ctr_ch[i]] < RC_STATE1) g.ctr_state[i] = 0;
+                    else if (g.rcin[osd.ctr_ch[i]] < RC_STATE2) g.ctr_state[i] = 1;
+					else if (g.rcin[osd.ctr_ch[i]] < RC_STATE3) g.ctr_state[i] = 2;
+					else if (g.rcin[osd.ctr_ch[i]] < RC_STATE4) g.ctr_state[i] = 3;
+					else if (g.rcin[osd.ctr_ch[i]] < RC_STATE5) g.ctr_state[i] = 4;
+                    else g.ctr_state[i] = 5;
                 }
 
             }
@@ -364,61 +364,61 @@ void read_mavlink()
             {
                 if (mavlink_msg_mission_item_get_seq(&msg) == 0)
                 {
-                    osd.home.home_coord.lat = DEG2RAD(mavlink_msg_mission_item_get_x(&msg));
-                    osd.home.home_coord.lon = DEG2RAD(mavlink_msg_mission_item_get_y(&msg));
-                    osd.home.home_alt = (int)mavlink_msg_mission_item_get_z(&msg);
+                    g.home.home_coord.lat = DEG2RAD(mavlink_msg_mission_item_get_x(&msg));
+                    g.home.home_coord.lon = DEG2RAD(mavlink_msg_mission_item_get_y(&msg));
+                    g.home.home_alt = (int)mavlink_msg_mission_item_get_z(&msg);
                 }
             }
                 break;
 
 			case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
             {
-                osd.home.uav_coord.lat = DEG2RAD(mavlink_msg_global_position_int_get_lat(&msg) / 10000000.0);
-                osd.home.uav_coord.lon = DEG2RAD(mavlink_msg_global_position_int_get_lon(&msg) / 10000000.0);
-                osd.home.uav_alt = (int)(mavlink_msg_global_position_int_get_alt(&msg) / 1000);
-                osd.home.uav_heading = (int)(mavlink_msg_global_position_int_get_hdg(&msg) / 100);
+                g.home.uav_coord.lat = DEG2RAD(mavlink_msg_global_position_int_get_lat(&msg) / 10000000.0);
+                g.home.uav_coord.lon = DEG2RAD(mavlink_msg_global_position_int_get_lon(&msg) / 10000000.0);
+                g.home.uav_alt = (int)(mavlink_msg_global_position_int_get_alt(&msg) / 1000);
+                g.home.uav_heading = (int)(mavlink_msg_global_position_int_get_hdg(&msg) / 100);
 
-				osd.vx = (float)mavlink_msg_global_position_int_get_vx(&msg) / 100.0f;
-				osd.vy = (float)mavlink_msg_global_position_int_get_vy(&msg) / 100.0f;
+				g.vx = (float)mavlink_msg_global_position_int_get_vx(&msg) / 100.0f;
+				g.vy = (float)mavlink_msg_global_position_int_get_vy(&msg) / 100.0f;
 
 
                 // Do home widget calculation
                 // TODO: Check if we have home widget enabled
 
-                if (osd.home.lock == HOME_LOCKED)
+                if (g.home.lock == HOME_LOCKED)
                 {
-                    osd.home.uav_bearing = (int)get_bearing(&osd.home.home_coord, &osd.home.uav_coord);
-                    osd.home.direction = osd.home.uav_bearing + 180;
-                    osd.home.direction -= osd.home.uav_heading;
-                    if (osd.home.direction < 0) osd.home.direction += 360;
-                    osd.home.distance = earth_distance(&osd.home.home_coord, &osd.home.uav_coord);
-                    osd.home_w.home_distance = osd.home.distance;
-                    osd.home_w.orientation = osd.home.direction;
+                    g.home.uav_bearing = (int)get_bearing(&g.home.home_coord, &g.home.uav_coord);
+                    g.home.direction = g.home.uav_bearing + 180;
+                    g.home.direction -= g.home.uav_heading;
+                    if (g.home.direction < 0) g.home.direction += 360;
+                    g.home.distance = earth_distance(&g.home.home_coord, &g.home.uav_coord);
+                    osd.home_w.home_distance = g.home.distance;
+                    osd.home_w.orientation = g.home.direction;
                 }
             }
             break;
 
             case MAVLINK_MSG_ID_EKF_STATUS_REPORT:
             {
-                osd.ekfvel = (int)(mavlink_msg_ekf_status_report_get_velocity_variance(&msg) * 100);
-                osd.ekfposh = (int)(mavlink_msg_ekf_status_report_get_pos_horiz_variance(&msg) * 100);
-                osd.ekfposv = (int)(mavlink_msg_ekf_status_report_get_pos_vert_variance(&msg) * 100);
-                osd.ekfcompass = (int)(mavlink_msg_ekf_status_report_get_compass_variance(&msg) * 100);
-                osd.ekfterrain = (int)(mavlink_msg_ekf_status_report_get_terrain_alt_variance(&msg) * 100);
+                g.ekfvel = (int)(mavlink_msg_ekf_status_report_get_velocity_variance(&msg) * 100);
+                g.ekfposh = (int)(mavlink_msg_ekf_status_report_get_pos_horiz_variance(&msg) * 100);
+                g.ekfposv = (int)(mavlink_msg_ekf_status_report_get_pos_vert_variance(&msg) * 100);
+                g.ekfcompass = (int)(mavlink_msg_ekf_status_report_get_compass_variance(&msg) * 100);
+                g.ekfterrain = (int)(mavlink_msg_ekf_status_report_get_terrain_alt_variance(&msg) * 100);
 
                 osd.stat.ekf_status = STATUS_OK;
 
-				if (osd.ekfvel > 50 ||
-                    osd.ekfposh > 50 ||
-                    osd.ekfposv > 50 ||
-                    osd.ekfcompass > 50 ||
-                    osd.ekfterrain > 50) osd.stat.ekf_status = STATUS_WARNING;
+				if (g.ekfvel > 50 ||
+                    g.ekfposh > 50 ||
+                    g.ekfposv > 50 ||
+                    g.ekfcompass > 50 ||
+                    g.ekfterrain > 50) osd.stat.ekf_status = STATUS_WARNING;
 
-                if (osd.ekfvel > 80 ||
-                    osd.ekfposh > 80 ||
-                    osd.ekfposv > 80 ||
-                    osd.ekfcompass > 80 ||
-                    osd.ekfterrain > 80) osd.stat.ekf_status = STATUS_CRITICAL;
+                if (g.ekfvel > 80 ||
+                    g.ekfposh > 80 ||
+                    g.ekfposv > 80 ||
+                    g.ekfcompass > 80 ||
+                    g.ekfterrain > 80) osd.stat.ekf_status = STATUS_CRITICAL;
             }
             break;
 			

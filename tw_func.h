@@ -26,26 +26,17 @@
 #define _TW_FUNC_H_
 
 
-#define	BIT0		(0x0001)
-#define	BIT1		(0x0002)
-#define	BIT2		(0x0004)
-#define	BIT3		(0x0008)
-#define	BIT4		(0x0010)
-#define	BIT5		(0x0020)
-#define	BIT6		(0x0040)
-#define	BIT7		(0x0080)
-
-#define	SetBit(x,y)			((x) |= (y))         
-#define	ClearBit(x,y)		((x) &= ~(y))        
-#define	BitSet(x,y)			(((x)&(y))== (y))    
-#define	BitClear(x,y)		(((x)&(y))== 0)      
-#define	IfBitSet(x,y)		if(((x)&(y)) == (y)) 
-#define	IfBitClear(x,y)	if(((x)&(y)) == 0)
+#define WAIT_OSG_WRSTALL		while(tw_read_register(0x241)&0x40)
+#define WAIT_OSG_IDLE			while(!(tw_read_register(0x241)&0x80))
+#define WAIT_INDR_DONE			while(tw_read_register(0x246)&0x1)
 
 #define	PTH_X			BIT0//BIT1//
 #define	PTH_Y			BIT1//BIT5//
 #define	PTH_PB			BIT2//
 #define	PTH_ALL			(PTH_X|PTH_Y)
+
+#define SCR_X_SIZE (720-1)
+#define SCR_Y_SIZE (576-1)
 
 //OSD registers
 
@@ -100,29 +91,9 @@
 #define FLD_ODD  2
 #define FLD_BOTH 3
 
-#define OSD_PATH_DISP 0
-#define OSD_PATH_REC  1
-
 #define SCRATCH 0
 #define DISPLAY 1
 
-#define SCREEN_SCALE 1.6f
-
-enum FontType {
-	FONT_8x8 = 0x01,
-	FONT_16x8 = 0x02,
-	FONT_16x16 = 0x03,
-	FONT_SHADOW_8x8 = 0x04,
-	FONT_SHADOW_16x8 = 0x05,
-	FONT_SHADOW_16x16 = 0x06,
-	FONT_OUTLINE_8x12 = 0x07,
-	FONT_OUTLINE_16x12 = 0x08,
-	FONT_OUTLINE_16x12c = 0x09,
-	FONT_8x8b = 0x0A,
-	FONT_QUICK = 0x0b
-};
-
-extern FontType font_type;      //Global variable to hold current font type
 
 enum input_channel {
     INPUT_CH_1 = 0x00,
@@ -163,10 +134,10 @@ struct vin_params_t
 
 extern unsigned char cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
-extern unsigned char OSD_work_field, OSD_display_field;
-extern unsigned char OSD_path; //0-display, 1-record
-extern unsigned char rec_color_shadow, rec_color, rec_color_background;
-extern unsigned char disp_color, disp_color_background, disp_color_shadow;
+//extern unsigned char OSD_work_field, OSD_display_field;
+//extern unsigned char OSD_path; //0-display, 1-record
+//extern unsigned char rec_color_shadow, rec_color, rec_color_background;
+//extern unsigned char disp_color, disp_color_background, disp_color_shadow;
 
 extern unsigned char OSD256_font_color;
 extern unsigned char OSD256_wr_page;
@@ -270,7 +241,7 @@ void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height,
 unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg);
 void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data);
 
-void CreateScrathFntTab(unsigned char dst, U8 color, U8 attrib, U8 font);
+void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font);
 
 
 

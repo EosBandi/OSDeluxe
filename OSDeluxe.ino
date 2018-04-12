@@ -29,21 +29,8 @@
 #define TW_RESET_PIN 14
 #define LED_PIN 13
 
-uint32_t FreeRam(){ // for Teensy 3.0
-    uint32_t stackTop;
-    uint32_t heapTop;
+globals_variables_t g;
 
-    // current position of the stack.
-    stackTop = (uint32_t) &stackTop;
-
-    // current position of heap.
-    void* hTop = malloc(1);
-    heapTop = (uint32_t) hTop;
-    free(hTop);
-
-    // The difference is the free, available ram.
-    return stackTop - heapTop;
-}
 
 void setup ()
 {
@@ -70,7 +57,6 @@ void setup ()
 	Serial2.begin(115200);
 
 
-    //delay(5000);
 }
 
 void loop ()
@@ -78,10 +64,9 @@ void loop ()
 
 	digitalWrite(LED_PIN, HIGH);
 
-
     tw_init ();
 
-	osd.pip_page = 0;
+	g.pip_page = 0;
 
 	tw_write_register(0x0c8, 0x03);
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
@@ -101,29 +86,24 @@ void loop ()
     //save_settings();
     //load_settings();
 
+	update_vout_settings();
+	update_vin_settings();
 	update_pip();
 
 
-	osd.displayed_mode = -1;        // Signal startup
+
+	g.displayed_mode = -1;        // Signal startup
 	
-									
-	//osd_center_marker();
+	memset(&g.message_buffer, 0, sizeof(g.message_buffer) );
+	memset(&g.message_archive, 0, sizeof(g.message_archive));
 
-
-//	OSD_work_field = FLD_ODD;
-//	OSD_display_field = FLD_EVEN;
-
-//	tw_osd_set_display_field(OSD_display_field);
-
-
-	memset(&osd.message_buffer, 0, sizeof(osd.message_buffer) );
-	osd.message_buffer_line = 0;
-	osd.message_buffer_display_time = 0;
+	g.message_buffer_line = 0;
+	g.message_buffer_display_time = 0;
 
 
 	//This is for selecting different sets
-	osd.visible_osd_page = 0x01; //bit coded 
-	osd.pip_page = 0x00;
+	g.visible_osd_page = 0x01; //bit coded 
+	g.pip_page = 0x00;
 
 	init_home();
 
@@ -157,6 +137,11 @@ void loop ()
 
 
 
+	g.arming_status = false;
+	g.displayed_arming_status = true;
+	g.armed_start_time = 0;
+	g.last_capacity_query = 0;
+
 //Main loop
 while (1)
 {
@@ -168,43 +153,43 @@ while (1)
 	
 	OSD256_box(PTH_Y, 0, 540, 719, 28, COLOR_50_WHITE | MIX);
 
-	if (osd.center_cross_visible & osd.visible_osd_page) osd_center_marker();
+	if (osd.center_cross_visible & g.visible_osd_page) osd_center_marker();
 
-	if (osd.move.visible & osd.visible_osd_page) movement_render(&osd.move);
+	if (osd.move.visible & g.visible_osd_page) movement_render(&osd.move);
 
-    if (osd.horizon.visible & osd.visible_osd_page) render_horizon(&osd.horizon);
+    if (osd.horizon.visible & g.visible_osd_page) render_horizon(&osd.horizon);
 
-	if (osd.gps.visible & osd.visible_osd_page) osd_gps_render( &osd.gps );
+	if (osd.gps.visible & g.visible_osd_page) osd_gps_render( &osd.gps );
 
-	if (osd.stat.visible & osd.visible_osd_page) osd_status_render(&osd.stat);
+	if (osd.stat.visible & g.visible_osd_page) osd_status_render(&osd.stat);
 
-	if (osd.batt1_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
+	if (osd.batt1_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
 
-	if (osd.batt2_v.visible & osd.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
+	if (osd.batt2_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
 
-	if (osd.batt1_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
+	if (osd.batt1_cap.visible  & g.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
 
-	if (osd.batt2_cap.visible  & osd.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
+	if (osd.batt2_cap.visible  & g.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
 
-	if (osd.batt1_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
+	if (osd.batt1_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
 
-	if (osd.batt2_curr.visible  & osd.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
+	if (osd.batt2_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
 	
-	if (osd.alt.visible & osd.visible_osd_page) osd_altitude_render(&osd.alt);
+	if (osd.alt.visible & g.visible_osd_page) osd_altitude_render(&osd.alt);
 
-	if (osd.vario.visible & osd.visible_osd_page) osd_vario_render(&osd.vario);
+	if (osd.vario.visible & g.visible_osd_page) osd_vario_render(&osd.vario);
 
-	if (osd.home_w.visible & osd.visible_osd_page) osd_home_render(&osd.home_w);
+	if (osd.home_w.visible & g.visible_osd_page) osd_home_render(&osd.home_w);
 
-	if (osd.mode.visible & osd.visible_osd_page) osd_mode_render(&osd.mode);
+	if (osd.mode.visible & g.visible_osd_page) osd_mode_render(&osd.mode);
 
-	if (osd.pull.visible & osd.visible_osd_page) osd_pull_render(&osd.pull);
+	if (osd.pull.visible & g.visible_osd_page) osd_pull_render(&osd.pull);
 
-    if (osd.msg_widget.visible & osd.visible_osd_page)  message_buffer_render();
+    if (osd.msg_widget.visible & g.visible_osd_page)  message_buffer_render();
 
-	if (osd.gs.visible & osd.visible_osd_page) osd_groundspeed_render(&osd.gs);
+	if (osd.gs.visible & g.visible_osd_page) osd_groundspeed_render(&osd.gs);
 
-	if (osd.thr.visible & osd.visible_osd_page) osd_throttle_render(&osd.thr);
+	if (osd.thr.visible & g.visible_osd_page) osd_throttle_render(&osd.thr);
 
 	//Switch working page for smooth redraw
 	OSD256_set_display_page(OSD256_wr_page);
@@ -213,35 +198,35 @@ while (1)
 
 
 	//Control channel 1 - Control PIP mode
-    if (osd.ctr_saved_state[0] != osd.ctr_state[0])
+    if (g.ctr_saved_state[0] != g.ctr_state[0])
     {
         // There is a change in ctr1 state
-        osd.ctr_saved_state[0] = osd.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
-    	osd.pip_page = osd.ctr_state[0];
+        g.ctr_saved_state[0] = g.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
+    	g.pip_page = g.ctr_state[0];
 
 		for (unsigned char i = 1; i < 5; i++)
 		{
-			tw_ch_set_input(i, osd.video_channels[osd.pip_page][i].input);
+			tw_ch_set_input(i, osd.video_channels[g.pip_page][i].input);
 
-			tw_ch_settings(i, osd.video_channels[osd.pip_page][i].enable,
-				osd.video_channels[osd.pip_page][i].popup);
+			tw_ch_settings(i, osd.video_channels[g.pip_page][i].enable,
+				osd.video_channels[g.pip_page][i].popup);
 
-			tw_ch_set_window(i, osd.video_channels[osd.pip_page][i].pos_h,
-				osd.video_channels[osd.pip_page][i].pos_v,
-				osd.video_channels[osd.pip_page][i].len_h);
+			tw_ch_set_window(i, osd.video_channels[g.pip_page][i].pos_h,
+				osd.video_channels[g.pip_page][i].pos_v,
+				osd.video_channels[g.pip_page][i].len_h);
 		}
 		
     }
 
     //Control channel 2 - OSD widgets page
 
-    if (osd.ctr_saved_state[1] != osd.ctr_state[1])
+    if (g.ctr_saved_state[1] != g.ctr_state[1])
     {
         // There is a change in ctr1 state
-        osd.ctr_saved_state[1] = osd.ctr_state[1]; // Save it, to prevent unneccessary state changes in the main loop
+        g.ctr_saved_state[1] = g.ctr_state[1]; // Save it, to prevent unneccessary state changes in the main loop
 
 		//visible_osd_page is a bit coded value bit represents the one page (1 - page 1, 2-page 2, 4-page 3, 8-page 4.... up to page 5)
-		osd.visible_osd_page = 0x01 << osd.ctr_state[1];
+		g.visible_osd_page = 0x01 << g.ctr_state[1];
 
     }
 
@@ -254,18 +239,16 @@ while (1)
 		for (int i = 0; i < 8; i++)send_param_list();
 	}
 	
-	/*
 	//Send out mavlink heartbeat
 	if ((millis() - last_heartbeat_sent) >= 1000)
 	{
 		heartbeat_out();
 		last_heartbeat_sent = millis();
 	}
-	*/
 
 
-    if (millis() > (osd.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
-    if ( (osd.batt1_cap.max_capacity == 0) && (millis() > (osd.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
+    if (millis() > (g.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
+    if ( (osd.batt1_cap.max_capacity == 0) && (millis() > (g.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
 
 	if (Serial2.available() == 0) 
 	{

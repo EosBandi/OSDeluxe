@@ -163,12 +163,12 @@ struct param_def parameters[] = {
 	PARAM("CTR_RC_CH_3", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[2], NULL),
 	PARAM("CTR_RC_CH_4", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[3], NULL),
 
-
+/*
 	// Bit coded field for visible chanels (four leas significatn bits)
 	PARAM("CTR2_0_VIDCHON", MAV_PARAM_TYPE_UINT8, &osd.ctr2_video_on[0], &update_channel_onoff),
 	PARAM("CTR2_1_VIDCHON", MAV_PARAM_TYPE_UINT8, &osd.ctr2_video_on[1], &update_channel_onoff),
 	PARAM("CTR2_2_VIDCHON", MAV_PARAM_TYPE_UINT8, &osd.ctr2_video_on[2], &update_channel_onoff),
-
+*/
 	//bit coded field for osd widget visibility by pages (1-8 pages)
 	PARAM("PAGE_GPS", MAV_PARAM_TYPE_UINT8, &osd.gps.visible, NULL),
 	PARAM("PAGE_BATT1_VOLT", MAV_PARAM_TYPE_UINT8, &osd.batt1_v.visible, NULL),
@@ -197,180 +197,179 @@ struct param_def parameters[] = {
 	PARAM("VOUT_OUT3_GAIN", MAV_PARAM_TYPE_UINT8, &osd.vout3_gain, &update_vout_settings),
 
 
-	PARAM("PIPM0_CH1_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].pos_h, &update_pip),
-	PARAM("PIPM0_CH1_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].pos_v, &update_pip),
-	PARAM("PIPM0_CH1_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].len_h, &update_pip),
-	PARAM("PIPM0_CH1_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].input, &update_pip),
-	PARAM("PIPM0_CH1_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].popup, &update_pip),
-	PARAM("PIPM0_CH1_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].enable, &update_pip),
+	PARAM("PIPM0_POS_H_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].pos_h, &update_pip),
+	PARAM("PIPM0_POS_V_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].pos_v, &update_pip),
+	PARAM("PIPM0_SIZE_CH1",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].len_h, &update_pip),
+	PARAM("PIPM0_INPUT_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].input, &update_pip),
+	PARAM("PIPM0_POPUP_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].popup, &update_pip),
+	PARAM("PIPM0_ENA_CH1",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][1].enable, &update_pip),
 
-	PARAM("PIPM0_CH2_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].pos_h, &update_pip),
-	PARAM("PIPM0_CH2_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].pos_v, &update_pip),
-	PARAM("PIPM0_CH2_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].len_h, &update_pip),
-	PARAM("PIPM0_CH2_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].input, &update_pip),
-	PARAM("PIPM0_CH2_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].popup, &update_pip),
-	PARAM("PIPM0_CH2_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].enable, &update_pip),
+	PARAM("PIPM0_POS_H_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].pos_h, &update_pip),
+	PARAM("PIPM0_POS_V_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].pos_v, &update_pip),
+	PARAM("PIPM0_SIZE_CH2",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].len_h, &update_pip),
+	PARAM("PIPM0_INPUT_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].input, &update_pip),
+	PARAM("PIPM0_POPUP_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].popup, &update_pip),
+	PARAM("PIPM0_ENA_CH2",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][2].enable, &update_pip),
 
-	PARAM("PIPM0_CH3_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].pos_h, &update_pip),
-	PARAM("PIPM0_CH3_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].pos_v, &update_pip),
-	PARAM("PIPM0_CH3_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].len_h, &update_pip),
-	PARAM("PIPM0_CH3_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].input, &update_pip),
-	PARAM("PIPM0_CH3_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].popup, &update_pip),
-	PARAM("PIPM0_CH3_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].enable, &update_pip),
+	PARAM("PIPM0_POS_H_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].pos_h, &update_pip),
+	PARAM("PIPM0_POS_V_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].pos_v, &update_pip),
+	PARAM("PIPM0_SIZE_CH3",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].len_h, &update_pip),
+	PARAM("PIPM0_INPUT_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].input, &update_pip),
+	PARAM("PIPM0_POPUP_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].popup, &update_pip),
+	PARAM("PIPM0_ENA_CH3",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][3].enable, &update_pip),
 
-	PARAM("PIPM0_CH4_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].pos_h, &update_pip),
-	PARAM("PIPM0_CH4_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].pos_v, &update_pip),
-	PARAM("PIPM0_CH4_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].len_h, &update_pip),
-	PARAM("PIPM0_CH4_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].input, &update_pip),
-	PARAM("PIPM0_CH4_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].popup, &update_pip),
-	PARAM("PIPM0_CH4_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].enable, &update_pip),
+	PARAM("PIPM0_POS_H_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].pos_h, &update_pip),
+	PARAM("PIPM0_POS_V_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].pos_v, &update_pip),
+	PARAM("PIPM0_SIZE_CH4",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].len_h, &update_pip),
+	PARAM("PIPM0_INPUT_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].input, &update_pip),
+	PARAM("PIPM0_POPUP_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].popup, &update_pip),
+	PARAM("PIPM0_ENA_CH4",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[0][4].enable, &update_pip),
 
-	PARAM("PIPM1_CH1_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].pos_h, &update_pip),
-	PARAM("PIPM1_CH1_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].pos_v, &update_pip),
-	PARAM("PIPM1_CH1_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].len_h, &update_pip),
-	PARAM("PIPM1_CH1_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].input, &update_pip),
-	PARAM("PIPM1_CH1_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].popup, &update_pip),
-	PARAM("PIPM1_CH1_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].enable, &update_pip),
+	PARAM("PIPM1_POS_H_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].pos_h, &update_pip),
+	PARAM("PIPM1_POS_V_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].pos_v, &update_pip),
+	PARAM("PIPM1_SIZE_CH1",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].len_h, &update_pip),
+	PARAM("PIPM1_INPUT_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].input, &update_pip),
+	PARAM("PIPM1_POPUP_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].popup, &update_pip),
+	PARAM("PIPM1_ENA_CH1",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][1].enable, &update_pip),
 
-	PARAM("PIPM1_CH2_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].pos_h, &update_pip),
-	PARAM("PIPM1_CH2_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].pos_v, &update_pip),
-	PARAM("PIPM1_CH2_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].len_h, &update_pip),
-	PARAM("PIPM1_CH2_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].input, &update_pip),
-	PARAM("PIPM1_CH2_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].popup, &update_pip),
-	PARAM("PIPM1_CH2_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].enable, &update_pip),
+	PARAM("PIPM1_POS_H_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].pos_h, &update_pip),
+	PARAM("PIPM1_POS_V_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].pos_v, &update_pip),
+	PARAM("PIPM1_SIZE_CH2",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].len_h, &update_pip),
+	PARAM("PIPM1_INPUT_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].input, &update_pip),
+	PARAM("PIPM1_POPUP_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].popup, &update_pip),
+	PARAM("PIPM1_ENA_CH2",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][2].enable, &update_pip),
 
-	PARAM("PIPM1_CH3_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].pos_h, &update_pip),
-	PARAM("PIPM1_CH3_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].pos_v, &update_pip),
-	PARAM("PIPM1_CH3_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].len_h, &update_pip),
-	PARAM("PIPM1_CH3_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].input, &update_pip),
-	PARAM("PIPM1_CH3_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].popup, &update_pip),
-	PARAM("PIPM1_CH3_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].enable, &update_pip),
+	PARAM("PIPM1_POS_H_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].pos_h, &update_pip),
+	PARAM("PIPM1_POS_V_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].pos_v, &update_pip),
+	PARAM("PIPM1_SIZE_CH3",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].len_h, &update_pip),
+	PARAM("PIPM1_INPUT_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].input, &update_pip),
+	PARAM("PIPM1_POPUP_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].popup, &update_pip),
+	PARAM("PIPM1_ENA_CH3",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][3].enable, &update_pip),
 
-	PARAM("PIPM1_CH4_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].pos_h, &update_pip),
-	PARAM("PIPM1_CH4_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].pos_v, &update_pip),
-	PARAM("PIPM1_CH4_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].len_h, &update_pip),
-	PARAM("PIPM1_CH4_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].input, &update_pip),
-	PARAM("PIPM1_CH4_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].popup, &update_pip),
-	PARAM("PIPM1_CH4_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].enable, &update_pip),
+	PARAM("PIPM1_POS_H_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].pos_h, &update_pip),
+	PARAM("PIPM1_POS_V_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].pos_v, &update_pip),
+	PARAM("PIPM1_SIZE_CH4",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].len_h, &update_pip),
+	PARAM("PIPM1_INPUT_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].input, &update_pip),
+	PARAM("PIPM1_POPUP_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].popup, &update_pip),
+	PARAM("PIPM1_ENA_CH4",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[1][4].enable, &update_pip),
+//---
+	PARAM("PIPM2_POS_H_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].pos_h, &update_pip),
+	PARAM("PIPM2_POS_V_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].pos_v, &update_pip),
+	PARAM("PIPM2_SIZE_CH1",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].len_h, &update_pip),
+	PARAM("PIPM2_INPUT_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].input, &update_pip),
+	PARAM("PIPM2_POPUP_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].popup, &update_pip),
+	PARAM("PIPM2_ENA_CH1",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].enable, &update_pip),
 
-	PARAM("PIPM2_CH1_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].pos_h, &update_pip),
-	PARAM("PIPM2_CH1_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].pos_v, &update_pip),
-	PARAM("PIPM2_CH1_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].len_h, &update_pip),
-	PARAM("PIPM2_CH1_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].input, &update_pip),
-	PARAM("PIPM2_CH1_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].popup, &update_pip),
-	PARAM("PIPM2_CH1_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][1].enable, &update_pip),
+	PARAM("PIPM2_POS_H_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].pos_h, &update_pip),
+	PARAM("PIPM2_POS_V_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].pos_v, &update_pip),
+	PARAM("PIPM2_SIZE_CH2",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].len_h, &update_pip),
+	PARAM("PIPM2_INPUT_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].input, &update_pip),
+	PARAM("PIPM2_POPUP_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].popup, &update_pip),
+	PARAM("PIPM2_ENA_CH2",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].enable, &update_pip),
 
-	PARAM("PIPM2_CH2_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].pos_h, &update_pip),
-	PARAM("PIPM2_CH2_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].pos_v, &update_pip),
-	PARAM("PIPM2_CH2_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].len_h, &update_pip),
-	PARAM("PIPM2_CH2_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].input, &update_pip),
-	PARAM("PIPM2_CH2_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].popup, &update_pip),
-	PARAM("PIPM2_CH2_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][2].enable, &update_pip),
+	PARAM("PIPM2_POS_H_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].pos_h, &update_pip),
+	PARAM("PIPM2_POS_V_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].pos_v, &update_pip),
+	PARAM("PIPM2_SIZE_CH3",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].len_h, &update_pip),
+	PARAM("PIPM2_INPUT_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].input, &update_pip),
+	PARAM("PIPM2_POPUP_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].popup, &update_pip),
+	PARAM("PIPM2_ENA_CH3",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].enable, &update_pip),
 
-	PARAM("PIPM2_CH3_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].pos_h, &update_pip),
-	PARAM("PIPM2_CH3_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].pos_v, &update_pip),
-	PARAM("PIPM2_CH3_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].len_h, &update_pip),
-	PARAM("PIPM2_CH3_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].input, &update_pip),
-	PARAM("PIPM2_CH3_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].popup, &update_pip),
-	PARAM("PIPM2_CH3_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][3].enable, &update_pip),
+	PARAM("PIPM2_POS_H_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].pos_h, &update_pip),
+	PARAM("PIPM2_POS_V_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].pos_v, &update_pip),
+	PARAM("PIPM2_SIZE_CH4",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].len_h, &update_pip),
+	PARAM("PIPM2_INPUT_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].input, &update_pip),
+	PARAM("PIPM2_POPUP_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].popup, &update_pip),
+	PARAM("PIPM2_ENA_CH4",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].enable, &update_pip),
+//---
+	PARAM("PIPM3_POS_H_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].pos_h, &update_pip),
+	PARAM("PIPM3_POS_V_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].pos_v, &update_pip),
+	PARAM("PIPM3_SIZE_CH1",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].len_h, &update_pip),
+	PARAM("PIPM3_INPUT_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].input, &update_pip),
+	PARAM("PIPM3_POPUP_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].popup, &update_pip),
+	PARAM("PIPM3_ENA_CH1",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].enable, &update_pip),
 
-	PARAM("PIPM2_CH4_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].pos_h, &update_pip),
-	PARAM("PIPM2_CH4_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].pos_v, &update_pip),
-	PARAM("PIPM2_CH4_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].len_h, &update_pip),
-	PARAM("PIPM2_CH4_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].input, &update_pip),
-	PARAM("PIPM2_CH4_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].popup, &update_pip),
-	PARAM("PIPM2_CH4_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[2][4].enable, &update_pip),
-		
-	PARAM("PIPM3_CH1_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].pos_h, &update_pip),
-	PARAM("PIPM3_CH1_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].pos_v, &update_pip),
-	PARAM("PIPM3_CH1_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].len_h, &update_pip),
-	PARAM("PIPM3_CH1_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].input, &update_pip),
-	PARAM("PIPM3_CH1_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].popup, &update_pip),
-	PARAM("PIPM3_CH1_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][1].enable, &update_pip),
+	PARAM("PIPM3_POS_H_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].pos_h, &update_pip),
+	PARAM("PIPM3_POS_V_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].pos_v, &update_pip),
+	PARAM("PIPM3_SIZE_CH2",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].len_h, &update_pip),
+	PARAM("PIPM3_INPUT_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].input, &update_pip),
+	PARAM("PIPM3_POPUP_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].popup, &update_pip),
+	PARAM("PIPM3_ENA_CH2",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].enable, &update_pip),
 
-	PARAM("PIPM3_CH2_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].pos_h, &update_pip),
-	PARAM("PIPM3_CH2_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].pos_v, &update_pip),
-	PARAM("PIPM3_CH2_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].len_h, &update_pip),
-	PARAM("PIPM3_CH2_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].input, &update_pip),
-	PARAM("PIPM3_CH2_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].popup, &update_pip),
-	PARAM("PIPM3_CH2_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][2].enable, &update_pip),
+	PARAM("PIPM3_POS_H_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].pos_h, &update_pip),
+	PARAM("PIPM3_POS_V_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].pos_v, &update_pip),
+	PARAM("PIPM3_SIZE_CH3",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].len_h, &update_pip),
+	PARAM("PIPM3_INPUT_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].input, &update_pip),
+	PARAM("PIPM3_POPUP_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].popup, &update_pip),
+	PARAM("PIPM3_ENA_CH3",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].enable, &update_pip),
 
-	PARAM("PIPM3_CH3_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].pos_h, &update_pip),
-	PARAM("PIPM3_CH3_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].pos_v, &update_pip),
-	PARAM("PIPM3_CH3_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].len_h, &update_pip),
-	PARAM("PIPM3_CH3_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].input, &update_pip),
-	PARAM("PIPM3_CH3_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].popup, &update_pip),
-	PARAM("PIPM3_CH3_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][3].enable, &update_pip),
-	
-	PARAM("PIPM3_CH4_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].pos_h, &update_pip),
-	PARAM("PIPM3_CH4_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].pos_v, &update_pip),
-	PARAM("PIPM3_CH4_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].len_h, &update_pip),
-	PARAM("PIPM3_CH4_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].input, &update_pip),
-	PARAM("PIPM3_CH4_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].popup, &update_pip),
-	PARAM("PIPM3_CH4_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].enable, &update_pip),
+	PARAM("PIPM3_POS_H_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].pos_h, &update_pip),
+	PARAM("PIPM3_POS_V_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].pos_v, &update_pip),
+	PARAM("PIPM3_SIZE_CH4",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].len_h, &update_pip),
+	PARAM("PIPM3_INPUT_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].input, &update_pip),
+	PARAM("PIPM3_POPUP_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].popup, &update_pip),
+	PARAM("PIPM3_ENA_CH4",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[3][4].enable, &update_pip),
+//-----
+	PARAM("PIPM4_POS_H_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].pos_h, &update_pip),
+	PARAM("PIPM4_POS_V_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].pos_v, &update_pip),
+	PARAM("PIPM4_SIZE_CH1",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].len_h, &update_pip),
+	PARAM("PIPM4_INPUT_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].input, &update_pip),
+	PARAM("PIPM4_POPUP_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].popup, &update_pip),
+	PARAM("PIPM4_ENA_CH1",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].enable, &update_pip),
+
+	PARAM("PIPM4_POS_H_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].pos_h, &update_pip),
+	PARAM("PIPM4_POS_V_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].pos_v, &update_pip),
+	PARAM("PIPM4_SIZE_CH2",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].len_h, &update_pip),
+	PARAM("PIPM4_INPUT_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].input, &update_pip),
+	PARAM("PIPM4_POPUP_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].popup, &update_pip),
+	PARAM("PIPM4_ENA_CH2",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].enable, &update_pip),
+
+	PARAM("PIPM4_POS_H_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].pos_h, &update_pip),
+	PARAM("PIPM4_POS_V_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].pos_v, &update_pip),
+	PARAM("PIPM4_SIZE_CH3",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].len_h, &update_pip),
+	PARAM("PIPM4_INPUT_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].input, &update_pip),
+	PARAM("PIPM4_POPUP_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].popup, &update_pip),
+	PARAM("PIPM4_ENA_CH3",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].enable, &update_pip),
+
+	PARAM("PIPM4_POS_H_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].pos_h, &update_pip),
+	PARAM("PIPM4_POS_V_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].pos_v, &update_pip),
+	PARAM("PIPM4_SIZE_CH4",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].len_h, &update_pip),
+	PARAM("PIPM4_INPUT_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].input, &update_pip),
+	PARAM("PIPM4_POPUP_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].popup, &update_pip),
+	PARAM("PIPM4_ENA_CH4",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].enable, &update_pip),
+//-----
+	PARAM("PIPM5_POS_H_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].pos_h, &update_pip),
+	PARAM("PIPM5_POS_V_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].pos_v, &update_pip),
+	PARAM("PIPM5_SIZE_CH1",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].len_h, &update_pip),
+	PARAM("PIPM5_INPUT_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].input, &update_pip),
+	PARAM("PIPM5_POPUP_CH1", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].popup, &update_pip),
+	PARAM("PIPM5_ENA_CH1",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].enable, &update_pip),
+
+	PARAM("PIPM5_POS_H_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].pos_h, &update_pip),
+	PARAM("PIPM5_POS_V_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].pos_v, &update_pip),
+	PARAM("PIPM5_SIZE_CH2",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].len_h, &update_pip),
+	PARAM("PIPM5_INPUT_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].input, &update_pip),
+	PARAM("PIPM5_POPUP_CH2", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].popup, &update_pip),
+	PARAM("PIPM5_ENA_CH2",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].enable, &update_pip),
+
+	PARAM("PIPM5_POS_H_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].pos_h, &update_pip),
+	PARAM("PIPM5_POS_V_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].pos_v, &update_pip),
+	PARAM("PIPM5_SIZE_CH3",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].len_h, &update_pip),
+	PARAM("PIPM5_INPUT_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].input, &update_pip),
+	PARAM("PIPM5_POPUP_CH3", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].popup, &update_pip),
+	PARAM("PIPM5_ENA_CH3",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].enable, &update_pip),
+
+	PARAM("PIPM5_POS_H_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].pos_h, &update_pip),
+	PARAM("PIPM5_POS_V_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].pos_v, &update_pip),
+	PARAM("PIPM5_SIZE_CH4",  MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].len_h, &update_pip),
+	PARAM("PIPM5_INPUT_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].input, &update_pip),
+	PARAM("PIPM5_POPUP_CH4", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].popup, &update_pip),
+	PARAM("PIPM5_ENA_CH4",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].enable, &update_pip),
 
 
-	PARAM("PIPM4_CH1_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].pos_h, &update_pip),
-	PARAM("PIPM4_CH1_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].pos_v, &update_pip),
-	PARAM("PIPM4_CH1_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].len_h, &update_pip),
-	PARAM("PIPM4_CH1_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].input, &update_pip),
-	PARAM("PIPM4_CH1_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].popup, &update_pip),
-	PARAM("PIPM4_CH1_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][1].enable, &update_pip),
+	PARAM("TEST_PIP_PAGE",MAV_PARAM_TYPE_UINT8, &g.pip_page, &update_pip),
+	PARAM("TEST_OSD_PAGE", MAV_PARAM_TYPE_UINT8, &g.visible_osd_page, NULL),
 
-	PARAM("PIPM4_CH2_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].pos_h, &update_pip),
-	PARAM("PIPM4_CH2_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].pos_v, &update_pip),
-	PARAM("PIPM4_CH2_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].len_h, &update_pip),
-	PARAM("PIPM4_CH2_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].input, &update_pip),
-	PARAM("PIPM4_CH2_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].popup, &update_pip),
-	PARAM("PIPM4_CH2_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][2].enable, &update_pip),
-
-	PARAM("PIPM4_CH3_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].pos_h, &update_pip),
-	PARAM("PIPM4_CH3_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].pos_v, &update_pip),
-	PARAM("PIPM4_CH3_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].len_h, &update_pip),
-	PARAM("PIPM4_CH3_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].input, &update_pip),
-	PARAM("PIPM4_CH3_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].popup, &update_pip),
-	PARAM("PIPM4_CH3_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][3].enable, &update_pip),
-
-	PARAM("PIPM4_CH4_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].pos_h, &update_pip),
-	PARAM("PIPM4_CH4_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].pos_v, &update_pip),
-	PARAM("PIPM4_CH4_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].len_h, &update_pip),
-	PARAM("PIPM4_CH4_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].input, &update_pip),
-	PARAM("PIPM4_CH4_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].popup, &update_pip),
-	PARAM("PIPM4_CH4_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[4][4].enable, &update_pip),
-
-		
-	PARAM("PIPM5_CH1_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].pos_h, &update_pip),
-	PARAM("PIPM5_CH1_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].pos_v, &update_pip),
-	PARAM("PIPM5_CH1_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].len_h, &update_pip),
-	PARAM("PIPM5_CH1_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].input, &update_pip),
-	PARAM("PIPM5_CH1_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].popup, &update_pip),
-	PARAM("PIPM5_CH1_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][1].enable, &update_pip),
-		
-	PARAM("PIPM5_CH2_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].pos_h, &update_pip),
-	PARAM("PIPM5_CH2_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].pos_v, &update_pip),
-	PARAM("PIPM5_CH2_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].len_h, &update_pip),
-	PARAM("PIPM5_CH2_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].input, &update_pip),
-	PARAM("PIPM5_CH2_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].popup, &update_pip),
-	PARAM("PIPM5_CH2_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][2].enable, &update_pip),
-
-	PARAM("PIPM5_CH3_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].pos_h, &update_pip),
-	PARAM("PIPM5_CH3_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].pos_v, &update_pip),
-	PARAM("PIPM5_CH3_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].len_h, &update_pip),
-	PARAM("PIPM5_CH3_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].input, &update_pip),
-	PARAM("PIPM5_CH3_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].popup, &update_pip),
-	PARAM("PIPM5_CH3_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][3].enable, &update_pip),
-	
-	PARAM("PIPM5_CH4_POS_H", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].pos_h, &update_pip),
-	PARAM("PIPM5_CH4_POS_V", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].pos_v, &update_pip),
-	PARAM("PIPM5_CH4_SIZE", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].len_h, &update_pip),
-	PARAM("PIPM5_CH4_INPUT", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].input, &update_pip),
-	PARAM("PIPM5_CH4_POPUP", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].popup, &update_pip),
-	PARAM("PIPM5_CH4_ENA", MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].enable, &update_pip),
-	
-	PARAM("TEST_PIP_PAGE",MAV_PARAM_TYPE_UINT8, &osd.pip_page, &update_pip),
-	PARAM("TEST_OSD_PAGE", MAV_PARAM_TYPE_UINT8, &osd.visible_osd_page, NULL),
-
-	PARAM("XXX", MAV_PARAM_TYPE_UINT8, &osd.test_byte, &update_test_byte),
+	PARAM("XXX", MAV_PARAM_TYPE_UINT8, &g.test_byte, &update_test_byte),
 
 	PARAM_END
 };
@@ -379,7 +378,7 @@ struct param_def parameters[] = {
 void update_test_byte()
 {
 
-	tw_write_register(0x0c5, osd.test_byte);
+	tw_write_register(0x0c5, g.test_byte);
 
 }
 
@@ -387,14 +386,14 @@ void update_pip()
 {
 	for (char i = 1; i<5; i++)
 	{
-		tw_ch_set_input(i, osd.video_channels[osd.pip_page][i].input);
+		tw_ch_set_input(i, osd.video_channels[g.pip_page][i].input);
 	
-		tw_ch_settings(i, osd.video_channels[osd.pip_page][i].enable,
-			osd.video_channels[osd.pip_page][i].popup);
+		tw_ch_settings(i, osd.video_channels[g.pip_page][i].enable,
+			osd.video_channels[g.pip_page][i].popup);
 	
-		tw_ch_set_window(i, osd.video_channels[osd.pip_page][i].pos_h,
-			osd.video_channels[osd.pip_page][i].pos_v,
-			osd.video_channels[osd.pip_page][i].len_h);
+		tw_ch_set_window(i, osd.video_channels[g.pip_page][i].pos_h,
+			osd.video_channels[g.pip_page][i].pos_v,
+			osd.video_channels[g.pip_page][i].len_h);
     
 	}
 
@@ -450,13 +449,14 @@ void update_vin_settings()
 
 }
 
+/*
 void update_channel_onoff()
 {
 	osd.ctr_saved_state[1] = 5;
 	debug("Called\n");
 
 }
-
+*/
 const char *mavdata_type_name[] = {
 	"CHAR", "UINT8_T", "INT8_T",
 	"UINT16_T", "INT16_T",

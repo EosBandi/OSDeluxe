@@ -36,13 +36,15 @@
 #include <EEPROM.h>
 #include "i2c_t3.h"
 
+#include "home_calc.h"
+#include "globals.h"
+#include "utils.h"
 #include "tw_font.h"
 #include "tw_func.h"
 #include "bitmaps.h"
 #include "graphics.h"
 #include "osd_widgets.h"
 #include "s1debug.h"
-#include "home_calc.h"
 #include "settings.h"
 #include "mavlink.h"
 #include "params.h"

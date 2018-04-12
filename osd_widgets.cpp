@@ -154,7 +154,7 @@ void osd_batt_curr_render(struct batt_curr_widget_t *bw)
 
 void osd_status_render( struct status_widget_t *s)
 {
-//debug("%u - %u - %u - %u - %u\n", s->x, s->y, s->vibe_status, s->visible, osd.visible_osd_page);
+//debug("%u - %u - %u - %u - %u\n", s->x, s->y, s->vibe_status, s->visible, g.visible_osd_page);
 
 
 
@@ -228,12 +228,12 @@ void osd_altitude_render( struct alt_widget_t *aw)
 
 void osd_groundspeed_render(struct gs_widget_t *gs)
 {
-	OSD256_printf(gs->x, gs->y, OSD256_FONT_YELLOW, 0, "\x5f %.0f\x7b\x7c", osd.groundspeed * 3.6);
+	OSD256_printf(gs->x, gs->y, OSD256_FONT_YELLOW, 0, "\x5f %.0f\x7b\x7c", g.groundspeed * 3.6);
 }
 
 void osd_throttle_render(struct throttle_widget_t *t)
 {
-	OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "Th %u", osd.rcin[3]);
+	OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "Th %u", g.rcin[3]);
 }
 
 
@@ -295,7 +295,7 @@ void osd_home_render(struct home_widget_t *hw)
     draw_polygon(&home_arrow, COLOR_WHITE);
 
 
-    if (osd.home.lock == HOME_LOCKED)
+    if (g.home.lock == HOME_LOCKED)
         OSD256_printf(hw->x-56, hw->y+35, OSD256_FONT_YELLOW, 0 , "% 4u m", hw->home_distance);
     else
         OSD256_printf(hw->x-56, hw->y+35, OSD256_FONT_YELLOW, 0,"no home");
@@ -334,9 +334,6 @@ void render_horizon(struct horizon_t *h)
     float cos_roll, sin_roll;
 
     char mix = MIX;
-
-    FontType ft_temp;
-
     unsigned char c1, c2, c3, c4;
 
     pitchrad = DEG2RAD(h->pitch);
@@ -439,7 +436,7 @@ void osd_mode_render(struct mode_widget_t *mw)
 
 	cust_mode = mw->mode;
 
-	if (osd.mav_type != MAV_TYPE_FIXED_WING) cust_mode += 100;
+	if (g.mav_type != MAV_TYPE_FIXED_WING) cust_mode += 100;
 
 	switch (cust_mode)
 	{
@@ -526,29 +523,29 @@ void osd_mode_render(struct mode_widget_t *mw)
 	else OSD256_printf(mw->mode_x, mw->mode_y, OSD256_FONT_YELLOW, 0, "%s", mode);
 
 
-	if (osd.system_status == MAV_STATE_CRITICAL)
+	if (g.system_status == MAV_STATE_CRITICAL)
 	{
 		if (mw->fs_centered) OSD256_printf(mw->fs_x-67, mw->fs_y, OSD256_FONT_RED_BLINK, 0, "FAILSAFE!");
 		else OSD256_printf(mw->fs_x, mw->fs_y, OSD256_FONT_RED_BLINK, 0, "FAILSAFE!");
 	}
 
 
-	if (osd.arming_status == 0)
+	if (g.arming_status == 0)
 	{
 		if (mw->arm_centered) OSD256_printf(mw->arm_x - 60 , mw->arm_y, OSD256_FONT_RED, 0, "Disarmed");
 		else OSD256_printf(mw->arm_x, mw->arm_y, OSD256_FONT_RED, 0, "Disarmed");
 
-		osd.armed_start_time == 0;
+		g.armed_start_time == 0;
 	}
 	else  //Arming status 1 ARMED
 	{
-		if (osd.armed_start_time == 0)
+		if (g.armed_start_time == 0)
 		{
-			osd.armed_start_time = millis();
-			osd.home.lock = HOME_WAIT;
+			g.armed_start_time = millis();
+			g.home.lock = HOME_WAIT;
 			mavlink_seen[MAVLINK_MSG_ID_MISSION_ITEM] = 0xffff;
 		}
-		else if (millis() < (osd.armed_start_time + 8000))
+		else if (millis() < (g.armed_start_time + 8000))
 		{
 			if (mw->arm_centered) OSD256_printf(mw->arm_x - 37, mw->arm_y, OSD256_FONT_RED_BLINK, 0, "ARMED");
 			else OSD256_printf(mw->arm_x, mw->arm_y, OSD256_FONT_RED_BLINK, 0, "ARMED");
@@ -570,37 +567,37 @@ void rc_control()
 void message_buffer_add_line(char *message, char severity)
 {
 	// Check if we are standing at the last line of the buffer.
-	if (osd.message_buffer_line == MESSAGE_BUFFER_LINES - 1)
+	if (g.message_buffer_line == MESSAGE_BUFFER_LINES - 1)
 	{
 		for (int i = 2; i < MESSAGE_BUFFER_LINES; i++)
 		{
-			strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 1
-			osd.message_severity[i - 1] = osd.message_severity[i];
+			strcpy(g.message_buffer[i - 1], g.message_buffer[i]); // roll to 1
+			g.message_severity[i - 1] = g.message_severity[i];
 		}
 	}
 	else
 	{
-		osd.message_buffer_line++;
+		g.message_buffer_line++;
 	}
 
-	strcpy(osd.message_buffer[osd.message_buffer_line], message);
-	osd.message_severity[osd.message_buffer_line] = severity;
+	strcpy(g.message_buffer[g.message_buffer_line], message);
+	g.message_severity[g.message_buffer_line] = severity;
 
 	//Add line to the archive as well, so we can always display the last 20 messages if needed
-	if (osd.message_archive_line == MESSAGE_BUFFER_LINES - 1)
+	if (g.message_archive_line == MESSAGE_BUFFER_LINES - 1)
 	{
 		for (int i = 2; i < MESSAGE_BUFFER_LINES; i++)
 		{
-			strcpy(osd.message_archive[i - 1], osd.message_archive[i]); // roll to 1
-			osd.message_archive_severity[i - 1] = osd.message_archive_severity[i];
+			strcpy(g.message_archive[i - 1], g.message_archive[i]); // roll to 1
+			g.message_archive_severity[i - 1] = g.message_archive_severity[i];
 		}
 	}
 	else {
-		osd.message_archive_line++;
+		g.message_archive_line++;
 	}
 
-	strcpy(osd.message_archive[osd.message_archive_line], message);
-	osd.message_archive_severity[osd.message_archive_line] = severity;
+	strcpy(g.message_archive[g.message_archive_line], message);
+	g.message_archive_severity[g.message_archive_line] = severity;
 
 }
 
@@ -613,30 +610,30 @@ void message_buffer_render()
 
 	now = millis();
 
-	if (osd.message_buffer_line > 0) display_time = 3000; // 3sec if there are more messages in the buffer
+	if (g.message_buffer_line > 0) display_time = 3000; // 3sec if there are more messages in the buffer
 
 	// buffer line 0 is the actual displayed, message buffer starts from 1. 
 	// message buffer line contains the last line of the buffer.
 
 	
 	//Check if the display time is ellapsed
-	if ( now > (osd.message_buffer_display_time + display_time))
+	if ( now > (g.message_buffer_display_time + display_time))
 	{
 		//Time is ellapsed for the current message, check if we have new message(s) in the buffer
-		if (osd.message_buffer_line > 0)
+		if (g.message_buffer_line > 0)
 		{
 			//Prepare message to be displayed at the next cycle
-			osd.message_buffer_display_time = now;
+			g.message_buffer_display_time = now;
 			for (int i = 1; i < MESSAGE_BUFFER_LINES; i++)
 			{
-				strcpy(osd.message_buffer[i - 1], osd.message_buffer[i]); // roll to 0
-				osd.message_severity[i - 1] = osd.message_severity[i];
+				strcpy(g.message_buffer[i - 1], g.message_buffer[i]); // roll to 0
+				g.message_severity[i - 1] = g.message_severity[i];
 			}
-			osd.message_buffer_line--;
+			g.message_buffer_line--;
 		}
 		else
 		{
-			osd.message_buffer_display_time = 0; //Nothing to display
+			g.message_buffer_display_time = 0; //Nothing to display
 		}
 
 	}
@@ -644,9 +641,9 @@ void message_buffer_render()
 	{
 
 		color = OSD256_FONT_WHITE;
-		if (osd.message_severity[0] <= 3) color = OSD256_FONT_RED;
+		if (g.message_severity[0] <= 3) color = OSD256_FONT_RED;
 
-		OSD256_printf(osd.msg_widget.x, osd.msg_widget.y,color, 1, "%s", osd.message_buffer[0]);
+		OSD256_printf(osd.msg_widget.x, osd.msg_widget.y,color, 1, "%s", g.message_buffer[0]);
 	}
 
 }
@@ -657,7 +654,7 @@ void message_list_render()
 
 	for (char i = 0; i < MESSAGE_BUFFER_LINES; i++)
 	{
-		OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 24, OSD256_FONT_WHITE, 1, "%s", osd.message_archive[i]);
+		OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 24, OSD256_FONT_WHITE, 1, "%s", g.message_archive[i]);
 	}
 }
 
@@ -679,8 +676,8 @@ void movement_render(move_widget_t *m)
 
 	//Convert Global Frame Vx Vy to vehicle frame v_pitch and v_roll;
 
-	v_roll  = osd.vy * osd.cos_yaw - osd.vx * osd.sin_yaw; // body roll vel
-	v_pitch = osd.vy * osd.sin_yaw + osd.vx * osd.cos_yaw; // body pitch vel
+	v_roll  = g.vy * g.cos_yaw - g.vx * g.sin_yaw; // body roll vel
+	v_pitch = g.vy * g.sin_yaw + g.vx * g.cos_yaw; // body pitch vel
 
 
 //	debug("yaw: %f cos y:%f sin y:%f\n",osd.yaw, osd.cos_yaw, osd.sin_yaw);

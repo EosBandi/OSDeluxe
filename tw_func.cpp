@@ -25,11 +25,15 @@
 #include "OSDeluxe.h"
 
 
+
+
 unsigned char cnt, count, data_buf[20];
 unsigned int ADDR_buf, count_TW2835;
 
 unsigned char OSD256_wr_page;
 unsigned char OSD256_font_color;
+
+
 
 void tw_init()
 {
@@ -399,37 +403,6 @@ void tw_ch_set_input(char ch, char input)
     }
 }
 
-
-#define FONT0_X 16
-#define FONT0_Y 20
-
-#define FONT1_X 16
-#define FONT1_Y 24
-
-
-#define U8 unsigned char
-#define U16 unsigned int
-
-#define	SetBit(x,y)			((x) |= (y))         
-#define	ClearBit(x,y)		((x) &= ~(y))        
-#define	BitSet(x,y)			(((x)&(y))== (y))    
-#define	BitClear(x,y)		(((x)&(y))== 0)      
-#define	IfBitSet(x,y)		if(((x)&(y)) == (y)) 
-#define	IfBitClear(x,y)		if(((x)&(y)) == 0)
-
-#define	PTH_X			BIT0//BIT1//
-#define	PTH_Y			BIT1//BIT5//
-#define	PTH_PB			BIT2//
-#define	PTH_ALL			(PTH_X|PTH_Y)
-
-
-#define WAIT_OSG_WRSTALL		while(tw_read_register(0x241)&0x40)
-#define WAIT_OSG_IDLE			while(!(tw_read_register(0x241)&0x80))
-#define WAIT_INDR_DONE			while(tw_read_register(0x246)&0x1)
-
-
-#define SCR_X_SIZE (720-1)
-#define SCR_Y_SIZE (576-1)
 
 void OSD256_OSG_Mode_Selection(U8 mode)
 {

@@ -25,7 +25,6 @@
 #include "osdeluxe.h"
 
 
-
 struct osd_settings osd;               //This will contain all osd setting
 
 
@@ -60,21 +59,21 @@ void load_settings()
 
 void default_settings()
 {
-	osd.ctr2_video_on[0] = 0b00001111;
-	osd.ctr2_video_on[1] = 0b00000111;
-	osd.ctr2_video_on[2] = 0b00000001;
+	//osd.ctr2_video_on[0] = 0b00001111;
+	//osd.ctr2_video_on[1] = 0b00000111;
+	//osd.ctr2_video_on[2] = 0b00000001;
 
 	                    // sharp, sat, contr, bright, enhance, hmir, vmir, bound, peak
-	osd.vin_params[0] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1, 2};
-	osd.vin_params[1] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1, 2};
-	osd.vin_params[2] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1, 2};
-	osd.vin_params[3] = { 0x08, 0x50, 0x64, 0x00, 1, 0, 0, 1 ,2};
+	osd.vin_params[0] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
+	osd.vin_params[1] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
+	osd.vin_params[2] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
+	osd.vin_params[3] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1 ,0};
 
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[0][1] = { 1, 1, 0, 0, 0, 180 };
-	osd.video_channels[0][2] = { 2, 1, 1, 0, 0, 64 };
-	osd.video_channels[0][3] = { 3, 1, 1, 116, 0, 64 };
-	osd.video_channels[0][4] = { 4, 1, 1, 64, 0, 52 };
+	osd.video_channels[0][2] = { 2, 0, 1, 0, 0, 64 };
+	osd.video_channels[0][3] = { 3, 0, 1, 116, 0, 64 };
+	osd.video_channels[0][4] = { 4, 0, 1, 64, 0, 52 };
 	
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[1][1] = { 1, 1, 0, 0, 0, 180 };
@@ -232,11 +231,6 @@ void default_settings()
 
    osd.mode.visible = 0x01;
 
-   osd.arming_status = false;
-   osd.displayed_arming_status = true;
-   osd.armed_start_time = 0;
-
-   osd.last_capacity_query = 0;
 
    osd.ctr_ch[0] = 10;
    osd.ctr_ch[1] = 11;

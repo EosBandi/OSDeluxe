@@ -28,21 +28,21 @@
 
 void init_home(void)
 {
-    osd.home.lock = HOME_NONE;
-    osd.home.last_calc = millis();
+    g.home.lock = HOME_NONE;
+    g.home.last_calc = millis();
 }
 
 void calc_home(void)
 {
     mavlink_message_t this_msg;
 
-    switch (osd.home.lock)
+    switch (g.home.lock)
     {
     case HOME_NONE:
     default:
         if (mavdata_age(MAVLINK_MSG_ID_HEARTBEAT) > 5000) return;
         /* check arming status */
-        if (osd.base_mode & MAV_MODE_FLAG_SAFETY_ARMED) osd.home.lock = HOME_WAIT;
+        if (g.base_mode & MAV_MODE_FLAG_SAFETY_ARMED) g.home.lock = HOME_WAIT;
         break;
     case HOME_WAIT:
         if (mavdata_age(MAVLINK_MSG_ID_MISSION_ITEM) > 2000)
@@ -53,11 +53,11 @@ void calc_home(void)
         }
         else
         {
-            osd.home.lock = HOME_GOT;
+            g.home.lock = HOME_GOT;
         }
         break;
     case HOME_GOT:
-        osd.home.lock = HOME_LOCKED;
+        g.home.lock = HOME_LOCKED;
         break;
     case HOME_LOCKED:
     {

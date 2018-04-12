@@ -271,7 +271,7 @@ struct message_list_widget_t {
 
 extern struct alt_widget_t aw;
 extern struct battery_widget_t bw;
-extern struct gps_widget_t g;
+extern struct gps_widget_t gw;
 extern struct bar b;
 extern struct status_widget_t status;
 extern struct vario_widget_t vw;
