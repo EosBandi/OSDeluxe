@@ -25,8 +25,8 @@
 #ifndef _PARAMS_H_
 #define _PARAMS_H_
 
-extern unsigned int total_params;
-extern unsigned int param_send_index;
+extern int			total_params;
+extern int			param_send_index;
 
 struct param_value {
     union {
@@ -57,7 +57,6 @@ void cast2param(struct param_def *p, float v);
 float get_parameter_value(int idx, char *name);
 void send_param_list();
 int params_set_value(char *name, float value, unsigned char trigger_cbk);
-void update_channel_onoff();
 void update_vin_settings();
 void update_vout_settings();
 void update_pip();

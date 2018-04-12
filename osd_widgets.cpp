@@ -330,16 +330,14 @@ void render_horizon(struct horizon_t *h)
     int  size, gap;
     float offset;
     float cx, cy;
-    float pitchrad, rollrad;
+    //float pitchrad, rollrad;
     float cos_roll, sin_roll;
+	U8 c1;
 
-    char mix = MIX;
-    unsigned char c1, c2, c3, c4;
-
-    pitchrad = DEG2RAD(h->pitch);
-    rollrad  = DEG2RAD(h->roll);
-    cos_roll = cos (rollrad);
-    sin_roll = -1 * sin (rollrad);
+    //pitchrad = DEG2RAD(h->pitch);
+    //rollrad  = DEG2RAD(h->roll);
+    cos_roll = cos (DEG2RAD(h->roll));
+    sin_roll = -1 * sin (DEG2RAD(h->roll));
 
 
     if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
@@ -428,11 +426,7 @@ void osd_mode_render(struct mode_widget_t *mw)
 {
 
 	char mode[17];
-	unsigned char mix = 0;
-	unsigned char tmp_field;
 	unsigned int cust_mode;
-
-	if (mw->mix) mix = MIX;
 
 	cust_mode = mw->mode;
 
@@ -535,7 +529,7 @@ void osd_mode_render(struct mode_widget_t *mw)
 		if (mw->arm_centered) OSD256_printf(mw->arm_x - 60 , mw->arm_y, OSD256_FONT_RED, 0, "Disarmed");
 		else OSD256_printf(mw->arm_x, mw->arm_y, OSD256_FONT_RED, 0, "Disarmed");
 
-		g.armed_start_time == 0;
+		g.armed_start_time = 0;
 	}
 	else  //Arming status 1 ARMED
 	{
@@ -652,7 +646,7 @@ void message_buffer_render()
 void message_list_render()
 {
 
-	for (char i = 0; i < MESSAGE_BUFFER_LINES; i++)
+	for (U8 i = 0; i < MESSAGE_BUFFER_LINES; i++)
 	{
 		OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 24, OSD256_FONT_WHITE, 1, "%s", g.message_archive[i]);
 	}

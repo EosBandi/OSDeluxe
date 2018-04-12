@@ -141,7 +141,7 @@ void heartbeat_validation(void)
         for (int n = 0; n < 3; n++)
         {
             request_mavlink_rates(); // Three times to make sure it will be readed
-            delay(200); // wait for 100ms
+            delay(200); // wait for 200ms
         }
         enable_mav_request = 0;
         waitingMAVBeats = 0;
@@ -466,7 +466,7 @@ void read_mavlink()
 					break;
 				
 				len = mavlink_msg_param_set_get_param_id(&msg, param_name);
-				param_name[16] = '\0';
+				if (len == 16) param_name[16] = '\0';
 
 				param_value = mavlink_msg_param_set_get_param_value(&msg);
 
@@ -494,8 +494,8 @@ void read_mavlink()
         }
     }
     // Update global packet drops counter
-    packet_drops += mv_status.packet_rx_drop_count;
-    parse_error += mv_status.parse_error;
+    //packet_drops += mv_status.packet_rx_drop_count;
+    //parse_error += mv_status.parse_error;
 
 	//debug("Attitude messages processed:%u\n", mm);
 }

@@ -67,16 +67,16 @@ struct globals_variables_t {
 	char		   system_status;   //Se MAVLINK_STATE enum 
 
 	char           message_buffer[MESSAGE_BUFFER_LINES][52];               //20 line of 52 character message_buffer
-	char           message_severity[MESSAGE_BUFFER_LINES];
-	char           message_buffer_line;
-	unsigned short message_buffer_display_line;
+	U8           message_severity[MESSAGE_BUFFER_LINES];
+	U8           message_buffer_line;
+	U8			 message_buffer_display_line;
 	long           message_buffer_display_time;
 	bool           message_display; //we have message to display in the buffer
 	bool           clear_req;
 
 	char		  message_archive[MESSAGE_BUFFER_LINES][52];
 	char		  message_archive_severity[MESSAGE_BUFFER_LINES];
-	char		  message_archive_line = 0;
+	U8			  message_archive_line = 0;
 
 
 	bool          displayed_arming_status;

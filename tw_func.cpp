@@ -147,7 +147,7 @@ void tw_init()
     tw_write_register (0x20F, 0x0f);
 
 
-    for (char i = 0; i < 18; i++)
+    for (U8 i = 0; i < 18; i++)
     {
         ADDR_buf = 0x20B;
         cnt = 0;
@@ -162,7 +162,7 @@ void tw_init()
         tw_write_buf (ADDR_buf, data_buf, cnt);
     }
 
-    for (char i = 0; i < 4; i++)
+    for (U8 i = 0; i < 4; i++)
     {
         ADDR_buf = 0x20B;
         cnt = 0;
@@ -384,6 +384,8 @@ void tw_ch_set_input(char ch, char input)
 	case 4:
 		inp = INPUT_CH_4;
 		break;
+	default:
+		inp = INPUT_CH_1;
 	}
 
     switch (ch)
@@ -483,8 +485,9 @@ void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 				else
 				{
 					if (pix == 1) pix_data = COLOR_BLACK | attrib;
-					if (pix == 2) pix_data = 2 | attrib;
-					if (pix == 3) pix_data = color | attrib;
+					else if (pix == 2) pix_data = 2 | attrib;
+					else if (pix == 3) pix_data = color | attrib;
+					else pix_data = 0xff; //Any unknown color renders to transparent
 				}
 				tw_write_register(0x200, pix_data);
 				mask >>= 2;
@@ -686,6 +689,8 @@ void OSD256_putc( U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font)
 		case OSD256_FONT_GREEN:
 			color_x = 0; color_y = 240;
 			break;
+		default:
+			color_x = 0; color_y = 0;
 		}
 	}
 	else
@@ -701,6 +706,8 @@ void OSD256_putc( U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font)
 		case OSD256_FONT_YELLOW:
 			color_x = 610; color_y = 288;
 			break;
+		default:
+			color_x = 610; color_y = 0;
 		}
 
 	}
@@ -719,7 +726,7 @@ void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned c
 
 	unsigned short _posX = posx;
 
-	for (char a = 0; a < strlen(str); a++)
+	for (U8 a = 0; a < strlen(str); a++)
 	{
 		OSD256_putc(_posX, posy, str[a]-32, color,font);
 		if (font == 0)_posX = _posX + 15;
@@ -744,7 +751,6 @@ void OSD256_printf(unsigned short posx, unsigned short posy, char color, char fo
 		args); // does not overrun sizeof(buf) including null terminator
 	va_end(args);
 
-	byte _posX = posx;
 	OSD256_puts(buf, posx, posy, color, font);
 }
 
@@ -760,7 +766,7 @@ void OSD256_printf_slow(unsigned short posx, unsigned short posy, char color, ch
 
 	byte _posX = posx;
 
-	for (char a = 0; a < strlen(buf); a++)
+	for (U8 a = 0; a < strlen(buf); a++)
 	{
 		if (font) WriteOSD256Fnt1(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
 		else WriteOSD256Fnt0(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
@@ -829,6 +835,7 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 			for (j = 0; j<4; j++)
 			{
 				pix = (mask &(*ptr)) >> ((3 - j) << 1);
+				pix_data = 0xff;	// Any unknown color renders to transparent
 				// 0 - empty, 1 - outline, 2- ???, 3-main color
 				if (pix == 0) pix_data = COLOR_BLACK | attrib;
 				if (pix == 2) pix_data = color | attrib;
@@ -850,7 +857,6 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height, U8 color, const char *bitmap)
 {
 	U8 reg40, tmp;
-	const U8 *ptr;
 	U16 tmp1;
 
 
@@ -889,7 +895,7 @@ void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height,
 
 	for (tmp1 = 0; tmp1< (height*width /2); tmp1++)
 	{
-		U8 pix, pix_data;
+		U8 pix;
 		
 
 		pix = (bitmap[tmp1] & 0xf0) >> 4;
