@@ -197,7 +197,7 @@ struct pull_widget_t {
 struct move_widget_t {
 	unsigned short x;
 	unsigned short y;
-	unsigned char  size;
+	unsigned short  size;
 	float		   max;
 	char		   visible;
 

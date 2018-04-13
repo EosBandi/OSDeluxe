@@ -40,6 +40,10 @@
 
 struct osd_settings {
 
+	U8 eeprom_version;								// version for eeporm content version.
+
+
+
 	vin_params_t vin_params[4];					// Video in
 
 //	unsigned char ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
@@ -84,7 +88,7 @@ struct osd_settings {
 
 	move_widget_t move;
 
-	char center_cross_visible = 0x01;
+	U8 center_cross_visible = 0x01;
 
 	unsigned char ctr_ch[4];
 
@@ -95,7 +99,7 @@ struct osd_settings {
 
 
 void default_settings();
-void load_settings();
+U8   load_settings();
 void save_settings();
 
 

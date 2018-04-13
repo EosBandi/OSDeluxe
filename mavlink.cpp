@@ -431,7 +431,7 @@ void read_mavlink()
                 {
                     osd.batt1_cap.max_capacity = (int)mavlink_msg_param_value_get_param_value(&msg);
                 }
-				debug("Battery capacity received\n");
+				//debug("%s : param received\n", param_name);
 
             }
 			break;

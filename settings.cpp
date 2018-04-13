@@ -35,33 +35,56 @@ void save_settings()
 
 
   ptr = (char*)&osd;
+
   for (address = 0; address < sizeof(osd); address++)
   {
       EEPROM.write(address, *ptr++);
   }
 
+  debug("Settings written to EEPROM\n");
+
 }
 
-void load_settings()
+U8 load_settings()
 {
   unsigned int address = 0;
   char *ptr;
 
 
   ptr = (char*)&osd;
+
   for (address = 0; address < sizeof(osd); address++)
   {
       *ptr++ = EEPROM.read(address);
   }
+
+  debug("Settings readed from EEPROM\n");
+
+  return osd.eeprom_version;
+
 }
 
 
 
 void default_settings()
 {
-	//osd.ctr2_video_on[0] = 0b00001111;
-	//osd.ctr2_video_on[1] = 0b00000111;
-	//osd.ctr2_video_on[2] = 0b00000001;
+
+	debug("Default Settings invoked\n");
+
+
+	osd.eeprom_version = EEPROM_VERSION;
+
+
+	osd.color_bar_x = 0;
+	osd.color_bar_y = 0;
+	osd.color_kill_x = 0;
+	osd.color_kill_y = 0;
+
+
+	osd.vout1_gain = 5;
+	osd.vout2_gain = 5;
+	osd.vout3_gain = 5;
+
 
 	                    // sharp, sat, contr, bright, enhance, hmir, vmir, bound, peak
 	osd.vin_params[0] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
@@ -230,6 +253,9 @@ void default_settings()
    osd.mode.mode = 0;
 
    osd.mode.visible = 0x01;
+
+   osd.center_cross_visible = 0x01;
+
 
 
    osd.ctr_ch[0] = 10;

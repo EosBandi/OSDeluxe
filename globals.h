@@ -26,6 +26,10 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
+#define EEPROM_VERSION 0x02
+
+
+
 #define MESSAGE_BUFFER_LINES 20
 
 
@@ -88,6 +92,9 @@ struct globals_variables_t {
 	unsigned long last_outgoing_heartbeat;
 
 	char test_byte;
+
+	U8 write_settings;
+	U8 debug_looptime;
 
 
 };

@@ -26,6 +26,8 @@
 #include "OSDeluxe.h"
 
 
+
+
 #define TW_RESET_PIN 14
 #define LED_PIN 13
 
@@ -78,13 +80,16 @@ void loop ()
 	OSD256_clear_screen(PTH_X, 0);
 	OSD256_clear_screen(PTH_X, 1);
 	OSD256_clear_screen(PTH_Y, 0);
-
-	
 	OSD256_set_display_page(0);
 
-    default_settings();
-    //save_settings();
-    //load_settings();
+
+	if (load_settings() != EEPROM_VERSION)
+	{
+		default_settings();
+		save_settings();
+	}
+
+
 
 	update_vout_settings();
 	update_vin_settings();
@@ -141,6 +146,9 @@ void loop ()
 	g.displayed_arming_status = true;
 	g.armed_start_time = 0;
 	g.last_capacity_query = 0;
+	g.debug_looptime = 0;
+
+
 
 //Main loop
 while (1)
@@ -298,7 +306,7 @@ while (1)
 		}
 	}
 
-	debug("Looptime : %lu\n", millis() - now);
+	if (g.debug_looptime) debug("Looptime : %lu\n", millis() - now);
 	//debug("Loop time: %lu\n", millis() - now);
 	//debug("Bytes waiting: %u\n", Serial1.available());
 

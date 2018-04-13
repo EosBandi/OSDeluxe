@@ -369,11 +369,26 @@ struct param_def parameters[] = {
 	PARAM("TEST_PIP_PAGE",MAV_PARAM_TYPE_UINT8, &g.pip_page, &update_pip),
 	PARAM("TEST_OSD_PAGE", MAV_PARAM_TYPE_UINT8, &g.visible_osd_page, NULL),
 
+    PARAM("WRITE_SETTINGS",MAV_PARAM_TYPE_UINT8, &g.write_settings, &do_settings_save),
+
+
+	PARAM("DEBUG_LOOPTIME", MAV_PARAM_TYPE_UINT8, &g.debug_looptime,NULL),
+
+
 	PARAM("XXX", MAV_PARAM_TYPE_UINT8, &g.test_byte, &update_test_byte),
 
 	PARAM_END
 };
 
+
+
+void do_settings_save()
+{
+	g.write_settings = 0;
+	save_settings();
+	message_buffer_add_line("OSD settings saved to EEPROM", 4);
+
+}
 
 void update_test_byte()
 {
@@ -520,7 +535,7 @@ int params_set_value(char *name, float value, unsigned char trigger_cbk)
 	int idx;
 
 	idx = get_parameter_index(name);
-	debug("name='%s' idx=%d\n", name, idx);
+	//debug("name='%s' idx=%d\n", name, idx);
 	if (idx < total_params) {
 		p = &parameters[idx];
 		cast2param(p, value);
