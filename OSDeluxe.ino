@@ -159,11 +159,12 @@ void loop ()
 //Main loop
 while (1)
 {
+	now = millis();
+
+
 	read_mavlink();
 
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
-
-	now = millis();
 
 	osd_boxes_render();
 
@@ -174,9 +175,9 @@ while (1)
 	if (osd.center_cross_visible & g.visible_osd_page) osd_center_marker();
 
 	if (osd.move.visible & g.visible_osd_page) movement_render(&osd.move);
-	now = millis();
-    if (osd.horizon.visible & g.visible_osd_page) render_horizon(&osd.horizon);
-	debug("%u\n", millis() - now);
+
+	if (osd.horizon.visible & g.visible_osd_page) render_horizon(&osd.horizon);
+	
 	if (osd.gps.visible & g.visible_osd_page) osd_gps_render( &osd.gps );
 
 	if (osd.stat.visible & g.visible_osd_page) osd_status_render(&osd.stat);
@@ -272,6 +273,7 @@ while (1)
     if (millis() > (g.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
     if ( (osd.batt1_cap.max_capacity == 0) && (millis() > (g.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
 
+	/*
 	if (Serial2.available() == 0) 
 	{
 		Serial2.write("X"); // Any character will generate reading
@@ -296,7 +298,7 @@ while (1)
 
 		}
 	}
-
+	*/
 	//0x111 enhance mode.... keep looking
     //0x57 coring for shapening
 	//a7 0d instead of 0x0c
@@ -321,7 +323,7 @@ while (1)
 	}
 
 	if (g.debug_looptime) debug("Looptime : %lu\n", millis() - now);
-	//debug("Loop time: %lu\n", millis() - now);
+	debug("Loop time: %lu\n", millis() - now);
 	//debug("Bytes waiting: %u\n", Serial1.available());
 
 

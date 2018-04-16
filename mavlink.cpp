@@ -169,7 +169,6 @@ void request_mavlink_rates(void)
 
 void request_mavlink_battery_capacity(void)
 {
-	debug("Battery capacity requested\n");
 //    mavlink_msg_param_request_read_send(MAVLINK_COMM_0,mavlink_system.sysid, mavlink_system.compid, "BATT_CAPACITY",-1);
     mavlink_msg_param_request_read_send(MAVLINK_COMM_0,0, 0, "BATT_CAPACITY",-1);
 }

@@ -426,13 +426,16 @@ void osd_center_marker()
 }
 
 #define RANGE 250
-#define SCALE 1
+#define SCALE 2
 #define MINOR_TICK  5
 #define MAJOR_TICK  10
 #define ZERO_LINE 120
 #define MAJOR_LINE  50
 #define MINOR_LINE  8
 
+
+#define WIDTH 400
+#define HEIGHT 300
 
 void render_horizon(struct horizon_t *h)
 {
@@ -453,7 +456,7 @@ void render_horizon(struct horizon_t *h)
 
 	if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
 	{
-		c1 = COLOR_ORANGE;
+		c1 = COLOR_YELLOW;
 	}
 	else {
 		c1 = COLOR_WHITE;
@@ -476,7 +479,6 @@ void render_horizon(struct horizon_t *h)
 
 	OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
 	OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 - 2, x1, y1 - 2);
-	//OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
 
 	//OSD256_printf(x0, y0, OSD256_FONT_YELLOW, 0, "%i", h->pitch);
 
@@ -491,7 +493,6 @@ void render_horizon(struct horizon_t *h)
 	y1 = cy + (size * sin_roll);
 
 	OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
-	//OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 - 2, x1, y1 - 2);
 	OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
 
 
