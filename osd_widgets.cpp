@@ -426,7 +426,7 @@ void osd_center_marker()
 }
 
 #define RANGE 250
-#define SCALE 6
+#define SCALE 1
 #define MINOR_TICK  5
 #define MAJOR_TICK  10
 #define ZERO_LINE 120
@@ -436,102 +436,171 @@ void osd_center_marker()
 
 void render_horizon(struct horizon_t *h)
 {
-    int y, i, j;
-    int x0, x1, y0, y1;
-    int  size, gap;
-    float offset;
-    float cx, cy;
-    //float pitchrad, rollrad;
-    float cos_roll, sin_roll;
+	int y, i, j;
+	int x0, x1, y0, y1;
+	int  size, gap;
+	float offset;
+	float cx, cy;
+	//float pitchrad, rollrad;
+	float cos_roll, sin_roll;
 	U8 c1;
 
-    //pitchrad = DEG2RAD(h->pitch);
-    //rollrad  = DEG2RAD(h->roll);
-    cos_roll = cos (DEG2RAD(h->roll));
-    sin_roll = -1 * sin (DEG2RAD(h->roll));
+	//pitchrad = DEG2RAD(h->pitch);
+	//rollrad  = DEG2RAD(h->roll);
+	cos_roll = cos(DEG2RAD(h->roll));
+	sin_roll = -1 * sin(DEG2RAD(h->roll));
 
 
-    if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
-    {
+	if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
+	{
 		c1 = COLOR_ORANGE;
-    }
-    else{
+	}
+	else {
 		c1 = COLOR_WHITE;
-    }
+	}
+
+	i = -(h->pitch*SCALE);
+	y = h->y + i;
+
+	size = ZERO_LINE; // Zero line
+
+	//center point
+	cx = h->x;
+	cy = y + i;
+	//start point
+	x0 = cx - (size * cos_roll);
+	x1 = cx + (size * cos_roll);
+	//end point
+	y0 = cy - (size * sin_roll);
+	y1 = cy + (size * sin_roll);
+
+	OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+	OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 - 2, x1, y1 - 2);
+	//OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
+
+	//OSD256_printf(x0, y0, OSD256_FONT_YELLOW, 0, "%i", h->pitch);
+
+	size = 60;
+	cx = h->x;
+	cy = y + i + 8;
+	//start point
+	x0 = cx - (size * cos_roll);
+	x1 = cx + (size * cos_roll);
+	//end point
+	y0 = cy - (size * sin_roll);
+	y1 = cy + (size * sin_roll);
+
+	OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+	//OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 - 2, x1, y1 - 2);
+	OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
 
 
-    for (i = -RANGE / 2; i <= RANGE / 2; i++)
-    {
-        y = h->y - i;
-        j = (h->pitch*SCALE) + i;
 
-        if (j % (MINOR_TICK * SCALE) == 0)
-        {
-            if (j == 0)
-            {
-                size = ZERO_LINE; // Zero line
-                gap = 8;
-            }
-            else
-            {
-                if (j % (MAJOR_TICK * SCALE) == 0)
-                    size = MAJOR_LINE; // tick
-                else
-                    size = MINOR_LINE; // small tick
-                gap = 20;
-            }
 
-            cx = h->x + (i * sin_roll);
-            cy = y + i - (i * cos_roll);
 
-            offset = (gap * cos_roll);
-            x0 = cx + offset;
-            offset = (size * cos_roll);
-            x1 = x0 + offset;
+}
+#define SCALE 6
 
-            offset = (gap * sin_roll);
-            y0 = cy + offset;
-            offset = (size * sin_roll);
-            y1 = y0 + offset;
-			if (size == ZERO_LINE) 
+void render_horizona(struct horizon_t *h)
+{
+	int y, i, j;
+	int x0, x1, y0, y1;
+	int  size, gap;
+	float offset;
+	float cx, cy;
+	//float pitchrad, rollrad;
+	float cos_roll, sin_roll;
+	U8 c1;
+
+	//pitchrad = DEG2RAD(h->pitch);
+	//rollrad  = DEG2RAD(h->roll);
+	cos_roll = cos(DEG2RAD(h->roll));
+	sin_roll = -1 * sin(DEG2RAD(h->roll));
+
+
+	if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
+	{
+		c1 = COLOR_ORANGE;
+	}
+	else {
+		c1 = COLOR_WHITE;
+	}
+
+
+	for (i = -RANGE / 2; i <= RANGE / 2; i++)
+	{
+		y = h->y - i;
+		j = (h->pitch*SCALE) + i;
+
+		if (j % (MINOR_TICK * SCALE) == 0)
+		{
+			if (j == 0)
 			{
-				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
-				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0-2, x1, y1-2);
-				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0+2, x1, y1+2);
+				size = ZERO_LINE; // Zero line
+				gap = 8;
 			}
 			else
 			{
-				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+				if (j % (MAJOR_TICK * SCALE) == 0)
+					size = MAJOR_LINE; // tick
+				else
+					size = MINOR_LINE; // small tick
+				gap = 20;
 			}
-            offset = (gap * cos_roll);
-            x0 = cx - offset;
-            offset = (size * cos_roll);
-            x1 = x0 - offset;
 
-            offset = (gap * sin_roll);
-            y0 = cy - offset;
-            offset = (size * sin_roll);
-            y1 = y0 - offset;
+			cx = h->x + (i * sin_roll);
+			cy = y + i - (i * cos_roll);
+
+			offset = (gap * cos_roll);
+			x0 = cx + offset;
+			offset = (size * cos_roll);
+			x1 = x0 + offset;
+
+			offset = (gap * sin_roll);
+			y0 = cy + offset;
+			offset = (size * sin_roll);
+			y1 = y0 + offset;
 			if (size == ZERO_LINE)
 			{
 				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
-				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0+2, x1, y1+2);
-				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0-2, x1, y1-2);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 - 2, x1, y1 - 2);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
+			}
+			else
+			{
+				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+			}
+			offset = (gap * cos_roll);
+			x0 = cx - offset;
+			offset = (size * cos_roll);
+			x1 = x0 - offset;
+
+			offset = (gap * sin_roll);
+			y0 = cy - offset;
+			offset = (size * sin_roll);
+			y1 = y0 - offset;
+			if (size == ZERO_LINE)
+			{
+				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
+				OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 - 2, x1, y1 - 2);
 			}
 			else
 			{
 				OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
 
 			}
- 
-				if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
-            {
-                OSD256_printf((cx-20), (cy-15), OSD256_FONT_WHITE, 1, "% 03d", j / SCALE);
-                
-            }
-        }
-    }
+
+			if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
+			{
+				OSD256_printf((cx - 20), (cy - 15), OSD256_FONT_WHITE, 1, "% 03d", j / SCALE);
+
+			}
+		}
+	}
 }
+
+
 
 void osd_mode_render(struct mode_widget_t *mw)
 {

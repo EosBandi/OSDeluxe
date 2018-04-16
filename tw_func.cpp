@@ -268,16 +268,11 @@ void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned cha
 void tw_write_buf (unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT)
 {
 
-    unsigned char page;
-    unsigned char reg;
     unsigned char i;
 
-    page = wrADDR >> 8;
-    reg = wrADDR & 0x00FF;
-
     Wire.beginTransmission (0x42);
-    Wire.write (page);
-    Wire.write (reg);
+    Wire.write (wrADDR >> 8);
+    Wire.write (wrADDR & 0x00FF);
     for (i = 0; i < wrCNT; i++)
     {
         Wire.write (wrBUF[i]);
