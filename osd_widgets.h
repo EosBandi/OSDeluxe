@@ -49,38 +49,6 @@ enum number_pos {
     POS_BELOW = 3
 };
 
-enum flight_mode {
-    PLANE_MODE_MANUAL     = 0,
-    PLANE_MODE_CIRCLE     = 1,
-    PLANE_MODE_STABILIZE  = 2,
-    PLANE_MODE_TRAINING   = 3,
-    PLANE_MODE_ACRO       = 4,
-    PLANE_MODE_FBWA       = 5,
-    PLANE_MODE_FBWB       = 6,
-    PLANE_MODE_CRUISE     = 7,
-    PLANE_MODE_AUTOTUNE   = 8,
-    PLANE_MODE_AUTO       = 10,
-    PLANE_MODE_RTL        = 11,
-    PLANE_MODE_LOITER     = 12,
-    PLANE_MODE_GUIDED     = 15,
-    PLANE_MODE_INIT       = 16,
-    COPTER_MODE_STABILIZE = 100,
-    COPTER_MODE_ACRO      = 101,
-    COPTER_MODE_ALTHOLD   = 102,
-    COPTER_MODE_AUTO      = 103,
-    COPTER_MODE_GUIDED    = 104,
-    COPTER_MODE_LOITER    = 105,
-    COPTER_MODE_RTL       = 106,
-    COPTER_MODE_CIRCLE    = 107,
-    COPTER_MODE_LAND      = 109,
-    COPTER_MODE_OF_LOITER = 110,
-    COPTER_MODE_DRIFT     = 111,
-    COPTER_MODE_SPORT     = 113,
-    COPTER_MODE_FLIP      = 114,
-    COPTER_MODE_AUTOTUNE  = 115,
-    COPTER_MODE_POSHOLD   = 116,
-};
-
 
  struct bar {
      unsigned short  x;  // x position (4 pixels 0-180)
@@ -117,7 +85,6 @@ struct batt_volt_widget_t {
 	unsigned short x;
 	unsigned short y;
 	struct bar volt;
-	float voltage;
 	unsigned char cells;
 	float min_cell_voltage;
 	float max_cell_voltage;
@@ -134,7 +101,6 @@ struct batt_cap_widget_t {
 	unsigned short x;
 	unsigned short y;
 	struct bar cap;
-	unsigned char remaining_capacity;
 	int max_capacity;
 	bartype bar_type;
 	bool mix;
@@ -146,11 +112,19 @@ struct batt_cap_widget_t {
 struct batt_curr_widget_t {
 	unsigned short x;
 	unsigned short y;
-	float current;
 	bool mix;
 	bool box;
 	unsigned char visible;
 };
+
+struct batt_power_widget_t
+{
+	unsigned short x;
+	unsigned short y;
+	unsigned char visible;
+};
+
+
 
 struct status_widget_t {
     unsigned short x;
@@ -167,7 +141,6 @@ struct status_widget_t {
 struct alt_widget_t {
     unsigned short x;
     unsigned short y;
-    float altitude;
     bool mix;
 	unsigned char visible;
 };
@@ -209,11 +182,22 @@ struct vario_widget_t {
     unsigned short h;
     unsigned short w;
     number_pos num_pos;
-    float vario;
     float vario_max;
     bool mix;
 	unsigned char visible;
 };
+
+struct vario_graph_widget_t {
+	unsigned short x;
+	unsigned short y;
+	unsigned short h;
+	unsigned short w;
+
+	float vario_max;
+	bool  mix;
+	unsigned char visible;
+};
+
 
 struct home_widget_t {
     unsigned short x;
@@ -237,18 +221,26 @@ struct mode_widget_t {
     unsigned short mode_x;
     unsigned short mode_y;
 	char		   mode_centered;
+	char		   mode_short;
 
     unsigned short fs_x;
     unsigned short fs_y;
 	char		   fs_centered;
-    unsigned short arm_x;
+
+	unsigned short arm_x;
     unsigned short arm_y;
 	char		   arm_centered;
 
-    bool mix;
-    unsigned char mode; //from mavlink
 	unsigned char visible;
 
+};
+
+
+struct compass_widget_t {
+	unsigned short x;
+	unsigned short y;
+
+	unsigned char visible;
 };
 
 struct message_widget_t {
@@ -256,7 +248,6 @@ struct message_widget_t {
 	unsigned short  x;
 	unsigned short  y;
 	bool mix;
-
 	unsigned char visible;
 
 };
@@ -269,6 +260,22 @@ struct message_list_widget_t {
 	unsigned char visible;
 };
 
+
+struct box_t {
+	unsigned short x;
+	unsigned short y;
+	unsigned short w;
+	unsigned short h;
+
+	unsigned char color;
+	unsigned char mix;
+
+	unsigned char visible;
+
+};
+
+/*
+
 extern struct alt_widget_t aw;
 extern struct battery_widget_t bw;
 extern struct gps_widget_t gw;
@@ -277,13 +284,17 @@ extern struct status_widget_t status;
 extern struct vario_widget_t vw;
 extern struct home_widget_t hw;
 extern struct horizon_t hor;
+*/
 
 void osd_bar_render(struct bar *b);
 void osd_gps_render(struct gps_widget_t *g);
-void osd_batt_volt_render(struct batt_volt_widget_t *bw);
-void osd_batt_cap_render(struct batt_cap_widget_t *bw);
-void osd_battery_render( struct battery_widget_t *bw);
-void osd_batt_curr_render(struct batt_curr_widget_t *bw);
+
+void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage);
+void osd_batt_cap_render(struct batt_cap_widget_t *bw, unsigned char remaining_capacity);
+//void osd_battery_render( struct battery_widget_t *bw);
+void osd_batt_curr_render(struct batt_curr_widget_t *bw, float current);
+void osd_batt_power_render(struct batt_power_widget_t *bw, int power);
+
 void osd_status_render( struct status_widget_t *s);
 void osd_altitude_render( struct alt_widget_t *aw);
 void osd_groundspeed_render(struct gs_widget_t *gs);
@@ -300,5 +311,8 @@ void movement_render(move_widget_t *m);
 void message_buffer_add_line(char *message, char severity);
 void message_buffer_render(void);
 void message_list_render();
+void osd_boxes_render();
+void osd_compass_render(compass_widget_t *c);
+void osd_render_vgraph(vario_graph_widget_t *w);
 
 #endif

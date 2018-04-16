@@ -216,7 +216,7 @@ void read_mavlink()
                 mavbeat = 1;                        // heartbeat is received
                 last_mav_beat = millis();
                 g.mav_type = mav_type;            // We already has this
-                osd.mode.mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
+                g.mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
                 g.base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
                 g.system_status = mavlink_msg_heartbeat_get_system_status(&msg);
 
@@ -250,8 +250,8 @@ void read_mavlink()
                 g.groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
                 g.heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
                 g.throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
-                osd.alt.altitude = mavlink_msg_vfr_hud_get_alt(&msg);
-                osd.vario.vario = mavlink_msg_vfr_hud_get_climb(&msg);
+                g.altitude = mavlink_msg_vfr_hud_get_alt(&msg);
+                g.vario = mavlink_msg_vfr_hud_get_climb(&msg);
 
             }
             break;
@@ -259,14 +259,23 @@ void read_mavlink()
             case MAVLINK_MSG_ID_SYS_STATUS:
             {
 
-                osd.batt1_v.voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
-                osd.batt1_curr.current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
-                osd.batt1_cap.remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
-				if (osd.batt1_cap.remaining_capacity == 255) osd.batt1_cap.remaining_capacity = 100;
-
-
+                g.b1_voltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); // Battery voltage, in millivolts (1 = 1 millivolt)
+                g.b1_current = ((float)mavlink_msg_sys_status_get_current_battery(&msg) / 100.0f); // Battery current, in 10*milliamperes (1 = 10 milliampere)
+                g.b1_remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg); // Remaining battery energy: (0%: 0, 100%: 100)
+				if (g.b1_remaining_capacity == 255) g.b1_remaining_capacity = 100;
+				g.b1_power = g.b1_voltage * g.b1_current;
             }
             break;
+
+			case MAVLINK_MSG_ID_BATTERY2:
+			{
+				g.b2_voltage = (mavlink_msg_battery2_get_voltage(&msg) / 1000.0f);
+				g.b2_current = ((float)mavlink_msg_battery2_get_current_battery(&msg) / 100.0f);
+				g.b2_power = g.b2_voltage * g.b2_current;
+			}
+			break;
+
+
 
             case MAVLINK_MSG_ID_RC_CHANNELS:
             {

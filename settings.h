@@ -40,8 +40,8 @@
 
 struct osd_settings {
 
-	U8 eeprom_version;								// version for eeporm content version.
-
+	U8   eeprom_version;								// version for eeporm content version.
+	U16  settings_size;
 
 
 	vin_params_t vin_params[4];					// Video in
@@ -66,10 +66,14 @@ struct osd_settings {
 	batt_volt_widget_t batt2_v;
 
 	batt_cap_widget_t batt1_cap;
-	batt_cap_widget_t batt2_cap;
+
 	batt_curr_widget_t batt1_curr;
 	batt_curr_widget_t batt2_curr;
 
+	batt_power_widget_t batt1_power;
+	batt_power_widget_t batt2_power;
+
+	compass_widget_t compass;
 
     status_widget_t stat;
     alt_widget_t alt;
@@ -77,6 +81,8 @@ struct osd_settings {
 	throttle_widget_t thr;
 
     vario_widget_t vario;
+	vario_graph_widget_t vgraph;
+
     home_widget_t home_w;
     horizon_t horizon;
     mode_widget_t mode;
@@ -87,6 +93,8 @@ struct osd_settings {
 	message_list_widget_t msg_list_widget;
 
 	move_widget_t move;
+
+	box_t boxes[8];
 
 	U8 center_cross_visible = 0x01;
 

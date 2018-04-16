@@ -62,6 +62,7 @@ void update_vout_settings();
 void update_pip();
 void update_test_byte();
 void do_settings_save();
+void do_update_pthy();
 
 
 #endif

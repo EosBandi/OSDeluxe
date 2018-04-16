@@ -73,7 +73,12 @@ void default_settings()
 
 
 	osd.eeprom_version = EEPROM_VERSION;
+	osd.settings_size = sizeof(osd);
 
+
+	memset(&osd.boxes, 0, sizeof(osd.boxes));
+	
+	osd.boxes[0] = { 0,540,720,29,3,1,1 };
 
 	osd.color_bar_x = 0;
 	osd.color_bar_y = 0;
@@ -85,9 +90,8 @@ void default_settings()
 	osd.vout2_gain = 5;
 	osd.vout3_gain = 5;
 
-
-	                    // sharp, sat, contr, bright, enhance, hmir, vmir, bound, peak
-	osd.vin_params[0] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
+		                    // sharp, sat, contr, bright, enhance, hmir, vmir, bound, peak
+	osd.vin_params[0] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 0, 0};
 	osd.vin_params[1] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
 	osd.vin_params[2] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
 	osd.vin_params[3] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1 ,0};
@@ -144,14 +148,12 @@ void default_settings()
 	osd.batt1_v.bar_type = BAR_SINGLE_COLOR;
 	osd.batt1_v.mix = 0;
 	osd.batt1_v.cells = 12;
-	osd.batt1_v.voltage = 11.11;
 	osd.batt1_v.box = true;
 	osd.batt1_v.visible = 0x01;
 
 	osd.batt1_cap.x = 600;
 	osd.batt1_cap.y = 500;
 	osd.batt1_cap.max_capacity = 0;
-	osd.batt1_cap.remaining_capacity = 50;
 	osd.batt1_cap.bar_type = BAR_SINGLE_COLOR;
 	osd.batt1_cap.mix = true;
 	osd.batt1_cap.box = false;
@@ -162,7 +164,6 @@ void default_settings()
 	osd.batt1_curr.mix = false;
 	osd.batt1_curr.box = true;
 	osd.batt1_curr.visible = 0x01;
-	osd.batt1_curr.current = 100;
 
 	osd.batt2_v.x = 145;
 	osd.batt2_v.y = 230;
@@ -173,24 +174,26 @@ void default_settings()
 	osd.batt2_v.bar_type = BAR_SINGLE_COLOR;
 	osd.batt2_v.mix = 0;
 	osd.batt2_v.cells = 6;
-	osd.batt2_v.voltage = 22.22;
 	osd.batt2_v.box = true;
 	osd.batt2_v.visible = 0x00;
-
-	osd.batt2_cap.x = 145;
-	osd.batt2_cap.y = 230;
-	osd.batt2_cap.max_capacity = 3000;
-	osd.batt2_cap.remaining_capacity = 10;
-	osd.batt2_cap.bar_type = BAR_SINGLE_COLOR;
-	osd.batt2_cap.mix = true;
-	osd.batt2_cap.box = true;
-	osd.batt2_cap.visible = 0x00;
 
 	osd.batt2_curr.x = 50;
 	osd.batt2_curr.y = 50;
 	osd.batt2_curr.mix = true;
 	osd.batt2_curr.box = true;
 	osd.batt2_curr.visible = 0x00;
+
+	osd.batt1_power.x = 614;
+	osd.batt1_power.y = 440;
+	osd.batt1_power.visible = 0x01;
+
+	osd.batt2_power.x = 10;
+	osd.batt2_power.y = 450;
+	osd.batt2_power.visible = 0x00;
+
+	osd.compass.x = 285;
+	osd.compass.y = 10;
+	osd.compass.visible = 0x01;
 
     osd.stat.x = 10;
     osd.stat.y = 510;
@@ -203,7 +206,6 @@ void default_settings()
     osd.alt.x = 10;
     osd.alt.y = 544;
     osd.alt.mix = 0;
-    osd.alt.altitude = 0;
 	osd.alt.visible = 0x01;
 
 	osd.gs.x = 150;
@@ -218,11 +220,19 @@ void default_settings()
     osd.vario.y = 188;
     osd.vario.h = 200;
     osd.vario.w = 10;
-    osd.vario.vario = 0;
     osd.vario.vario_max = 5.0f;
     osd.vario.mix = 1;
     osd.vario.num_pos = POS_BELOW;
 	osd.vario.visible = 0x01;
+
+	osd.vgraph.x = 613;
+	osd.vgraph.y = 120;
+	osd.vgraph.h = 60;
+	osd.vgraph.w = 80;
+	osd.vgraph.vario_max = 2.0f;
+	osd.vgraph.visible = 0x01;
+	osd.vgraph.mix = 1;
+
 
     osd.home_w.x = 360;
     osd.home_w.y = 509;
@@ -236,9 +246,10 @@ void default_settings()
 	osd.horizon.visible = 0x00;
 
 
-   osd.mode.mode_x =  360;
-   osd.mode.mode_y = 5;
-   osd.mode.mode_centered = 1;
+   osd.mode.mode_x =  120;
+   osd.mode.mode_y = 512;
+   osd.mode.mode_centered = 0;
+   osd.mode.mode_short = 0;
 
 
    osd.mode.fs_x =  360;
@@ -246,11 +257,8 @@ void default_settings()
    osd.mode.fs_centered = 1;
 
    osd.mode.arm_x =  360;
-   osd.mode.arm_y = 55;
+   osd.mode.arm_y = 320;
    osd.mode.arm_centered = 1;
-
-   osd.mode.mix = 0;
-   osd.mode.mode = 0;
 
    osd.mode.visible = 0x01;
 
@@ -265,10 +273,9 @@ void default_settings()
     
 	osd.pull.x = 7;
 	osd.pull.y = 215;
-	osd.pull.mix = false;
 	osd.pull.pull = 0;
 	osd.pull.warning = 7*9.8f;
-	osd.pull.visible = 0x01;
+	osd.pull.visible = 0x00;
 
 
 	osd.msg_widget.x = 10;
@@ -277,7 +284,6 @@ void default_settings()
 
 	osd.msg_list_widget.x = 4;
 	osd.msg_list_widget.y = 20;
-	osd.msg_list_widget.mix = false;
 	osd.msg_list_widget.visible = 0x01;
 
 

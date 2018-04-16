@@ -74,6 +74,7 @@ void loop ()
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
 	//tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
 
+	tw_write_register(0x240, 0x01);
 
 	//We will use these screens 
 	//Don't clear all since pages larger than 0 share memory with scratch table
@@ -82,14 +83,12 @@ void loop ()
 	OSD256_clear_screen(PTH_Y, 0);
 	OSD256_set_display_page(0);
 
-
-	if (load_settings() != EEPROM_VERSION)
+	load_settings();
+	if ((osd.eeprom_version != EEPROM_VERSION) || (osd.settings_size != sizeof(osd))  )
 	{
 		default_settings();
 		save_settings();
 	}
-
-
 
 	update_vout_settings();
 	update_vin_settings();
@@ -98,6 +97,7 @@ void loop ()
 
 
 	g.displayed_mode = -1;        // Signal startup
+	g.mode = 0;
 	
 	memset(&g.message_buffer, 0, sizeof(g.message_buffer) );
 	memset(&g.message_archive, 0, sizeof(g.message_archive));
@@ -122,7 +122,7 @@ void loop ()
 
 
 	//Commented out for quick start, need to run at every powerup
-	init_font_tables();
+	//init_font_tables();
 	init_bitmaps();
 
 	OSD256_clear_screen(PTH_X,0);
@@ -135,11 +135,13 @@ void loop ()
 
 
 	OSD256_wr_page = 1;
+	
 	//OSD256_wr_page = 0;
 
 	OSD256_set_display_page(0);
+	
 	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 575);
-
+	//while (1);
 
 
 	g.arming_status = false;
@@ -147,8 +149,12 @@ void loop ()
 	g.armed_start_time = 0;
 	g.last_capacity_query = 0;
 	g.debug_looptime = 0;
+	memset(&g.vario_graph, 0, sizeof(g.vario_graph));
+	g.vgraph_idx = 0;
 
+	g.pthy_redraw = true;
 
+	
 
 //Main loop
 while (1)
@@ -158,8 +164,12 @@ while (1)
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
 
 	now = millis();
-	
-	OSD256_box(PTH_Y, 0, 540, 719, 28, COLOR_50_WHITE | MIX);
+
+	osd_boxes_render();
+
+	if (osd.vgraph.visible & g.visible_osd_page) osd_render_vgraph(&osd.vgraph);
+
+	if (osd.compass.visible & g.visible_osd_page) osd_compass_render(&osd.compass);
 
 	if (osd.center_cross_visible & g.visible_osd_page) osd_center_marker();
 
@@ -171,18 +181,20 @@ while (1)
 
 	if (osd.stat.visible & g.visible_osd_page) osd_status_render(&osd.stat);
 
-	if (osd.batt1_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v);
+	if (osd.batt1_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v, g.b1_voltage);
 
-	if (osd.batt2_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v);
+	if (osd.batt2_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v, g.b2_voltage);
 
-	if (osd.batt1_cap.visible  & g.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap);
+	if (osd.batt1_cap.visible  & g.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap, g.b1_remaining_capacity);
 
-	if (osd.batt2_cap.visible  & g.visible_osd_page) osd_batt_cap_render(&osd.batt2_cap);
+	if (osd.batt1_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr, g.b1_current);
 
-	if (osd.batt1_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr);
-
-	if (osd.batt2_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr);
+	if (osd.batt2_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr, g.b2_current);
 	
+	if (osd.batt1_power.visible & g.visible_osd_page) osd_batt_power_render(&osd.batt1_power, g.b1_power);
+
+	if (osd.batt2_power.visible & g.visible_osd_page) osd_batt_power_render(&osd.batt2_power, g.b2_power);
+
 	if (osd.alt.visible & g.visible_osd_page) osd_altitude_render(&osd.alt);
 
 	if (osd.vario.visible & g.visible_osd_page) osd_vario_render(&osd.vario);
@@ -204,6 +216,8 @@ while (1)
 	if (OSD256_wr_page == 0) OSD256_wr_page = 1;
 	else OSD256_wr_page = 0;
 
+	//The full redraw cycle has ended, we assume all PTHY redraws were done as well
+	g.pthy_redraw = false;
 
 	//Control channel 1 - Control PIP mode
     if (g.ctr_saved_state[0] != g.ctr_state[0])
@@ -232,10 +246,10 @@ while (1)
     {
         // There is a change in ctr1 state
         g.ctr_saved_state[1] = g.ctr_state[1]; // Save it, to prevent unneccessary state changes in the main loop
-
 		//visible_osd_page is a bit coded value bit represents the one page (1 - page 1, 2-page 2, 4-page 3, 8-page 4.... up to page 5)
 		g.visible_osd_page = 0x01 << g.ctr_state[1];
-
+		g.pthy_redraw = true; //force redraw of pth_y elements as well.
+		OSD256_clear_screen(PTH_Y, 0); //And clean the pthy display
     }
 
     //check heartbeat

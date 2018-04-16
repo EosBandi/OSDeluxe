@@ -27,6 +27,111 @@
 char sVoltFormat[] = "%5.2fV";
 char sCapFormat[] =  "%5.0f\x5b";
 
+const char* flight_modes_copter_long[] = {
+	"Stabilize",			//STABILIZE = 0,  // manual airframe angle with manual throttle
+	"Acro",				//ACRO = 1,  // manual body-frame angular rate with manual throttle
+	"Altitude hold",		//ALT_HOLD = 2,  // manual airframe angle with automatic throttle
+	"Auto",				//AUTO = 3,  // fully automatic waypoint control using mission commands
+	"Guided",				//GUIDED = 4,  // fully automatic fly to coordinate or fly at velocity/direction using GCS immediate commands
+	"Loiter",				//LOITER = 5,  // automatic horizontal acceleration with automatic throttle
+	"Return to home",		//RTL = 6,  // automatic return to launching point
+	"Circle",				//CIRCLE = 7,  // automatic circular flight with automatic throttle
+	"Unknown mode",
+	"Land",				//LAND = 9,  // automatic landing with horizontal position control
+	"Unknown mode",
+	"Drift",				//DRIFT = 11,  // semi-automous position, yaw and throttle control
+	"Unknown mode",
+	"Sport",				//SPORT = 13,  // manual earth-frame angular rate control with manual throttle
+	"Flip",				//FLIP = 14,  // automatically flip the vehicle on the roll axis
+	"Auto Tune",			//AUTOTUNE = 15,  // automatically tune the vehicle's roll and pitch gains
+	"Position Hold",		//POSHOLD = 16,  // automatic position hold with manual override, with automatic throttle
+	"Brake",				//BRAKE = 17,  // full-brake using inertial/GPS system, no pilot input
+	"Throw",				//THROW = 18,  // throw to launch mode using inertial/GPS system, no pilot input
+	"Avoid ADSB",			//AVOID_ADSB = 19,  // automatic avoidance of obstacles in the macro scale - e.g. full-sized aircraft
+	"Guided No GPS",		//GUIDED_NOGPS = 20,  // guided mode but only accepts attitude and altitude
+	"Smart RTL",			//SMART_RTL = 21,  // SMART_RTL returns to home by retracing its steps
+	"Flow Hold"	        //FLOWHOLD = 22,  // FLOWHOLD holds position with optical flow without rangefinder
+};
+
+const char* flight_modes_copter_short[] = {
+	"STAB" ,			//STABILIZE = 0,  // manual airframe angle with manual throttle
+	"AVRO" ,				//ACRO = 1,  // manual body-frame angular rate with manual throttle
+	"AltHLD" ,		//ALT_HOLD = 2,  // manual airframe angle with automatic throttle
+	"AUTO" ,				//AUTO = 3,  // fully automatic waypoint control using mission commands
+	"GUIDED" ,				//GUIDED = 4,  // fully automatic fly to coordinate or fly at velocity/direction using GCS immediate commands
+	"LOITER" ,				//LOITER = 5,  // automatic horizontal acceleration with automatic throttle
+	"RTH" ,		//RTL = 6,  // automatic return to launching point
+	"CIRCLE" ,				//CIRCLE = 7,  // automatic circular flight with automatic throttle
+	"UNKNWN" ,
+	"LAND" ,		//LAND = 9,  // automatic landing with horizontal position control
+	"UNKNWN" ,
+	"DRIFT" ,				//DRIFT = 11,  // semi-automous position, yaw and throttle control
+	"UNKNWN" ,
+	"SPORT" ,				//SPORT = 13,  // manual earth-frame angular rate control with manual throttle
+	"FLIP" ,				//FLIP = 14,  // automatically flip the vehicle on the roll axis
+	"ATUNE" ,			//AUTOTUNE = 15,  // automatically tune the vehicle's roll and pitch gains
+	"PosHLD" ,		//POSHOLD = 16,  // automatic position hold with manual override, with automatic throttle
+	"BRAKE" ,				//BRAKE = 17,  // full-brake using inertial/GPS system, no pilot input
+	"THROW" ,				//THROW = 18,  // throw to launch mode using inertial/GPS system, no pilot input
+	"A-ADSB" ,			//AVOID_ADSB = 19,  // automatic avoidance of obstacles in the macro scale - e.g. full-sized aircraft
+	"GdNoGPS" ,		//GUIDED_NOGPS = 20,  // guided mode but only accepts attitude and altitude
+	"SmrtRTL" ,			//SMART_RTL = 21,  // SMART_RTL returns to home by retracing its steps
+	"FlowHLD" 	        //FLOWHOLD = 22,  // FLOWHOLD holds position with optical flow without rangefinder
+};
+
+const char* flight_modes_plane_long[] = {
+
+	"Manual",				//MANUAL = 0,
+	"Circle",				//CIRCLE = 1,
+	"Stabilize",			//STABILIZE = 2,
+	"Training",			//TRAINING = 3,
+	"Acro",				//ACRO = 4,
+	"Fly By Wire A",		//FLY_BY_WIRE_A = 5,
+	"Fly By Wire B",		//FLY_BY_WIRE_B = 6,
+	"Cruise",				//CRUISE = 7,
+	"Auto Tune",			//AUTOTUNE = 8,
+	"Unknown mode" ,
+	"Auto",				//AUTO = 10,
+	"Return to Launch",	//RTL = 11,
+	"Loiter",				//LOITER = 12,
+	"Unknown mode" ,
+	"Avoid ADSB",			//AVOID_ADSB = 14,
+	"Guided",				//GUIDED = 15,
+	"Initialising",		//INITIALISING = 16,
+	"Q Stabilize",		//QSTABILIZE = 17,
+	"Q Hovering",			//QHOVER = 18,
+	"Q Loitering",		//QLOITER = 19,
+	"Q Land",				//QLAND = 20,
+	"Q Return to Launch"	//QRTL = 21
+};
+
+const char* flight_modes_plane_short[] = {
+
+	"MANU" ,				//MANUAL = 0,
+	"CIRC" ,				//CIRCLE = 1,
+	"STAB" ,				//STABILIZE = 2,
+	"TRNG" ,				//TRAINING = 3,
+	"ACRO" ,				//ACRO = 4,
+	"FBWA" ,				//FLY_BY_WIRE_A = 5,
+	"FBWB" ,				//FLY_BY_WIRE_B = 6,
+	"CRUISE" ,			//CRUISE = 7,
+	"ATUNE" ,			//AUTOTUNE = 8,
+	"UNKNWN" ,
+	"AUTO" ,				//AUTO = 10,
+	"RTL" ,				//RTL = 11,
+	"LOIT" ,				//LOITER = 12,
+	"UNKNWN" ,
+	"A-ADSB" ,			//AVOID_ADSB = 14,
+	"GUID" ,				//GUIDED = 15,
+	"INIT" ,				//INITIALISING = 16,
+	"QSTAB" ,			//QSTABILIZE = 17,
+	"QHOVER" ,			//QHOVER = 18,
+	"QLOIT" ,			//QLOITER = 19,
+	"QLAND" ,			//QLAND = 20,
+	"QRTL" 				//QRTL = 21
+};
+
+
 
 void osd_bar_render(struct bar *b)
 {
@@ -98,7 +203,7 @@ void osd_gps_render(struct gps_widget_t *g)
     OSD256_printf(g->x + 42, g->y + 22,color,0, "%2.2f", g->hdop);
 }
 
-void osd_batt_volt_render(struct batt_volt_widget_t *bw)
+void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
 {
 
 	bw->volt.x = bw->x;
@@ -108,7 +213,7 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw)
 
 	bw->volt.max = bw->max_cell_voltage * bw->cells;
 	bw->volt.min = bw->min_cell_voltage * bw->cells;
-	bw->volt.val = bw->voltage;
+	bw->volt.val = voltage;
 	bw->volt.warn_red = bw->red_cell_voltage * bw->cells;
 	bw->volt.warn_yellow = bw->yellow_cell_voltage * bw->cells;
 	bw->volt.mix = bw->mix;
@@ -120,7 +225,7 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw)
 
 }
 
-void osd_batt_cap_render(struct batt_cap_widget_t *bw)
+void osd_batt_cap_render(struct batt_cap_widget_t *bw, unsigned char remaining_capacity)
 {
 
 
@@ -132,8 +237,8 @@ void osd_batt_cap_render(struct batt_cap_widget_t *bw)
 	bw->cap.max = bw->max_capacity;
 	//debug("remaining:%u\n", bw->remaining_capacity);
 	bw->cap.min = 0;
-	if (bw->remaining_capacity >= 0)
-		bw->cap.val = bw->max_capacity * ((float)bw->remaining_capacity / 100);
+	if (remaining_capacity >= 0)
+		bw->cap.val = bw->max_capacity * ((float)remaining_capacity / 100);
 	else
 		bw->cap.val = 0;
 	bw->cap.warn_yellow = bw->max_capacity * 0.2f;      //Yellow warning at 20%
@@ -147,17 +252,21 @@ void osd_batt_cap_render(struct batt_cap_widget_t *bw)
 
 }
 
-void osd_batt_curr_render(struct batt_curr_widget_t *bw)
+void osd_batt_curr_render(struct batt_curr_widget_t *bw, float current)
 {
-	OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW,0,"%5.1fA", bw->current);
+	OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW,0,"%5.1fA", current);
 }
+
+void osd_batt_power_render(struct batt_power_widget_t *bw, int power)
+{
+	OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW, 0, "%4uW", power);
+}
+
+
+
 
 void osd_status_render( struct status_widget_t *s)
 {
-//debug("%u - %u - %u - %u - %u\n", s->x, s->y, s->vibe_status, s->visible, g.visible_osd_page);
-
-
-
 
 // Display notification bars
  switch (s->gps_status)
@@ -223,7 +332,7 @@ void osd_pull_render(struct pull_widget_t *pw)
 
 void osd_altitude_render( struct alt_widget_t *aw)
 {
- OSD256_printf(aw->x, aw->y,OSD256_FONT_YELLOW,0, "\x5c\x5d%dm", (int)aw->altitude);
+ OSD256_printf(aw->x, aw->y,OSD256_FONT_YELLOW,0, "\x5c\x5d%dm", (int)g.altitude);
 } 
 
 void osd_groundspeed_render(struct gs_widget_t *gs)
@@ -233,7 +342,7 @@ void osd_groundspeed_render(struct gs_widget_t *gs)
 
 void osd_throttle_render(struct throttle_widget_t *t)
 {
-	OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "Th %u", g.rcin[3]);
+	OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "\x7d\x7e%u", g.rcin[3]);
 }
 
 
@@ -243,7 +352,7 @@ void osd_vario_render(struct vario_widget_t *vw)
     unsigned char mix;
     float val, f, fh;
 
-    val = vw->vario;
+    val = g.vario;
     if (val > vw->vario_max) val = vw->vario_max;
     if (val < -vw->vario_max) val = -vw->vario_max;
 
@@ -258,7 +367,7 @@ void osd_vario_render(struct vario_widget_t *vw)
     f = vw->h / 2;
     fh = abs(f * val / vw->vario_max);
 
-    if (vw->vario >= 0)
+    if (g.vario >= 0)
     {
 		OSD256_box(PTH_X, vw->x + 1, vw->y + f - fh, vw->w - 2, fh, COLOR_GREEN);
     }
@@ -269,16 +378,16 @@ void osd_vario_render(struct vario_widget_t *vw)
     switch (vw->num_pos)
     {
     case POS_RIGHT:
-        OSD256_printf(vw->x + vw->w + 1, vw->y + f - 4,OSD256_FONT_YELLOW,1 ,"% 4.1fm/s", vw->vario);
+        OSD256_printf(vw->x + vw->w + 1, vw->y + f - 4,OSD256_FONT_YELLOW,1 ,"% 4.1fm/s", g.vario);
         break;
     case POS_LEFT:
-		OSD256_printf(vw->x - 16, vw->y + f - 4,OSD256_FONT_YELLOW,1, "% 4.1fm/s", vw->vario);
+		OSD256_printf(vw->x - 16, vw->y + f - 4,OSD256_FONT_YELLOW,1, "% 4.1fm/s", g.vario);
         break;
     case POS_ABOVE:
-        OSD256_printf(vw->x - 20, vw->y - 25  , OSD256_FONT_YELLOW, 1, "% 4.1", vw->vario);
+        OSD256_printf(vw->x - 20, vw->y - 25  , OSD256_FONT_YELLOW, 1, "% 4.1", g.vario);
         break;
     case POS_BELOW:
-        OSD256_printf(vw->x - 20, vw->y+vw->h +2  , OSD256_FONT_YELLOW, 1, "% 4.1f", vw->vario);
+        OSD256_printf(vw->x - 20, vw->y+vw->h +2  , OSD256_FONT_YELLOW, 1, "% 4.1f", g.vario);
         break;
     }
 }
@@ -305,12 +414,14 @@ void osd_home_render(struct home_widget_t *hw)
 
 void osd_center_marker()
 {
+	if (g.pthy_redraw)
+	{
+		OSD256_box(PTH_Y, 340, 286, 40, 6, 0x88);
+		OSD256_box(PTH_Y, 340, 288, 40, 2, 0x99);
 
-	OSD256_box(PTH_X, 340, 285, 40, 7, COLOR_BLACK | MIX);
-	OSD256_box(PTH_X, 340, 287, 40, 3, COLOR_WHITE | MIX);
-
-	OSD256_box(PTH_X, 358, 268, 5, 40, COLOR_BLACK | MIX);
-	OSD256_box(PTH_X, 359, 268, 3, 40, COLOR_WHITE | MIX);
+		OSD256_box(PTH_Y, 359, 268, 1, 40, 0x89);
+		OSD256_box(PTH_Y, 360, 268, 1, 40, 0x98);
+	}
 
 }
 
@@ -425,90 +536,52 @@ void render_horizon(struct horizon_t *h)
 void osd_mode_render(struct mode_widget_t *mw)
 {
 
-	char mode[17];
+	char mode[20];
+
 	unsigned int cust_mode;
+	unsigned char mode_list_size;
 
-	cust_mode = mw->mode;
+	cust_mode = g.mode;
 
-	if (g.mav_type != MAV_TYPE_FIXED_WING) cust_mode += 100;
-
-	switch (cust_mode)
+	switch (g.mav_type)
 	{
-	case PLANE_MODE_MANUAL:
-		strcpy(mode, "Manual");
+	case MAV_TYPE_GENERIC:
+	case MAV_TYPE_QUADROTOR:
+	case MAV_TYPE_COAXIAL:
+	case MAV_TYPE_HELICOPTER:
+	case MAV_TYPE_HEXAROTOR:
+	case MAV_TYPE_OCTOROTOR:
+	case MAV_TYPE_TRICOPTER:
+	case MAV_TYPE_DODECAROTOR:
+		mode_list_size = sizeof(flight_modes_copter_long) / sizeof(flight_modes_copter_long[0]);
+		if (g.mode > mode_list_size) cust_mode = 8;
+		if (osd.mode.mode_short)
+			strcpy(mode, flight_modes_copter_short[cust_mode]);
+		else
+			strcpy(mode, flight_modes_copter_long[cust_mode]);
 		break;
-	case PLANE_MODE_CIRCLE:
-	case COPTER_MODE_CIRCLE:
-		strcpy(mode, "Circle");
+
+	case MAV_TYPE_FIXED_WING:
+	case MAV_TYPE_VTOL_DUOROTOR:
+	case MAV_TYPE_VTOL_QUADROTOR:
+	case MAV_TYPE_VTOL_TILTROTOR:
+		mode_list_size = sizeof(flight_modes_plane_long) / sizeof(flight_modes_plane_long[0]);
+		if (g.mode > mode_list_size) cust_mode = 8;
+		if (osd.mode.mode_short)
+			strcpy(mode, flight_modes_plane_short[cust_mode]);
+		else
+			strcpy(mode, flight_modes_plane_long[cust_mode]);
 		break;
-	case PLANE_MODE_STABILIZE:
-	case COPTER_MODE_STABILIZE:
-		strcpy(mode, "Stabilize");
-		break;
-	case PLANE_MODE_TRAINING:
-		strcpy(mode, "Training");
-		break;
-	case PLANE_MODE_ACRO:
-	case COPTER_MODE_ACRO:
-		strcpy(mode, "Acro");
-		break;
-	case PLANE_MODE_FBWA:
-		strcpy(mode, "Fly-By-Wire A");
-		break;
-	case PLANE_MODE_FBWB:
-		strcpy(mode, "Fly-By-Wire B");
-		break;
-	case PLANE_MODE_CRUISE:
-		strcpy(mode, "Cruise");
-		break;
-	case PLANE_MODE_AUTOTUNE:
-	case COPTER_MODE_AUTOTUNE:
-		strcpy(mode, "Auto tune");
-		break;
-	case PLANE_MODE_AUTO:
-	case COPTER_MODE_AUTO:
-		strcpy(mode, "Auto");
-		break;
-	case PLANE_MODE_RTL:
-	case COPTER_MODE_RTL:
-		strcpy(mode, "RTL");
-		break;
-	case PLANE_MODE_LOITER:
-	case COPTER_MODE_LOITER:
-		strcpy(mode, "Loiter");
-		break;
-	case PLANE_MODE_INIT:
-		strcpy(mode, "Initializing");
-		break;
-	case PLANE_MODE_GUIDED:
-	case COPTER_MODE_GUIDED:
-		strcpy(mode, "Guided");
-		break;
-	case COPTER_MODE_ALTHOLD:
-		strcpy(mode, "Altitude hold");
-		break;
-	case COPTER_MODE_LAND:
-		strcpy(mode, "Land");
-		break;
-	case COPTER_MODE_OF_LOITER:
-		strcpy(mode, "OF Loiter");
-		break;
-	case COPTER_MODE_DRIFT:
-		strcpy(mode, "Drift");
-		break;
-	case COPTER_MODE_SPORT:
-		strcpy(mode, "Sport");
-		break;
-	case COPTER_MODE_FLIP:
-		strcpy(mode, "Flip");
-		break;
-	case COPTER_MODE_POSHOLD:
-		strcpy(mode, "Position hold");
-		break;
+
 	default:
-		strcpy(mode, "Unknown Mode");
-		break;
+		strcpy(mode, "unknown");
+
 	}
+
+
+
+
+
 	if (mw->mode_centered)
 	{
 		int l = (float)strlen(mode) * 15;
@@ -673,11 +746,6 @@ void movement_render(move_widget_t *m)
 	v_roll  = g.vy * g.cos_yaw - g.vx * g.sin_yaw; // body roll vel
 	v_pitch = g.vy * g.sin_yaw + g.vx * g.cos_yaw; // body pitch vel
 
-
-//	debug("yaw: %f cos y:%f sin y:%f\n",osd.yaw, osd.cos_yaw, osd.sin_yaw);
-//	debug("vx: %f, vy: %f\n", osd.vx, osd.vy);
-//	debug("vroll: %f, vpitch: %f\n", v_roll, v_pitch);
-
 	s = m->size - 1;
 	centerx = m->x + (s + 1) / 2 - 7;
 	centery = m->y + (s + 1) / 2 - 7;
@@ -694,38 +762,177 @@ void movement_render(move_widget_t *m)
 	if (offsetx > (m->size / 2))
 	{
 		offsetx = m->size / 2;
-		bitmap = BMP_BALL_BLUE;
+		bitmap = BMP_BALL_RED;
 	}
 	else if (offsetx < (-(m->size / 2)))
 	{
 		offsetx = -(m->size / 2);
-		bitmap = BMP_BALL_BLUE;
+		bitmap = BMP_BALL_RED;
 	}
 
 	if (offsety >(m->size / 2))
 	{
 		offsety = m->size / 2;
-		bitmap = BMP_BALL_BLUE;
+		bitmap = BMP_BALL_RED;
 	}
 	else if (offsety < (-(m->size / 2)))
 	{
 		offsety = -(m->size / 2);
-		bitmap = BMP_BALL_BLUE;
+		bitmap = BMP_BALL_RED;
 	}
 
 
-	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y, m->x + s, m->y);
-	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y + s, m->x + s, m->y + s);
+	if(g.pthy_redraw)
+	{
+		OSD256_drawline(PTH_Y, 0x11, m->x, m->y, m->x + s, m->y);
+		OSD256_drawline(PTH_Y, 0x11, m->x, m->y + s, m->x + s, m->y + s);
 
-	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y, m->x, m->y + s);
-	OSD256_drawline(PTH_X, COLOR_WHITE, m->x + s, m->y, m->x + s, m->y + s);
+		OSD256_drawline(PTH_Y, 0x11, m->x, m->y, m->x, m->y + s);
+		OSD256_drawline(PTH_Y, 0x11, m->x + s, m->y, m->x + s, m->y + s);
 
-	OSD256_drawline(PTH_X, COLOR_WHITE, m->x + (s+1)/2, m->y, m->x + (s+1)/2, m->y + s);
-	OSD256_drawline(PTH_X, COLOR_WHITE, m->x, m->y + (s+1)/2, m->x + s, m->y + (s+1)/2);
-	OSD256_Circle(PTH_X, COLOR_75_WHITE, m->x+s/2, m->y+s/2, m->size / 4);
+		OSD256_drawline(PTH_Y, 0x11, m->x + (s + 1) / 2, m->y, m->x + (s + 1) / 2, m->y + s);
+		OSD256_drawline(PTH_Y, 0x11, m->x, m->y + (s + 1) / 2, m->x + s, m->y + (s + 1) / 2);
 
+		OSD256_Circle(PTH_Y, 0x99, m->x + s / 2, m->y + s / 2, m->size / 4);
+	}
 	//reverse y offset
 	OSD256_display_bitmap(bitmap, centerx+offsetx, centery-offsety);
+
+
+}
+
+
+void osd_boxes_render()
+{
+	U8 color;
+
+	if (g.pthy_redraw)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			if ((osd.boxes[i].h > 0) && (osd.boxes[i].w > 0))
+			{
+				if (osd.boxes[i].visible & g.visible_osd_page)
+				{
+
+					switch (osd.boxes[i].color)
+					{
+					case 0:
+						color = COLOR_REC_BLACK;
+						break;
+					case 1:
+						color = COLOR_REC_WHITE;
+						break;
+					case 2:
+						color = COLOR_REC_50_WHITE;
+						break;
+					case 3:
+						color = COLOR_REC_25_WHITE;
+						break;
+					default:
+						color = COLOR_REC_BLACK;
+					}
+					if (osd.boxes[i].mix) color = color | REC_MIX;
+
+					OSD256_box(PTH_Y, osd.boxes[i].x, osd.boxes[i].y, osd.boxes[i].w, osd.boxes[i].h, color);
+				}
+			}
+
+		}
+	}
+
+
+}
+
+
+
+void osd_compass_render(compass_widget_t *c)
+{
+	const char cardinals[] = { 'N', 'E', 'S', 'W' };
+	int i, j, x;
+
+	unsigned short x_center = 75 + c->x;
+	unsigned short y_center = 25 + c->y;
+	unsigned short range = 150;
+	unsigned short chr_pos;
+
+
+
+	OSD256_printf(x_center - 8, c->y + 12, OSD256_FONT_WHITE, 0, "\x8f");
+
+	if (g.heading < 10) chr_pos = 8;
+	if ((g.heading >= 10) && (g.heading < 100) ) chr_pos = 16;
+	if (g.heading >= 100) chr_pos = 24;
+
+	OSD256_printf(x_center - chr_pos, c->y, OSD256_FONT_YELLOW, 0, "%u", g.heading);
+
+	y_center += 6;
+	for (i = -range / 2; i <= range / 2; i++) {
+		x = x_center + i;
+		j = (g.heading + i + 360) % 360;
+		if (j == 0 || j == 90 || j == 180 || j == 270) {
+			OSD256_box(PTH_X, x-2, y_center, 5, 8, COLOR_BLACK);
+			OSD256_box(PTH_X, x-1, y_center, 3, 8, COLOR_WHITE);
+
+			OSD256_printf(x - 7, y_center + 10, OSD256_FONT_YELLOW, 0, "%c", cardinals[j / 90]);
+		}
+		else if (j % 45 == 0) {
+			OSD256_box(PTH_X, x - 2, y_center, 5, 8, COLOR_BLACK);
+			OSD256_box(PTH_X, x - 1, y_center, 3, 8, COLOR_WHITE);
+		}
+		else if (j % 15 == 0) {
+			OSD256_box(PTH_X, x - 2, y_center, 5, 4, COLOR_BLACK);
+			OSD256_box(PTH_X, x - 1, y_center, 3, 4, COLOR_WHITE);
+		}
+	}
+
+	OSD256_box(PTH_X, c->x-8 , c->y, 15, 60, 0xff);
+	OSD256_box(PTH_X, c->x + range - 6, c->y, 16, 60, 0xff);
+
+
+}
+
+
+void osd_render_vgraph(vario_graph_widget_t *w)
+{
+
+	unsigned short y_center;
+	unsigned char mix = 0;
+	float val;
+
+
+	val = g.vario;
+
+	if (w->mix) mix = MIX;
+
+	y_center = w->y + (w->h / 2);
+
+	if (g.pthy_redraw)
+	{
+		OSD256_drawline(PTH_Y, COLOR_REC_WHITE, w->x + w->w, w->y, w->x + w->w, w->y + w->h);
+		OSD256_drawline(PTH_Y, COLOR_REC_WHITE, w->x, y_center, w->x + w->w, y_center);
+
+	}
+
+	//for test
+	//g.variot += ((float)random(20)/100.0f - 0.1f);
+	//val = g.variot;
+
+	if (val > w->vario_max)  val = w->vario_max;
+	if (val < -w->vario_max) val = -w->vario_max;
+
+	memcpy(&g.vario_graph[0], &g.vario_graph[1], sizeof(short) * 79);
+
+	g.vario_graph[79] = val * 10 * ((w->h/2) / (w->vario_max * 10));
+
+	for (int i = 0; i < 80; i++)
+	{
+		if (g.vario_graph[i]>0)
+			OSD256_drawline(PTH_X, COLOR_GREEN | mix,w->x + i, y_center, w->x + i, y_center - g.vario_graph[i]);
+		else
+			OSD256_drawline(PTH_X, COLOR_RED | mix, w->x + i, y_center, w->x + i, y_center - g.vario_graph[i]);
+	}
+
 
 
 }

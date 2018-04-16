@@ -36,7 +36,7 @@ struct param_def parameters[] = {
 	PARAM("VIN1_SHARPENING", MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].sharpening, &update_vin_settings),
 	PARAM("VIN1_SATURATION", MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].saturation, &update_vin_settings),
 	PARAM("VIN1_CONTRAST",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].contrast, &update_vin_settings),
- 	PARAM("VIN1_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].brightness, &update_vin_settings),
+	PARAM("VIN1_BRIGHTNESS", MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].brightness, &update_vin_settings),
 	PARAM("VIN1_ENHANCE",    MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].enhance, &update_vin_settings),
 	PARAM("VIN1_H_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].h_mirror, &update_vin_settings),
 	PARAM("VIN1_V_MIRROR",   MAV_PARAM_TYPE_UINT8,&osd.vin_params[0].v_mirror, &update_vin_settings),
@@ -81,6 +81,13 @@ struct param_def parameters[] = {
 	PARAM("VARIO_NUMPOS", MAV_PARAM_TYPE_UINT8, &osd.vario.num_pos, NULL),
 	PARAM("VARIO_MAXIMUM", MAV_PARAM_TYPE_REAL32, &osd.vario.vario_max, NULL),
 
+	PARAM("VGRAPH_POSX", MAV_PARAM_TYPE_UINT16, &osd.vgraph.x, &do_update_pthy),
+	PARAM("VGRAPH_POSY", MAV_PARAM_TYPE_UINT16, &osd.vgraph.y, &do_update_pthy),
+	PARAM("VGRAPH_HEIGHT", MAV_PARAM_TYPE_UINT16, &osd.vgraph.h, &do_update_pthy),
+	PARAM("VGRAPH_MAXIMUM", MAV_PARAM_TYPE_REAL32, &osd.vgraph.vario_max, NULL),
+	PARAM("VGRAPH_MIX", MAV_PARAM_TYPE_UINT8, &osd.vgraph.mix, NULL),
+
+
 	PARAM("GPS_POSX", MAV_PARAM_TYPE_UINT16, &osd.gps.x, NULL),
 	PARAM("GPS_POSY", MAV_PARAM_TYPE_UINT16, &osd.gps.y, NULL),
 	PARAM("GPS_SAT_WARNING", MAV_PARAM_TYPE_UINT8, &osd.gps.sat_warn, NULL),
@@ -111,21 +118,26 @@ struct param_def parameters[] = {
 	PARAM("BAT1CAP_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt1_cap.y, NULL),
 	PARAM("BAT1CAP_BARTYPE", MAV_PARAM_TYPE_UINT8, &osd.batt1_cap.bar_type, NULL),
 
-	PARAM("BAT2CAP_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt2_cap.x, NULL),
-	PARAM("BAT2CAP_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt2_cap.y, NULL),
-	PARAM("BAT2CAP_BARTYPE", MAV_PARAM_TYPE_UINT8, &osd.batt2_cap.bar_type, NULL),
-
 	PARAM("BAT1CUR_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt1_curr.x, NULL),
 	PARAM("BAT1CUR_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt1_curr.y, NULL),
 
 	PARAM("BAT2CUR_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt2_curr.x, NULL),
 	PARAM("BAT2CUR_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt2_curr.y, NULL),
 
+	PARAM("BAT1PWR_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt1_power.x, NULL),
+	PARAM("BAT1PWR_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt1_power.y, NULL),
+
+	PARAM("BAT2PWR_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt2_power.x, NULL),
+	PARAM("BAT2PWR_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt2_power.y, NULL),
+
 	PARAM("STATUS_POSX", MAV_PARAM_TYPE_UINT16, &osd.stat.x, NULL),
 	PARAM("STATUS_POSY", MAV_PARAM_TYPE_UINT16, &osd.stat.y, NULL),
 
 	PARAM("ALT_POSX", MAV_PARAM_TYPE_UINT16, &osd.alt.x, NULL),
 	PARAM("ALT_POSY", MAV_PARAM_TYPE_UINT16, &osd.alt.y, NULL),
+
+	PARAM("COMPASS_POSX", MAV_PARAM_TYPE_UINT16, &osd.compass.x, NULL),
+	PARAM("COMPASS_POSY", MAV_PARAM_TYPE_UINT16, &osd.compass.y, NULL),
 
 	PARAM("PULL_POSX", MAV_PARAM_TYPE_UINT16, &osd.pull.x, NULL),
 	PARAM("PULL_POSY", MAV_PARAM_TYPE_UINT16, &osd.pull.y, NULL),
@@ -136,12 +148,16 @@ struct param_def parameters[] = {
 
 	PARAM("MODE_POSX", MAV_PARAM_TYPE_UINT16, &osd.mode.mode_x, NULL),
 	PARAM("MODE_POSY", MAV_PARAM_TYPE_UINT16, &osd.mode.mode_y, NULL),
+	PARAM("MODE_CENTERED", MAV_PARAM_TYPE_UINT8, &osd.mode.mode_centered, NULL),
+	PARAM("MODE_SHORT", MAV_PARAM_TYPE_UINT8, &osd.mode.mode_short, NULL),
 
 	PARAM("FAILSAFE_POSX", MAV_PARAM_TYPE_UINT16, &osd.mode.fs_x, NULL),
 	PARAM("FAILSAFE_POSY", MAV_PARAM_TYPE_UINT16, &osd.mode.fs_y, NULL),
+	PARAM("FAILSAFE_CENTERD", MAV_PARAM_TYPE_UINT8, &osd.mode.fs_centered, NULL),
 
 	PARAM("ARM_POSX", MAV_PARAM_TYPE_UINT16, &osd.mode.arm_x, NULL),
 	PARAM("ARM_POSY", MAV_PARAM_TYPE_UINT16, &osd.mode.arm_y, NULL),
+	PARAM("ARM_CENTERD", MAV_PARAM_TYPE_UINT8, &osd.mode.arm_centered, NULL),
 
 	PARAM("MESSAGE_POSX", MAV_PARAM_TYPE_UINT16, &osd.msg_widget.x, NULL),
 	PARAM("MESSAGE_POSY", MAV_PARAM_TYPE_UINT16, &osd.msg_widget.y, NULL),
@@ -152,9 +168,9 @@ struct param_def parameters[] = {
 	PARAM("THROTTLE_POSX", MAV_PARAM_TYPE_UINT16, &osd.thr.x, NULL),
 	PARAM("THROTTLE_POSY", MAV_PARAM_TYPE_UINT16, &osd.thr.y, NULL),
 
-	PARAM("MOVE_POSX", MAV_PARAM_TYPE_UINT16, &osd.move.x, NULL),
-	PARAM("MOVE_POSY", MAV_PARAM_TYPE_UINT16, &osd.move.y, NULL),
-	PARAM("MOVE_SIZE", MAV_PARAM_TYPE_UINT16, &osd.move.size, NULL),
+	PARAM("MOVE_POSX", MAV_PARAM_TYPE_UINT16, &osd.move.x, &do_update_pthy),
+	PARAM("MOVE_POSY", MAV_PARAM_TYPE_UINT16, &osd.move.y, &do_update_pthy),
+	PARAM("MOVE_SIZE", MAV_PARAM_TYPE_UINT16, &osd.move.size, &do_update_pthy),
 	PARAM("MOVE_MAX",  MAV_PARAM_TYPE_REAL32, &osd.move.max, NULL),
 
 
@@ -163,12 +179,6 @@ struct param_def parameters[] = {
 	PARAM("CTR_RC_CH_3", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[2], NULL),
 	PARAM("CTR_RC_CH_4", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[3], NULL),
 
-/*
-	// Bit coded field for visible chanels (four leas significatn bits)
-	PARAM("CTR2_0_VIDCHON", MAV_PARAM_TYPE_UINT8, &osd.ctr2_video_on[0], &update_channel_onoff),
-	PARAM("CTR2_1_VIDCHON", MAV_PARAM_TYPE_UINT8, &osd.ctr2_video_on[1], &update_channel_onoff),
-	PARAM("CTR2_2_VIDCHON", MAV_PARAM_TYPE_UINT8, &osd.ctr2_video_on[2], &update_channel_onoff),
-*/
 	//bit coded field for osd widget visibility by pages (1-8 pages)
 	PARAM("PAGE_GPS", MAV_PARAM_TYPE_UINT8, &osd.gps.visible, NULL),
 	PARAM("PAGE_BATT1_VOLT", MAV_PARAM_TYPE_UINT8, &osd.batt1_v.visible, NULL),
@@ -176,9 +186,12 @@ struct param_def parameters[] = {
 	PARAM("PAGE_BATT1_CURR", MAV_PARAM_TYPE_UINT8, &osd.batt1_curr.visible, NULL),
 	PARAM("PAGE_BATT2_CURR", MAV_PARAM_TYPE_UINT8, &osd.batt2_curr.visible, NULL),
 	PARAM("PAGE_BATT1_CAP", MAV_PARAM_TYPE_UINT8, &osd.batt1_cap.visible, NULL),
-	PARAM("PAGE_BATT2_CAP", MAV_PARAM_TYPE_UINT8, &osd.batt2_cap.visible, NULL),
+	PARAM("PAGE_BATT1_PWR", MAV_PARAM_TYPE_UINT8, &osd.batt1_power.visible, NULL),
+	PARAM("PAGE_BATT2_PWR", MAV_PARAM_TYPE_UINT8, &osd.batt2_power.visible, NULL),
+
 	PARAM("PAGE_STAT", MAV_PARAM_TYPE_UINT8, &osd.stat.visible, NULL),
 	PARAM("PAGE_ALT", MAV_PARAM_TYPE_UINT8, &osd.alt.visible, NULL),
+	PARAM("PAGE_COMPASS", MAV_PARAM_TYPE_UINT8, &osd.compass.visible, NULL),
 	PARAM("PAGE_VARIO", MAV_PARAM_TYPE_UINT8, &osd.vario.visible, NULL),
 	PARAM("PAGE_HOME", MAV_PARAM_TYPE_UINT8, &osd.home_w.visible, NULL),
 	PARAM("PAGE_HORIZON", MAV_PARAM_TYPE_UINT8, &osd.horizon.visible, NULL),
@@ -188,7 +201,16 @@ struct param_def parameters[] = {
 	PARAM("PAGE_GS", MAV_PARAM_TYPE_UINT8, &osd.gs.visible, NULL),
 	PARAM("PAGE_THROTTLE", MAV_PARAM_TYPE_UINT8, &osd.thr.visible, NULL),
 	PARAM("PAGE_MOVE", MAV_PARAM_TYPE_UINT8, &osd.move.visible, NULL),
-	PARAM("PAGE_CENTER_M", MAV_PARAM_TYPE_UINT8, &osd.center_cross_visible , NULL),
+	PARAM("PAGE_CENTER_M", MAV_PARAM_TYPE_UINT8, &osd.center_cross_visible , &do_update_pthy),
+
+	PARAM("PAGE_BOX_1", MAV_PARAM_TYPE_INT16, &osd.boxes[0].visible, &do_update_pthy),
+	PARAM("PAGE_BOX_2", MAV_PARAM_TYPE_INT16, &osd.boxes[1].visible, &do_update_pthy),
+	PARAM("PAGE_BOX_3", MAV_PARAM_TYPE_INT16, &osd.boxes[2].visible, &do_update_pthy),
+	PARAM("PAGE_BOX_4", MAV_PARAM_TYPE_INT16, &osd.boxes[3].visible, &do_update_pthy),
+	PARAM("PAGE_BOX_5", MAV_PARAM_TYPE_INT16, &osd.boxes[4].visible, &do_update_pthy),
+	PARAM("PAGE_BOX_6", MAV_PARAM_TYPE_INT16, &osd.boxes[5].visible, &do_update_pthy),
+	PARAM("PAGE_BOX_7", MAV_PARAM_TYPE_INT16, &osd.boxes[6].visible, &do_update_pthy),
+	PARAM("PAGE_BOX_8", MAV_PARAM_TYPE_INT16, &osd.boxes[7].visible, &do_update_pthy),
 
 	PARAM("VOUT_COLOR_BAR", MAV_PARAM_TYPE_UINT8, &osd.color_bar_x, &update_vout_settings),
 	PARAM("VOUT_COLOR_KILL", MAV_PARAM_TYPE_UINT8, &osd.color_kill_x, &update_vout_settings),
@@ -366,8 +388,65 @@ struct param_def parameters[] = {
 	PARAM("PIPM5_ENA_CH4",   MAV_PARAM_TYPE_UINT8, &osd.video_channels[5][4].enable, &update_pip),
 
 
+
+	PARAM("BOX_1_X",	MAV_PARAM_TYPE_INT16,	&osd.boxes[0].x, &do_update_pthy),
+	PARAM("BOX_1_Y",	MAV_PARAM_TYPE_INT16,	&osd.boxes[0].y, &do_update_pthy),
+	PARAM("BOX_1_WIDTH",MAV_PARAM_TYPE_INT16,	&osd.boxes[0].w, &do_update_pthy),
+	PARAM("BOX_1_HEIGHT",MAV_PARAM_TYPE_INT16,	&osd.boxes[0].h, &do_update_pthy),
+	PARAM("BOX_1_COLOR", MAV_PARAM_TYPE_INT8,	&osd.boxes[0].color, &do_update_pthy),
+	PARAM("BOX_1_MIX",	MAV_PARAM_TYPE_INT8,	&osd.boxes[0].mix, &do_update_pthy),
+
+	PARAM("BOX_2_X", MAV_PARAM_TYPE_INT16, &osd.boxes[1].x, &do_update_pthy),
+	PARAM("BOX_2_Y", MAV_PARAM_TYPE_INT16, &osd.boxes[1].y, &do_update_pthy),
+	PARAM("BOX_2_WIDTH", MAV_PARAM_TYPE_INT16, &osd.boxes[1].w, &do_update_pthy),
+	PARAM("BOX_2_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[1].h, &do_update_pthy),
+	PARAM("BOX_2_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[1].color, &do_update_pthy),
+	PARAM("BOX_2_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[1].mix, &do_update_pthy),
+
+	PARAM("BOX_3_X", MAV_PARAM_TYPE_INT16, &osd.boxes[2].x, &do_update_pthy),
+	PARAM("BOX_3_Y", MAV_PARAM_TYPE_INT16, &osd.boxes[2].y, &do_update_pthy),
+	PARAM("BOX_3_WIDTH", MAV_PARAM_TYPE_INT16, &osd.boxes[2].w, &do_update_pthy),
+	PARAM("BOX_3_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[2].h, &do_update_pthy),
+	PARAM("BOX_3_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[2].color, &do_update_pthy),
+	PARAM("BOX_3_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[2].mix, &do_update_pthy),
+
+	PARAM("BOX_4_X", MAV_PARAM_TYPE_INT16, &osd.boxes[3].x, &do_update_pthy),
+	PARAM("BOX_4_Y", MAV_PARAM_TYPE_INT16, &osd.boxes[3].y, &do_update_pthy),
+	PARAM("BOX_4_WIDTH", MAV_PARAM_TYPE_INT16, &osd.boxes[3].w, &do_update_pthy),
+	PARAM("BOX_4_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[3].h, &do_update_pthy),
+	PARAM("BOX_4_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[3].color, &do_update_pthy),
+	PARAM("BOX_4_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[3].mix, &do_update_pthy),
+
+	PARAM("BOX_5_X", MAV_PARAM_TYPE_INT16, &osd.boxes[4].x, &do_update_pthy),
+	PARAM("BOX_5_Y", MAV_PARAM_TYPE_INT16, &osd.boxes[4].y, &do_update_pthy),
+	PARAM("BOX_5_WIDTH", MAV_PARAM_TYPE_INT16, &osd.boxes[4].w, &do_update_pthy),
+	PARAM("BOX_5_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[4].h, &do_update_pthy),
+	PARAM("BOX_5_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[4].color, &do_update_pthy),
+	PARAM("BOX_5_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[4].mix, &do_update_pthy),
+
+	PARAM("BOX_6_X", MAV_PARAM_TYPE_INT16, &osd.boxes[5].x, &do_update_pthy),
+	PARAM("BOX_6_Y", MAV_PARAM_TYPE_INT16, &osd.boxes[5].y, &do_update_pthy),
+	PARAM("BOX_6_WIDTH", MAV_PARAM_TYPE_INT16, &osd.boxes[5].w, &do_update_pthy),
+	PARAM("BOX_6_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[5].h, &do_update_pthy),
+	PARAM("BOX_6_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[5].color, &do_update_pthy),
+	PARAM("BOX_6_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[5].mix, &do_update_pthy),
+
+	PARAM("BOX_7_X", MAV_PARAM_TYPE_INT16, &osd.boxes[6].x, &do_update_pthy),
+	PARAM("BOX_7_Y", MAV_PARAM_TYPE_INT16, &osd.boxes[6].y, &do_update_pthy),
+	PARAM("BOX_7_WIDTH", MAV_PARAM_TYPE_INT16, &osd.boxes[6].w, &do_update_pthy),
+	PARAM("BOX_7_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[6].h, &do_update_pthy),
+	PARAM("BOX_7_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[6].color, &do_update_pthy),
+	PARAM("BOX_7_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[6].mix, &do_update_pthy),
+		
+	PARAM("BOX_8_X", MAV_PARAM_TYPE_INT16, &osd.boxes[7].x, &do_update_pthy),
+	PARAM("BOX_8_Y", MAV_PARAM_TYPE_INT16, &osd.boxes[7].y, &do_update_pthy),
+	PARAM("BOX_8_WIDTH", MAV_PARAM_TYPE_INT16, &osd.boxes[7].w, &do_update_pthy),
+	PARAM("BOX_8_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[7].h, &do_update_pthy),
+	PARAM("BOX_8_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[7].color, &do_update_pthy),
+	PARAM("BOX_8_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[7].mix, &do_update_pthy),
+
 	PARAM("TEST_PIP_PAGE",MAV_PARAM_TYPE_UINT8, &g.pip_page, &update_pip),
-	PARAM("TEST_OSD_PAGE", MAV_PARAM_TYPE_UINT8, &g.visible_osd_page, NULL),
+	PARAM("TEST_OSD_PAGE", MAV_PARAM_TYPE_UINT8, &g.visible_osd_page, &do_update_pthy),
 
     PARAM("WRITE_SETTINGS",MAV_PARAM_TYPE_UINT8, &g.write_settings, &do_settings_save),
 
@@ -381,6 +460,12 @@ struct param_def parameters[] = {
 };
 
 
+void do_update_pthy()
+{
+	//initiate redraw of boxes on pthy page
+	g.pthy_redraw = true;
+	OSD256_clear_screen(PTH_Y, 0); //And clean the pthy display
+}
 
 void do_settings_save()
 {
@@ -393,7 +478,7 @@ void do_settings_save()
 void update_test_byte()
 {
 
-	tw_write_register(0x0c5, g.test_byte);
+	tw_write_register(0x242, g.test_byte);
 
 }
 

@@ -132,6 +132,7 @@ struct vin_params_t
 
 
 
+
 extern unsigned char cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
 //extern unsigned char OSD_work_field, OSD_display_field;
@@ -173,19 +174,20 @@ const unsigned char colortable[18][3] = {
 };
 
 const unsigned char colortable_rec[4][3] = {
-{0x00, 0x80, 0x80},							//Black         0
-{0xf0, 0x80, 0x80},							//100%white     4
-{110, 97, 218},							//Red           6   
-{0x3f, 0x80, 0x80}							//Green         10
+{0x00, 0x80, 0x80},							//Black         
+{0xf0, 0x80, 0x80},							//100%white     
+{0x7f, 0x80, 0x80},							//50%white              
+{0x3f, 0x80, 0x80}							//25%white         
 };
 
-#define COLOR_REC_BLACK 0
-#define COLOR_REC_WHITE 1
-#define COLOR_REC_RED   2
-#define COLOR_REC_GREEN 3
-#define COLOR_REC_NONE  0xf
-#define REC_MIX         0x8
-#define REC_BLINK       0x4
+#define COLOR_REC_BLACK  0x00
+#define COLOR_REC_WHITE  0x11
+#define COLOR_REC_50_WHITE   0x22
+#define COLOR_REC_25_WHITE   0x33
+
+#define COLOR_REC_NONE  0xff
+#define REC_MIX         0x88
+#define REC_BLINK       0x44
 
 
 #define OSD256_FONT_WHITE     0
@@ -231,7 +233,7 @@ void OSD256_clear_screen(U8 _pth, U8 page);
 
 void OSD256_set_drawcolor(U8 color);
 void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y);
-void OSD256_setpixel_fast(U16 start_x, U16 start_Y);
+void OSD256_setpixel_fast(U8 _pth, U16 start_x, U16 start_Y);
 void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2);
 void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius);
 void OSD256_box(char _pth, unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color);

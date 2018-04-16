@@ -409,12 +409,7 @@ void tw_ch_set_input(char ch, char input)
 void OSD256_OSG_Mode_Selection(U8 mode)
 {
 	U8 tmp;
-
-	tmp = tw_read_register(0x241);
-	tmp &= ~0x3;
-	tmp |= (mode & 0x3);
-	tmp |= 0x8; //test
-	tw_write_register(0x241, tmp);
+	tw_write_register(0x241, mode & 0x3);
 }
 
 void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib)
@@ -531,19 +526,10 @@ void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font)
 void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color)
 {
 	unsigned char reg40, tmp;
+	U8 reg205, reg206, reg207, reg208, reg209, reg20a, reg24e, reg24f;
+	U8 reg241, reg242, reg243;
 
-	if (BitSet(_pth, PTH_X))
-	{
-		tw_write_register(0x20a, (OSD256_wr_page & 0x7) << 2);					//... y path 0x20, x Path 0x00
-	}
-	else
-	{
-		tw_write_register(0x20a, 0x20);					//... y path 0x20, x Path 0x00
-		start_X >>= 1;
-		end_X >>= 1;
-	}
-
-    //check boundaries, if dst=1 then destination is display, so check screen boundaries
+	//check boundaries, if dst=1 then destination is display, so check screen boundaries
 
 	if (dst == 1) {
 		if (start_X >= SCR_X_SIZE)  start_X = SCR_X_SIZE;
@@ -560,6 +546,18 @@ void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16
 
 	}
 
+	if (BitSet(_pth, PTH_X))
+	{
+		reg20a = (OSD256_wr_page & 0x7) << 2;
+	}
+	else
+	{
+		reg20a = 0x20;
+		start_X >>= 1;
+		end_X >>= 1;
+	}
+
+
 	if (start_X >= end_X) start_X = end_X;
 
 	if (start_Y >= end_Y) start_Y = end_Y;
@@ -567,24 +565,21 @@ void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16
 	if ((start_X == end_X) && (start_Y == end_Y))           //Since we can't fill only 1 pixel, just return.
 		return;
 
-	reg40 = tw_read_register(0x240);
-	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
 
-	tw_write_register(0x243, color); 				// Filling color
-
-	OSD256_OSG_Mode_Selection(2);					// Set OSG operation mode to Block fill
+	reg241 = 0x02;
+	reg242 = 0xca;
+	reg243 = color;
 
 
-	tw_write_register(0x205, start_X);
-	tw_write_register(0x206, end_X);
-	tmp = ((start_X & 0xff00) >> 8 << 6) | ((end_X & 0xff00) >> 8 << 4);
-	tw_write_register(0x24e, tmp);
+
+	reg205 = start_X;
+	reg206 = end_X;
+	reg24e = ((start_X & 0xff00) >> 8 << 6) | ((end_X & 0xff00) >> 8 << 4);
 
 
-	tw_write_register(0x207, start_Y);
-	tw_write_register(0x208, end_Y);
-	tmp = ((start_Y & 0xff00) >> 8 << 2) | ((end_Y & 0xff00) >> 8);
-	tw_write_register(0x209, tmp);
+	reg207 = start_Y;
+	reg208 = end_Y;
+	reg209 = ((start_Y & 0xff00) >> 8 << 2) | ((end_Y & 0xff00) >> 8);
 
 	//Set OSG_DSTCTL           0 scratch 1 display   
 	if (dst == 1)
@@ -592,10 +587,31 @@ void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16
 	else
 		tmp = 0;						//scratch 
 
-	tw_write_register(0x24f, tmp | 0x1);
+	reg24f = tmp | 0x01;
+
+	cnt = 0;
+	data_buf[cnt++] = reg241;
+	data_buf[cnt++] = reg242;
+	data_buf[cnt++] = reg243;
+	tw_write_buf(0x241, data_buf, cnt);
+
+
+
+	cnt = 0;
+	data_buf[cnt++] = reg205;
+	data_buf[cnt++] = reg206;
+	data_buf[cnt++] = reg207;
+	data_buf[cnt++] = reg208;
+	data_buf[cnt++] = reg209;
+	data_buf[cnt++] = reg20a;
+	tw_write_buf(0x205, data_buf, cnt);
+
+	cnt = 0;
+	data_buf[cnt++] = reg24e;
+	data_buf[cnt++] = reg24f;
+	tw_write_buf(0x24e, data_buf, cnt);
 
 	WAIT_OSG_IDLE;
-	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
 }
 
 // src/dst 0 - sratch, 1 - display
@@ -949,6 +965,13 @@ void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 	end_X = start_X + 1;
 	end_Y = start_Y + 1;
 
+	//check boundaries, if dst=1 then destination is display, so check screen boundaries
+	if (start_X >= SCR_X_SIZE)  start_X = SCR_X_SIZE;
+	if (start_Y >= SCR_Y_SIZE)  start_Y = SCR_Y_SIZE;
+	if (end_X >= SCR_X_SIZE)  end_X = SCR_X_SIZE;
+	if (end_Y >= SCR_Y_SIZE)  end_Y = SCR_Y_SIZE;
+
+
 	if (BitSet(_pth, PTH_X))
 	{
 		reg20a = (OSD256_wr_page & 0x7) << 2;					//... y path 0x20, x Path 0x00
@@ -960,12 +983,6 @@ void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 		end_X >>= 1;
 	}
 
-	//check boundaries, if dst=1 then destination is display, so check screen boundaries
-
-	if (start_X >= SCR_X_SIZE)  start_X = SCR_X_SIZE;
-	if (start_Y >= SCR_Y_SIZE)  start_Y = SCR_Y_SIZE;
-	if (end_X >= SCR_X_SIZE)  end_X = SCR_X_SIZE;
-	if (end_Y >= SCR_Y_SIZE)  end_Y = SCR_Y_SIZE;
 
 	tw_write_register(0x243, COLOR_WHITE);				// Filling color
 	tw_write_register(0x241, 0x02);				// Set OSG operation mode to Block fill
@@ -981,8 +998,7 @@ void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 	tmp = ((start_Y & 0xff00) >> 8 << 2) | ((end_Y & 0xff00) >> 8);
 	reg209 = tmp;
 
-	tmp = 0x4;					//To Display buffer
-	reg24f = tmp | 0x1;       //start
+	reg24f = 0x4 | 0x1;       //start
 
 
 	cnt = 0;
@@ -1002,13 +1018,17 @@ void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 	//WAIT_OSG_IDLE; //do we really need this ?
 }
 
-void OSD256_setpixel_fast(U16 start_X, U16 start_Y)
+void OSD256_setpixel_fast(U8 pth, U16 start_X, U16 start_Y)
 {
 //	unsigned char tmp;
 	U16 end_X, end_Y;
 
 	U8 reg205, reg206, reg207, reg208, reg209;
 	U8 reg24e;
+
+	if (pth == PTH_Y) {
+		start_X >>= 1;
+	}
 
 	end_X = start_X + 1;
 	end_Y = start_Y + 1;
@@ -1111,7 +1131,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 			longLen += y;
 			for (int j = 0x8000 + (x << 16); y <= longLen; ++y)
 			{
-				OSD256_setpixel_fast(j >> 16, y);
+				OSD256_setpixel_fast(_pth, j >> 16, y);
 				j += decInc;
 			}
 			return;
@@ -1119,7 +1139,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 		longLen += y;
 		for (int j = 0x8000 + (x << 16); y >= longLen; --y)
 		{
-			OSD256_setpixel_fast(j >> 16, y);
+			OSD256_setpixel_fast(_pth, j >> 16, y);
 			j -= decInc;
 		}
 		return;
@@ -1130,7 +1150,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 		longLen += x;
 		for (int j = 0x8000 + (y << 16); x <= longLen; ++x)
 		{
-			OSD256_setpixel_fast(x, j >> 16);
+			OSD256_setpixel_fast(_pth, x, j >> 16);
 			j += decInc;
 		}
 		return;
@@ -1138,7 +1158,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 	longLen += x;
 	for (int j = 0x8000 + (y << 16); x >= longLen; --x)
 	{
-		OSD256_setpixel_fast( x, j >> 16);
+		OSD256_setpixel_fast(_pth, x, j >> 16);
 		j -= decInc;
 	}
 }
@@ -1152,6 +1172,7 @@ void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius)
 	OSD256_set_drawcolor(color);
 	tw_write_register(0x241, 0x02);
 
+
 	if (BitSet(_pth, PTH_X))
 	{
 		reg20a = (OSD256_wr_page & 0x7) << 2;					//... y path 0x20, x Path 0x00
@@ -1160,7 +1181,6 @@ void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius)
 	{
 		reg20a = 0x20;					//... y path 0x20, x Path 0x00
 	}
-
 	tw_write_register(0x20a, reg20a);
 
 	d = yCenter - xCenter;
@@ -1170,16 +1190,16 @@ void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius)
 	while (x <= y)
 	{
 
-		OSD256_setpixel_fast(xCenter + x, yCenter + y);
-		OSD256_setpixel_fast(xCenter + x, yCenter - y);
-		OSD256_setpixel_fast(xCenter - x, yCenter + y);
-		OSD256_setpixel_fast(xCenter - x, yCenter - y);
+		OSD256_setpixel_fast(_pth, xCenter + x, yCenter + y);
+		OSD256_setpixel_fast(_pth, xCenter + x, yCenter - y);
+		OSD256_setpixel_fast(_pth, xCenter - x, yCenter + y);
+		OSD256_setpixel_fast(_pth, xCenter - x, yCenter - y);
 
-		OSD256_setpixel_fast(yCenter + y - d, yCenter + x);
-		OSD256_setpixel_fast(yCenter + y - d, yCenter - x);
+		OSD256_setpixel_fast(_pth, yCenter + y - d, yCenter + x);
+		OSD256_setpixel_fast(_pth, yCenter + y - d, yCenter - x);
 
-		OSD256_setpixel_fast(yCenter - y - d, yCenter + x);
-		OSD256_setpixel_fast(yCenter - y - d, yCenter - x);
+		OSD256_setpixel_fast(_pth, yCenter - y - d, yCenter + x);
+		OSD256_setpixel_fast(_pth, yCenter - y - d, yCenter - x);
 
 		if (tSwitch < 0)
 		{

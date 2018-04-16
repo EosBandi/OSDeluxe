@@ -46,6 +46,17 @@ struct globals_variables_t {
 	bool          arming_status;
 	home_data_t   home;
 
+	unsigned int  mode;
+
+	float         altitude;
+	float         vario;
+
+	float		  variot;
+
+	short         vario_graph[80];
+	unsigned char vgraph_idx;
+
+
 	int           ekfvel;
 	int           ekfposh;
 	int           ekfposv;
@@ -57,6 +68,16 @@ struct globals_variables_t {
 	float		  yaw;					// Yaw in rad
 	float		  cos_yaw, sin_yaw;		// Precalculated yaw sin/cos values
 
+
+	int           b1_power;				//Battery 1 Power (Watts)
+	float         b1_current;           
+	float         b1_voltage;
+	unsigned char b1_remaining_capacity;
+
+
+	int           b2_power;				//Battery 1 Power (Watts)
+	float         b2_current;
+	float         b2_voltage;
 
 
 	unsigned char ctr_state[4];
@@ -95,6 +116,8 @@ struct globals_variables_t {
 
 	U8 write_settings;
 	U8 debug_looptime;
+
+	bool pthy_redraw;					//indicated that we need to redraw osd contect on y path.
 
 
 };
