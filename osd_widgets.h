@@ -51,10 +51,10 @@ enum number_pos {
 
 
  struct bar {
-     unsigned short  x;  // x position (4 pixels 0-180)
-     unsigned short y;  // y position (field 0-288)
-     unsigned short  w;  // width in 4pixels
-     unsigned short h;  // height
+     U16  x;  // x position (4 pixels 0-180)
+     U16 y;  // y position (field 0-288)
+     U16  w;  // width in 4pixels
+     U16 h;  // height
      float max;         // maximum displayable value    
      float min;         // minimum displayable value
      float val;         // value to display
@@ -67,25 +67,25 @@ enum number_pos {
  };
 
 struct gps_widget_t {
-    unsigned short x;
-    unsigned short y;
-    unsigned char sat;
-    unsigned char sat_warn;			//Warning level, makes the status yellow (It belongs to the status widget, but for PARAMS it easier to put here
-	unsigned char sat_critical;     //Critical level, makes status red, and gps indicator also red
+    U16 x;
+    U16 y;
+    U8 sat;
+    U8 sat_warn;			//Warning level, makes the status yellow (It belongs to the status widget, but for PARAMS it easier to put here
+	U8 sat_critical;     //Critical level, makes status red, and gps indicator also red
     float         hdop;
     float         hdop_warn;		//Warning level see above (hdop above this)
 	float		  hdop_critical;	//Critical level see above  (hdop above this)
-    unsigned char  fix;
-    unsigned char color;
-	unsigned char visible;
+    U8  fix;
+    U8 color;
+	U8 visible;
 };
 
 
 struct batt_volt_widget_t {
-	unsigned short x;
-	unsigned short y;
+	U16 x;
+	U16 y;
 	struct bar volt;
-	unsigned char cells;
+	U8 cells;
 	float min_cell_voltage;
 	float max_cell_voltage;
 	float red_cell_voltage;
@@ -93,204 +93,203 @@ struct batt_volt_widget_t {
 	bartype bar_type;
 	bool mix;
 	bool box;
-	unsigned char visible;
+	U8 visible;
 };
 
 
 struct batt_cap_widget_t {
-	unsigned short x;
-	unsigned short y;
+	U16 x;
+	U16 y;
 	struct bar cap;
 	int max_capacity;
 	bartype bar_type;
 	bool mix;
 	bool box;
-	unsigned char visible;
+	U8 visible;
 };
 
 
 struct batt_curr_widget_t {
-	unsigned short x;
-	unsigned short y;
+	U16 x;
+	U16 y;
 	bool mix;
 	bool box;
-	unsigned char visible;
+	U8 visible;
 };
 
 struct batt_power_widget_t
 {
-	unsigned short x;
-	unsigned short y;
-	unsigned char visible;
+	U16 x;
+	U16 y;
+	U8 visible;
 };
 
-
-
 struct status_widget_t {
-    unsigned short x;
-    unsigned short y;
+    U16 x;
+    U16 y;
 
     status_info gps_status;
     status_info ekf_status;
     status_info vibe_status;
 
     bool mix;
-	unsigned char visible;
+	U8 visible;
 };
 
 struct alt_widget_t {
-    unsigned short x;
-    unsigned short y;
+    U16 x;
+    U16 y;
     bool mix;
-	unsigned char visible;
+	U8 visible;
 };
 
 struct gs_widget_t {
-	unsigned short x;
-	unsigned short y;
-	unsigned char visible;
+	U16 x;
+	U16 y;
+	U8 visible;
 };
 
 struct throttle_widget_t {
-	unsigned short x;
-	unsigned short y;
-	unsigned char  visible;
+	U16 x;
+	U16 y;
+	U8  visible;
 };
 
 
 struct pull_widget_t {
-	unsigned short x;
-	unsigned short y;
+	U16 x;
+	U16 y;
 	float pull;
 	bool mix;
 	float warning;			//Warning level in Newtons
-	unsigned char visible;
+	U8 visible;
 };
 
 struct move_widget_t {
-	unsigned short x;
-	unsigned short y;
-	unsigned short  size;
+	U16 x;
+	U16 y;
+	U16  size;
 	float		   max;
 	char		   visible;
 
 };
 
 struct vario_widget_t {
-    unsigned short x;
-    unsigned short y;
-    unsigned short h;
-    unsigned short w;
+    U16 x;
+    U16 y;
+    U16 h;
+    U16 w;
     number_pos num_pos;
     float vario_max;
     bool mix;
-	unsigned char visible;
+	U8 visible;
 };
 
 struct vario_graph_widget_t {
-	unsigned short x;
-	unsigned short y;
-	unsigned short h;
-	unsigned short w;
+	U16 x;
+	U16 y;
+	U16 h;
+	U16 w;
 
 	float vario_max;
 	bool  mix;
-	unsigned char visible;
+	U8 visible;
 };
 
 
 struct home_widget_t {
-    unsigned short x;
-    unsigned short y;
+    U16 x;
+    U16 y;
     float orientation;
     unsigned int home_distance;    
-	unsigned char visible;
+	U8 visible;
 };
 
 struct horizon_t {
-    unsigned short  x;
-    unsigned short  y;
+    U16  x;
+    U16  y;
 
     int pitch;
     int roll;
 
-	unsigned char visible;
+	U8 visible;
 };
 
 struct mode_widget_t {
-    unsigned short mode_x;
-    unsigned short mode_y;
+    U16 mode_x;
+    U16 mode_y;
 	char		   mode_centered;
 	char		   mode_short;
 
-    unsigned short fs_x;
-    unsigned short fs_y;
+    U16 fs_x;
+    U16 fs_y;
 	char		   fs_centered;
 
-	unsigned short arm_x;
-    unsigned short arm_y;
+	U16 arm_x;
+    U16 arm_y;
 	char		   arm_centered;
 
-	unsigned char visible;
+	U8 visible;
 
 };
 
 
 struct compass_widget_t {
-	unsigned short x;
-	unsigned short y;
+	U16 x;
+	U16 y;
 
-	unsigned char visible;
+	U8 visible;
 };
 
 struct message_widget_t {
 
-	unsigned short  x;
-	unsigned short  y;
+	U16  x;
+	U16  y;
 	bool mix;
-	unsigned char visible;
+	U8 visible;
 
 };
 
 struct message_list_widget_t {
-	unsigned short x;
-	unsigned short y;
+	U16 x;
+	U16 y;
 	bool mix;
 	
-	unsigned char visible;
+	U8 visible;
 };
 
 
 struct box_t {
-	unsigned short x;
-	unsigned short y;
-	unsigned short w;
-	unsigned short h;
+	U16 x;
+	U16 y;
+	U16 w;
+	U16 h;
 
-	unsigned char color;
-	unsigned char mix;
+	U8 color;
+	U8 mix;
 
-	unsigned char visible;
+	U8 visible;
 
 };
 
-/*
 
-extern struct alt_widget_t aw;
-extern struct battery_widget_t bw;
-extern struct gps_widget_t gw;
-extern struct bar b;
-extern struct status_widget_t status;
-extern struct vario_widget_t vw;
-extern struct home_widget_t hw;
-extern struct horizon_t hor;
-*/
+struct radar_widget_t {
+	U16 x;
+	U16 y;
+	U16 size;
+	U8  scale;
+	U8 type;
+
+	U8 visible;
+};
+
+
 
 void osd_bar_render(struct bar *b);
 void osd_gps_render(struct gps_widget_t *g);
 
 void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage);
-void osd_batt_cap_render(struct batt_cap_widget_t *bw, unsigned char remaining_capacity);
+void osd_batt_cap_render(struct batt_cap_widget_t *bw, U8 remaining_capacity);
 //void osd_battery_render( struct battery_widget_t *bw);
 void osd_batt_curr_render(struct batt_curr_widget_t *bw, float current);
 void osd_batt_power_render(struct batt_power_widget_t *bw, int power);
@@ -315,8 +314,9 @@ void message_list_render();
 void osd_boxes_render();
 void osd_compass_render(compass_widget_t *c);
 void osd_render_vgraph(vario_graph_widget_t *w);
+void osd_render_radar(radar_widget_t *w);
 
 
-void render();
+//void render();
 
 #endif

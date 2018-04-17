@@ -46,7 +46,7 @@ struct osd_settings {
 
 	vin_params_t vin_params[4];					// Video in
 
-//	unsigned char ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
+//	U8 ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
 
 	bool color_bar_x = false;
 	bool color_bar_y = false;
@@ -96,9 +96,14 @@ struct osd_settings {
 
 	box_t boxes[8];
 
+	radar_widget_t radar1;
+	radar_widget_t radar2;
+	radar_widget_t radar3;
+
+
 	U8 center_cross_visible = 0x01;
 
-	unsigned char ctr_ch[4];
+	U8 ctr_ch[4];
 
 
 

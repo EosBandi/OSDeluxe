@@ -27,11 +27,11 @@
 
 
 
-unsigned char cnt, count, data_buf[20];
+U8 cnt, count, data_buf[20];
 unsigned int ADDR_buf, count_TW2835;
 
-unsigned char OSD256_wr_page;
-unsigned char OSD256_font_color;
+U8 OSD256_wr_page;
+U8 OSD256_font_color;
 
 boundary_t boundary;						//Dynamically defined boundary for restrict drawing
 
@@ -53,7 +53,7 @@ void tw_init()
 	
 
 
-	static unsigned char pg1_a0_video_path[] =
+	static U8 pg1_a0_video_path[] =
 	{
 		0x60,		// a0  bit67-INX - bit54-INY 
 		0x11,		// a1  1 CBVS output for both VAOYX and VAOCX DAV
@@ -72,7 +72,7 @@ void tw_init()
 	tw_write_buf(0x1a0, pg1_a0_video_path, sizeof(pg1_a0_video_path));
 
 	//video decoder settings Same for all channels
-	static unsigned char pg0_00_decoder_settings[] =
+	static U8 pg0_00_decoder_settings[] =
 	{   0x00,		//00	Read only, no need   
 		0x07,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
 		0x02,		//02	Hdelay    //0x0a
@@ -99,7 +99,7 @@ void tw_init()
 
 												//    |       ch1      ||      ch2       ||     ch3        ||     c4
 												//	   0x60  0x61  0x62  0x63  0x64  0x65  0x66  0x67  0x68  0x69  0x6a  0x6b
-	static unsigned char pg1_60_channel_settings[] = { 0xc0, 0x02, 0x00, 0xc1, 0x02, 0x00, 0xc2, 0x02, 0x00, 0xc3, 0x02, 0x00, 0x00,0xe4 };
+	static U8 pg1_60_channel_settings[] = { 0xc0, 0x02, 0x00, 0xc1, 0x02, 0x00, 0xc2, 0x02, 0x00, 0xc3, 0x02, 0x00, 0x00,0xe4 };
 	
 	tw_write_buf(0x160, pg1_60_channel_settings, sizeof(pg1_60_channel_settings));
 
@@ -191,7 +191,7 @@ void tw_init()
 
 
 
-    unsigned char	tbl_pal_pg0_sfr3[] = {		//... 
+    U8	tbl_pal_pg0_sfr3[] = {		//... 
 	//	0x00,0x00,0x00,0x07,		//...		0xc0~0xc3	//... AUTOBGNDxx on
 		0x00,0x00,0x00,0x00,		//...		0xc0~0xc3	//... AUTOBGNDxx off
 		0x00,0xff,0xf0,0xff,		//...		0xc4~0xc7	//... recommend:full table
@@ -201,7 +201,7 @@ void tw_init()
 
 	tw_write_buf(0x0c0, tbl_pal_pg0_sfr3, sizeof(tbl_pal_pg0_sfr3));
 
-unsigned char	tbl_pal_pg0_sfr1[] = {		//... other decoder part
+U8	tbl_pal_pg0_sfr1[] = {		//... other decoder part
 		0x00,0x77,0x07,0x45,		//...		0x40~0x43	//... update:060626
 		0xa0,0xd0,0x0, 0xf0,		//...		0x44~0x47
 		0xf0,0xf0,0xf0,0x02,		//...		0x48~0x4b
@@ -218,10 +218,10 @@ tw_write_register (0x238, 0b00000101);
 
 }
 
-unsigned char tw_read_register (unsigned int rdADDR)
+U8 tw_read_register (unsigned int rdADDR)
 {
-    unsigned char page, reg;
-    unsigned char ret;
+    U8 page, reg;
+    U8 ret;
 
     page = rdADDR >> 8;
     reg = rdADDR & 0x00ff;
@@ -234,9 +234,9 @@ unsigned char tw_read_register (unsigned int rdADDR)
     return (ret);
 }
 
-void tw_write_register (unsigned int wrADDR, unsigned char content)
+void tw_write_register (unsigned int wrADDR, U8 content)
 {
-    unsigned char page, reg;
+    U8 page, reg;
 
     page = wrADDR >> 8;
     reg = wrADDR & 0x00ff;
@@ -247,17 +247,17 @@ void tw_write_register (unsigned int wrADDR, unsigned char content)
     Wire.endTransmission ();
 }
 
-unsigned char tw_read_register_bit(unsigned int rdADDR, unsigned char _flg)
+U8 tw_read_register_bit(unsigned int rdADDR, U8 _flg)
 {
-	unsigned char val;
+	U8 val;
 	
 	val = tw_read_register(rdADDR);
 	return (val & _flg);
 }
 
-void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned char _data)
+void tw_write_register_bit(unsigned int wrADDR, U8 _flg, U8 _data)
 {
-	unsigned char val;
+	U8 val;
 
 	val = tw_read_register(wrADDR);
 	val = (val & ~_flg) | _data;
@@ -266,10 +266,10 @@ void tw_write_register_bit(unsigned int wrADDR, unsigned char _flg, unsigned cha
 }
 
 
-void tw_write_buf (unsigned int wrADDR, unsigned char *wrBUF, unsigned char wrCNT)
+void tw_write_buf (U16 wrADDR, U8 *wrBUF, U8 wrCNT)
 {
 
-    unsigned char i;
+    U8 i;
 
     Wire.beginTransmission (0x42);
     Wire.write (wrADDR >> 8);
@@ -292,7 +292,7 @@ void OSD256_set_display_page(char rd_page)
 }
 
 
-void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H)
+void tw_ch_set_window (U8 _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H)
 {
     unsigned int _ADDR_1, _ADDR_2;
 
@@ -351,12 +351,12 @@ void tw_ch_set_window (unsigned char _ch, unsigned int _pos_H, unsigned int _pos
 
 	}
 
-void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _popup)
+void tw_ch_settings (U8 _ch, U8 _on_off, U8 _popup)
 {
 
     if (_ch < 1 || _ch > 4) return;
 
-    unsigned char value = _ch - 1;
+    U8 value = _ch - 1;
     if (_on_off) value |= 0x80;
     if (_popup) value |= 0x40;
     tw_write_register (0x110 + (_ch - 1) * 0x08, value);
@@ -365,7 +365,7 @@ void tw_ch_settings (unsigned char _ch, unsigned char _on_off, unsigned char _po
 void tw_ch_set_input(char ch, char input)
 {
 
-	unsigned char inp;
+	U8 inp;
 	switch (input)
 	{
 	case 1:
@@ -521,7 +521,7 @@ void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font)
 
 void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color)
 {
-	unsigned char reg40, tmp;
+	U8 reg40, tmp;
 	U8 reg205, reg206, reg207, reg208, reg209, reg20a, reg24e, reg24f;
 	U8 reg241, reg242, reg243;
 
@@ -615,7 +615,7 @@ void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y,
 	U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y)
 {
 
-	unsigned char reg40, tmp;
+	U8 reg40, tmp;
 
 
 	tw_write_register(0x20a, (OSD256_wr_page & 0x7) << 2);					//... y path 0x20, x Path 0x00
@@ -733,10 +733,10 @@ void OSD256_putc( U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font)
 }
 
 
-void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned char color, unsigned char font)
+void OSD256_puts(char *str, U16 posx, U16 posy, U8 color, U8 font)
 {
 
-	unsigned short _posX = posx;
+	U16 _posX = posx;
 
 	for (U8 a = 0; a < strlen(str); a++)
 	{
@@ -754,7 +754,7 @@ void OSD256_puts(char *str, unsigned short posx, unsigned short posy, unsigned c
 	}
 }
 
-void OSD256_printf(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...)
+void OSD256_printf(U16 posx, U16 posy, char color, char font, const char *format, ...)
 {
 	char buf[128];
 	va_list args;
@@ -767,7 +767,7 @@ void OSD256_printf(unsigned short posx, unsigned short posy, char color, char fo
 }
 
 
-void OSD256_printf_slow(unsigned short posx, unsigned short posy, char color, char font, const char *format, ...)
+void OSD256_printf_slow(U16 posx, U16 posy, char color, char font, const char *format, ...)
 {
 	char buf[128];
 	va_list args;
@@ -951,7 +951,7 @@ void OSD256_clear_screen(U8 _pth, U8 page)
 
 void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 {
-	unsigned char tmp;
+	U8 tmp;
 	U16 end_X, end_Y;
 
 	U8 reg205, reg206, reg207, reg208, reg209, reg20a;
@@ -1016,7 +1016,7 @@ void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 
 void OSD256_setpixel_fast(U8 pth, U16 start_X, U16 start_Y)
 {
-//	unsigned char tmp;
+//	U8 tmp;
 	U16 end_X, end_Y;
 
 	U8 reg205, reg206, reg207, reg208, reg209;
@@ -1217,7 +1217,7 @@ void OSD256_set_drawcolor(U8 color)
 	tw_write_register(0x243, color);
 }
 
-void OSD256_box(char _pth, unsigned short x, unsigned short y, unsigned short w, unsigned short h, unsigned char color)
+void OSD256_box(U8 _pth, U16 x, U16 y, U16 w, U16 h, U8 color)
 {
 	OSD256_Block_fill(_pth, DISPLAY, x, y, x + w - 1, y + h - 1, color);
 };

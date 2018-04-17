@@ -25,8 +25,11 @@
 #ifndef OSDELUXE_H
 #define	OSDELUXE_H
 
-#define U8 unsigned char
-#define U16 unsigned int
+
+
+// Common definitions used all over the code
+#define U8  unsigned char 
+#define U16 unsigned short
 
 
 #include <Arduino.h>
@@ -36,6 +39,7 @@
 #include <EEPROM.h>
 #include "i2c_t3.h"
 
+#include "strings.h"
 #include "home_calc.h"
 #include "globals.h"
 #include "utils.h"

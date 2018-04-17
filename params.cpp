@@ -173,6 +173,23 @@ struct param_def parameters[] = {
 	PARAM("MOVE_SIZE", MAV_PARAM_TYPE_UINT16, &osd.move.size, &do_update_pthy),
 	PARAM("MOVE_MAX",  MAV_PARAM_TYPE_REAL32, &osd.move.max, NULL),
 
+	PARAM("RADAR1_POSX", MAV_PARAM_TYPE_UINT16, &osd.radar1.x, &do_update_pthy),
+	PARAM("RADAR1_POSY", MAV_PARAM_TYPE_UINT16, &osd.radar1.y, &do_update_pthy),
+	PARAM("RADAR1_SIZE", MAV_PARAM_TYPE_UINT16, &osd.radar1.size, &do_update_pthy),
+	PARAM("RADAR1_SCALE", MAV_PARAM_TYPE_UINT8, &osd.radar1.scale, &do_update_pthy),
+	PARAM("RADAR1_TYPE", MAV_PARAM_TYPE_UINT8, &osd.radar1.type, &do_update_pthy),
+
+	PARAM("RADAR2_POSX", MAV_PARAM_TYPE_UINT16, &osd.radar2.x, &do_update_pthy),
+	PARAM("RADAR2_POSY", MAV_PARAM_TYPE_UINT16, &osd.radar2.y, &do_update_pthy),
+	PARAM("RADAR2_SIZE", MAV_PARAM_TYPE_UINT16, &osd.radar2.size, &do_update_pthy),
+	PARAM("RADAR2_SCALE", MAV_PARAM_TYPE_UINT8, &osd.radar2.scale, &do_update_pthy),
+	PARAM("RADAR2_TYPE", MAV_PARAM_TYPE_UINT8, &osd.radar2.type, &do_update_pthy),
+
+	PARAM("RADAR3_POSX", MAV_PARAM_TYPE_UINT16, &osd.radar2.x, &do_update_pthy),
+	PARAM("RADAR3_POSY", MAV_PARAM_TYPE_UINT16, &osd.radar2.y, &do_update_pthy),
+	PARAM("RADAR3_SIZE", MAV_PARAM_TYPE_UINT16, &osd.radar2.size, &do_update_pthy),
+	PARAM("RADAR3_SCALE", MAV_PARAM_TYPE_UINT8, &osd.radar2.scale, &do_update_pthy),
+	PARAM("RADAR3_TYPE", MAV_PARAM_TYPE_UINT8, &osd.radar2.type, &do_update_pthy),
 
 	PARAM("CTR_RC_CH_1", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[0], NULL),
 	PARAM("CTR_RC_CH_2", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[1], NULL),
@@ -202,6 +219,9 @@ struct param_def parameters[] = {
 	PARAM("PAGE_THROTTLE", MAV_PARAM_TYPE_UINT8, &osd.thr.visible, NULL),
 	PARAM("PAGE_MOVE", MAV_PARAM_TYPE_UINT8, &osd.move.visible, NULL),
 	PARAM("PAGE_CENTER_M", MAV_PARAM_TYPE_UINT8, &osd.center_cross_visible , &do_update_pthy),
+	PARAM("PAGE_RADAR1", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
+	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
+	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
 
 	PARAM("PAGE_BOX_1", MAV_PARAM_TYPE_INT16, &osd.boxes[0].visible, &do_update_pthy),
 	PARAM("PAGE_BOX_2", MAV_PARAM_TYPE_INT16, &osd.boxes[1].visible, &do_update_pthy),
@@ -614,7 +634,7 @@ float get_parameter_value(int idx, char *name)
 	}
 }
 
-int params_set_value(char *name, float value, unsigned char trigger_cbk)
+int params_set_value(char *name, float value, U8 trigger_cbk)
 {
 	struct param_def *p;
 	int idx;
@@ -633,15 +653,15 @@ int params_set_value(char *name, float value, unsigned char trigger_cbk)
 
 
 
-float cast2float(void *value, unsigned char type)
+float cast2float(void *value, U8 type)
 {
 	switch (type) {
 	case MAV_PARAM_TYPE_UINT8:
-		return (float) *((unsigned char*)(value));
+		return (float) *((U8*)(value));
 	case MAV_PARAM_TYPE_INT8:
 		return (float) *((char*)(value));
 	case MAV_PARAM_TYPE_UINT16:
-		return (float) *((unsigned short*)(value));
+		return (float) *((U16*)(value));
 	case MAV_PARAM_TYPE_INT16:
 		return (float) *((short*)(value));
 	case MAV_PARAM_TYPE_REAL32:
@@ -655,13 +675,13 @@ void cast2param(struct param_def *p, float v)
 {
 	switch (p->type) {
 	case MAV_PARAM_TYPE_UINT8:
-		*((unsigned char*)(p->value)) = (unsigned char)v;
+		*((U8*)(p->value)) = (U8)v;
 		break;
 	case MAV_PARAM_TYPE_INT8:
 		*((char*)(p->value)) = (char)v;
 		break;
 	case MAV_PARAM_TYPE_UINT16:
-		*((unsigned short*)(p->value)) = (unsigned short)v;
+		*((U16*)(p->value)) = (U16)v;
 		break;
 	case MAV_PARAM_TYPE_INT16:
 		*((short*)(p->value)) = (short)v;

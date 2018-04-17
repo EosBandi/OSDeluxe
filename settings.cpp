@@ -294,4 +294,26 @@ void default_settings()
 	osd.move.visible = 0x01;
 
 
+	osd.radar1.x = 10;
+	osd.radar1.y = 10;
+	osd.radar1.size = 100;
+	osd.radar1.scale = 1;
+	osd.radar1.type = 0;
+	osd.radar1.visible = 0x01;
+
+	osd.radar2.x = 210;
+	osd.radar2.y = 138;
+	osd.radar2.size = 300;
+	osd.radar2.scale = 2;
+	osd.radar2.type = 1;
+	osd.radar2.visible = 0x02;
+
+	osd.radar3.x = 100;
+	osd.radar3.y = 100;
+	osd.radar3.size = 100;
+	osd.radar3.scale = 1;
+	osd.radar3.type = 2;
+	osd.radar3.visible = 0x00;
+
+
 }

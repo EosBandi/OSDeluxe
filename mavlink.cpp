@@ -43,7 +43,7 @@ void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
     }
 }
 
-const static unsigned char mavlink_stream_map[] = {
+const static U8 mavlink_stream_map[] = {
     MAV_DATA_STREAM_ALL,
     /* SCALED_IMU2, SCALED_PRESSURE, SENSOR_OFFSETS */
     MAV_DATA_STREAM_RAW_SENSORS,
@@ -65,9 +65,9 @@ const static unsigned char mavlink_stream_map[] = {
 
 struct mavlink_config
 {
-    unsigned char streams[8];
-    unsigned char uav_sysid, osd_sysid;
-    unsigned char heartbeat;
+    U8 streams[8];
+    U8 uav_sysid, osd_sysid;
+    U8 heartbeat;
     uint8_t shell_rate;
 };
 
@@ -112,7 +112,7 @@ int parse_error = 0;
 
 #define MAX_STREAMS 7
 
-bool getBit(unsigned char byte, int position) // position in range 0-7
+bool getBit(U8 byte, int position) // position in range 0-7
 {
     return (byte >> position) & 0x1;
 }
@@ -151,7 +151,7 @@ void heartbeat_validation(void)
 
 void request_mavlink_rates(void)
 {
-    const unsigned char MAVStreams[MAX_STREAMS] = { MAV_DATA_STREAM_RAW_SENSORS, 
+    const U8 MAVStreams[MAX_STREAMS] = { MAV_DATA_STREAM_RAW_SENSORS, 
                                                     MAV_DATA_STREAM_EXTENDED_STATUS,
                                                     MAV_DATA_STREAM_RC_CHANNELS,
                                                     MAV_DATA_STREAM_POSITION,
@@ -445,7 +445,7 @@ void read_mavlink()
 			break;
 			case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 			{
-				unsigned char sys, comp;
+				U8 sys, comp;
 
 				sys = mavlink_msg_param_request_list_get_target_system(&msg);
 				comp = mavlink_msg_param_request_list_get_target_component(&msg);
@@ -460,7 +460,7 @@ void read_mavlink()
 			break;
 			case MAVLINK_MSG_ID_PARAM_SET:
 			{
-				unsigned char sys, comp;
+				U8 sys, comp;
 				mavlink_message_t msg2;
 				unsigned int len;
 				char param_name[17];
@@ -542,7 +542,7 @@ void mavlink_send_msg(mavlink_message_t *msg)
 {
 
     unsigned int len;
-    unsigned char buf[MAVLINK_MAX_PACKET_LEN];
+    U8 buf[MAVLINK_MAX_PACKET_LEN];
 
     len = mavlink_msg_to_send_buffer(buf, msg);
     

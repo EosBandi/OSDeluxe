@@ -134,7 +134,7 @@ void loop ()
 	g.detected_cell_count = 0;					//0 means not detected yet
 
 	//Commented out for quick start, need to run at every powerup
-	init_font_tables();
+	//init_font_tables();
 	init_bitmaps();
 
 	OSD256_clear_screen(PTH_X,0);
@@ -166,10 +166,15 @@ while (1)
 
 
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
-
-	render();
-
+	
 	osd_boxes_render();
+
+
+	if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
+
+	if (osd.radar2.visible & g.visible_osd_page) osd_render_radar(&osd.radar2);
+
+	if (osd.radar3.visible & g.visible_osd_page) osd_render_radar(&osd.radar3);
 
 	if (osd.vgraph.visible & g.visible_osd_page) osd_render_vgraph(&osd.vgraph);
 
@@ -230,7 +235,7 @@ while (1)
         g.ctr_saved_state[0] = g.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
     	g.pip_page = g.ctr_state[0];
 
-		for (unsigned char i = 1; i < 5; i++)
+		for (U8 i = 1; i < 5; i++)
 		{
 			tw_ch_set_input(i, osd.video_channels[g.pip_page][i].input);
 

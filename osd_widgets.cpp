@@ -247,7 +247,7 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
 
 }
 
-void osd_batt_cap_render(struct batt_cap_widget_t *bw, unsigned char remaining_capacity)
+void osd_batt_cap_render(struct batt_cap_widget_t *bw, U8 remaining_capacity)
 {
 
 
@@ -371,7 +371,7 @@ void osd_throttle_render(struct throttle_widget_t *t)
 void osd_vario_render(struct vario_widget_t *vw)
 {
 
-    unsigned char mix;
+    U8 mix;
     float val, f, fh;
 
     val = g.vario;
@@ -632,7 +632,7 @@ void osd_mode_render(struct mode_widget_t *mw)
 	char mode[32];
 
 	unsigned int cust_mode;
-	unsigned char mode_list_size;
+	U8 mode_list_size;
 
 	cust_mode = g.mode;
 
@@ -946,10 +946,10 @@ void osd_compass_render(compass_widget_t *c)
 	const char cardinals[] = { 'N', 'E', 'S', 'W' };
 	int i, j, x;
 
-	unsigned short x_center = 75 + c->x;
-	unsigned short y_center = 25 + c->y;
-	unsigned short range = 150;
-	unsigned short chr_pos;
+	U16 x_center = 75 + c->x;
+	U16 y_center = 25 + c->y;
+	U16 range = 150;
+	U16 chr_pos;
 
 
 
@@ -991,8 +991,8 @@ void osd_compass_render(compass_widget_t *c)
 void osd_render_vgraph(vario_graph_widget_t *w)
 {
 
-	unsigned short y_center;
-	unsigned char mix = 0;
+	U16 y_center;
+	U8 mix = 0;
 	float val;
 
 
@@ -1033,17 +1033,11 @@ void osd_render_vgraph(vario_graph_widget_t *w)
 }
 
 
-#define X_SIZE 250
-#define Y_SIZE 250
-
-#define X_POS 380
-#define Y_POS 100
-
-void render()
+void osd_render_radar(radar_widget_t *w)
 {
 	char buf[10];
 	unsigned long d = (unsigned long)g.home.distance;
-	unsigned int r = (X_SIZE / 2) - 2;
+	unsigned int r = (w->size / 2) - 2;
 	int x, y;
 	int min_increment;
 	long i, scale;
@@ -1057,70 +1051,66 @@ void render()
 	uav.len = 4;
 	uav.points = uav_points;
 
-
 	struct polygon *p;
 
-	x = (X_SIZE / 2) - 1;
-	y = (Y_SIZE / 2) - 1;
+
+	x = (w->size / 2) - 1;
+	y = (w->size / 2) - 1;
 
 
 	if (g.pthy_redraw)
 	{
 		
-		OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + X_POS, 0 + Y_POS, x + X_POS, r * 2 + Y_POS);
-		OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, 0 + X_POS, y + Y_POS, r * 2 + X_POS, y + Y_POS);
-		OSD256_Circle(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + X_POS, y + Y_POS, r);
-		OSD256_Circle(PTH_Y, COLOR_REC_25_WHITE | REC_MIX, x + X_POS, y + Y_POS, r+2);
+		OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + w->x, 0 + w->y, x + w->x, r * 2 + w->y);
+		OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, 0 + w->x, y + w->y, r * 2 + w->x, y + w->y);
+		OSD256_Circle(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + w->x, y + w->y, r);
+		OSD256_Circle(PTH_Y, COLOR_REC_25_WHITE | REC_MIX, x + w->x, y + w->y, r+2);
 	}
 
 	/* auto scale */
 	min_increment = 250;
 	scale = ((d / min_increment) + 1) * min_increment;
-	OSD256_printf(X_POS, Y_POS, OSD256_FONT_WHITE, 1, "%um", (unsigned int)scale);
+	OSD256_printf(w->x, w->y, OSD256_FONT_WHITE, 1, "%um", (unsigned int)scale);
 
 	i = (long)d * r;
 	i /= scale;
 
-
-	/* radar fixed at uav heading, home moves */
-	//x += sin(DEG2RAD(g.home.direction)) * i;
-	//y -= cos(DEG2RAD(g.home.direction)) * i;
-	//scale_polygon(&ils, 2);
-	//transform_polygon(&ils, x, y, g.launch_heading - g.heading - 180);
-	//p = &ils;
-
-
-
-	/* radar always facing north, uav moves */
-//	x += sin(DEG2RAD(g.home.uav_bearing)) * i;
-//	y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
-//	transform_polygon(&uav, x, y, g.heading);
-//	p = &uav;
-
-	/* radar always facing launch direction, uav moves */
-//	x += sin(DEG2RAD(g.home.uav_bearing - g.launch_heading)) * i;
-//	y -= cos(DEG2RAD(g.home.uav_bearing - g.launch_heading)) * i;
-//	transform_polygon(&uav, x, y, g.heading - g.launch_heading);
-//	p = &uav;
-		
-	//		/* testing waypoints */
-	//		/* radar always facing north, uav moves with waypoints */
-	if (g.wp_seq > 0) {
-		long i_wp = (long)g.wp_distance * r;
-		i_wp /= scale;
-		int x_wp = x, y_wp = y;
-		x_wp += sin(DEG2RAD(g.wp_target_bearing - g.heading)) * i_wp;
-		y_wp -= cos(DEG2RAD(g.wp_target_bearing - g.heading)) * i_wp;
-		OSD256_printf(x_wp + X_POS-6, y_wp+Y_POS-10, OSD256_FONT_WHITE, 1, "%d", g.wp_seq);
+	switch (w->type)
+	{
+	case 0:
+		/* radar fixed at uav heading, home moves */
+		x += sin(DEG2RAD(g.home.direction)) * i;
+		y -= cos(DEG2RAD(g.home.direction)) * i;
+		scale_polygon(&ils, w->scale);
+		transform_polygon(&ils, x, y, g.launch_heading - g.heading - 180);
+		p = &ils;
+		break;
+	case 1:
+		/* radar always facing north, uav moves */
+		x += sin(DEG2RAD(g.home.uav_bearing)) * i;
+		y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
+		scale_polygon(&uav, w->scale);
+		transform_polygon(&uav, x, y, g.heading);
+		p = &uav;
+		break;
+	case 2:
+		//		/* radar always facing north, uav moves with waypoints */
+		if (g.wp_seq > 0) {
+			long i_wp = (long)g.wp_distance * r;
+			i_wp /= scale;
+			int x_wp = x, y_wp = y;
+			x_wp += sin(DEG2RAD(g.wp_target_bearing - g.heading)) * i_wp;
+			y_wp -= cos(DEG2RAD(g.wp_target_bearing - g.heading)) * i_wp;
+			OSD256_printf(x_wp + w->x - 6, y_wp + w->y - 10, OSD256_FONT_WHITE, 1, "%d", g.wp_seq);
+		}
+		x += sin(DEG2RAD(g.home.uav_bearing)) * i;
+		y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
+		scale_polygon(&uav, w->scale);
+		transform_polygon(&uav, x, y, g.heading);
+		p = &uav;
+		break;
 	}
-	x += sin(DEG2RAD(g.home.uav_bearing)) * i;
-	y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
-	transform_polygon(&uav, x, y, g.heading);
-	p = &uav;
-
-			
-			
-	move_polygon(p, X_POS, Y_POS);
+	move_polygon(p, w->x, w->y);
 	move_polygon(p, -1, -1);
 	draw_polygon(p, COLOR_BLACK);
 	move_polygon(p, 1, 1);
