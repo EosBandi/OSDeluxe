@@ -26,15 +26,16 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
-#define EEPROM_VERSION 0x02
+#define EEPROM_VERSION 0x03
 
 
 
 #define MESSAGE_BUFFER_LINES 20
+#define NO_HEADING 0xfff
 
 
 
-struct globals_variables_t {
+struct global_variables_t {
 
 	//Global variables
 	unsigned char mav_type;             //MAV type from mavlink heartbeat;
@@ -45,6 +46,9 @@ struct globals_variables_t {
 	int           throttle;
 	bool          arming_status;
 	home_data_t   home;
+	int			  launch_heading;
+
+
 
 	unsigned int  mode;
 
@@ -119,11 +123,13 @@ struct globals_variables_t {
 
 	bool pthy_redraw;					//indicated that we need to redraw osd contect on y path.
 
+	bool powerup;						//Are we resetting or powering up from zero.
+	U8 detected_cell_count;
 
 };
 
 
-extern globals_variables_t g;
+extern global_variables_t g;
 
 
 #endif

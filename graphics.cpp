@@ -63,6 +63,23 @@ void move_polygon(struct polygon *p, int x, int y)
     }
 }
 
+
+void scale_polygon(struct polygon *p, float scale)
+{
+
+	struct point *pt = p->points;
+	unsigned char i;
+
+	for (i = 0; i < p->len; i++) {
+		pt->x = pt->x * scale;
+		pt->y = pt->y * scale;
+		pt++;
+	}
+
+}
+
+
+
 void draw_polygon(struct polygon *p, char color)
 {
    unsigned char i;

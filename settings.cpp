@@ -147,7 +147,7 @@ void default_settings()
 	osd.batt1_v.yellow_cell_voltage = 3.8;
 	osd.batt1_v.bar_type = BAR_SINGLE_COLOR;
 	osd.batt1_v.mix = 0;
-	osd.batt1_v.cells = 12;
+	osd.batt1_v.cells = 0;
 	osd.batt1_v.box = true;
 	osd.batt1_v.visible = 0x01;
 

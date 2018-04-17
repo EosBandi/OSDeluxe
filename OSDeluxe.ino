@@ -31,7 +31,7 @@
 #define TW_RESET_PIN 14
 #define LED_PIN 13
 
-globals_variables_t g;
+global_variables_t g;
 
 
 void setup ()
@@ -121,6 +121,18 @@ void loop ()
 	OSD256_wr_page = 0;
 
 
+	g.arming_status = false;
+	g.displayed_arming_status = true;
+	g.armed_start_time = 0;
+	g.last_capacity_query = 0;
+	g.debug_looptime = 0;
+	memset(&g.vario_graph, 0, sizeof(g.vario_graph));
+	g.vgraph_idx = 0;
+	boundary = { 0,0,SCR_X_SIZE, SCR_Y_SIZE };
+	g.pthy_redraw = true;
+	g.launch_heading = NO_HEADING;
+	g.detected_cell_count = 0;					//0 means not detected yet
+
 	//Commented out for quick start, need to run at every powerup
 	//init_font_tables();
 	init_bitmaps();
@@ -140,20 +152,8 @@ void loop ()
 
 	OSD256_set_display_page(0);
 	
+
 	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 575);
-	//while (1);
-
-
-	g.arming_status = false;
-	g.displayed_arming_status = true;
-	g.armed_start_time = 0;
-	g.last_capacity_query = 0;
-	g.debug_looptime = 0;
-	memset(&g.vario_graph, 0, sizeof(g.vario_graph));
-	g.vgraph_idx = 0;
-
-	g.pthy_redraw = true;
-
 	
 
 //Main loop
@@ -164,7 +164,10 @@ while (1)
 
 	read_mavlink();
 
+
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
+
+	render();
 
 	osd_boxes_render();
 
@@ -271,6 +274,7 @@ while (1)
 
 
     if (millis() > (g.home.last_calc+HOME_CALC_INTERVAL)) calc_home();
+	find_launch_heading();
     if ( (osd.batt1_cap.max_capacity == 0) && (millis() > (g.last_capacity_query+5000)) ) request_mavlink_battery_capacity();
 
 	/*
@@ -323,7 +327,7 @@ while (1)
 	}
 
 	if (g.debug_looptime) debug("Looptime : %lu\n", millis() - now);
-	debug("Loop time: %lu\n", millis() - now);
+	//debug("Loop time: %lu\n", millis() - now);
 	//debug("Bytes waiting: %u\n", Serial1.available());
 
 

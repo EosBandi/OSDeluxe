@@ -316,4 +316,7 @@ void osd_boxes_render();
 void osd_compass_render(compass_widget_t *c);
 void osd_render_vgraph(vario_graph_widget_t *w);
 
+
+void render();
+
 #endif

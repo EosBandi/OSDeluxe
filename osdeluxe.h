@@ -48,7 +48,7 @@
 #include "settings.h"
 #include "mavlink.h"
 #include "params.h"
-
+#include "helpers.h"
 
 
 #endif

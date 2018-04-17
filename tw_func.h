@@ -128,10 +128,15 @@ struct vin_params_t
 	char peaking;
 };
 
+struct boundary_t {
+	unsigned short x0;
+	unsigned short y0;
+	unsigned short x1;
+	unsigned short y1;
+};
 
 
-
-
+extern boundary_t boundary;
 
 extern unsigned char cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;

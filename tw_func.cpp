@@ -33,6 +33,7 @@ unsigned int ADDR_buf, count_TW2835;
 unsigned char OSD256_wr_page;
 unsigned char OSD256_font_color;
 
+boundary_t boundary;						//Dynamically defined boundary for restrict drawing
 
 
 void tw_init()
@@ -1020,6 +1021,9 @@ void OSD256_setpixel_fast(U8 pth, U16 start_X, U16 start_Y)
 
 	U8 reg205, reg206, reg207, reg208, reg209;
 	U8 reg24e;
+
+	if (start_X < boundary.x0 || start_X > boundary.x1) return;
+	if (start_Y < boundary.y0 || start_Y > boundary.y1) return;
 
 	if (pth == PTH_Y) {
 		start_X >>= 1;

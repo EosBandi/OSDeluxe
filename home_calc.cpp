@@ -89,3 +89,19 @@ float get_bearing(struct gps_coord_t *c1, struct gps_coord_t *c2)
     float x = cos(c1->lat)*sin(c2->lat) - sin(c1->lat)*cos(c2->lat)*cos(c2->lon - c1->lon);
     return RAD2DEG(atan2(y, x));
 }
+
+
+void find_launch_heading()
+{
+	if (g.home.lock != HOME_LOCKED)
+		return;
+
+	if (g.launch_heading != NO_HEADING)
+		return;
+
+	if ((g.throttle > 10) &&
+		(g.airspeed > 5) &&
+		(g.altitude > 5))
+		g.launch_heading = g.heading;
+
+}

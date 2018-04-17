@@ -76,7 +76,7 @@ float get_bearing(struct gps_coord_t *c1, struct gps_coord_t *c2);
 
 void init_home(void);
 void calc_home(void);
-
+void find_launch_heading();
 
 
 #endif

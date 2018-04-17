@@ -205,17 +205,39 @@ void osd_gps_render(struct gps_widget_t *g)
 
 void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
 {
+	U8 cells = 0;
+
+	//Autodetect cell count if necessary
+	if (bw->cells == 0)						//cells = 0 means autodetect
+	{ 
+		if (g.detected_cell_count == 0)		// 0 detected cells means autodetect not yet run
+		{
+			if (voltage != 0)				// We have some voltage to quess on
+			{
+				cells = voltage / 4;
+				if (cells > 12) cells = 12; //Quick fix for 12S systems
+				g.detected_cell_count = cells;
+				char str[32];
+				sprintf(str, "Battery detected as %uS", cells);
+				message_buffer_add_line(str, 4);
+			}
+		}
+		else cells = g.detected_cell_count;
+	}
+	else cells = bw->cells;
+	
+
 
 	bw->volt.x = bw->x;
 	bw->volt.y = bw->y;
 	bw->volt.w = 96;
 	bw->volt.h = 20;
 
-	bw->volt.max = bw->max_cell_voltage * bw->cells;
-	bw->volt.min = bw->min_cell_voltage * bw->cells;
+	bw->volt.max = bw->max_cell_voltage * cells;
+	bw->volt.min = bw->min_cell_voltage * cells;
 	bw->volt.val = voltage;
-	bw->volt.warn_red = bw->red_cell_voltage * bw->cells;
-	bw->volt.warn_yellow = bw->yellow_cell_voltage * bw->cells;
+	bw->volt.warn_red = bw->red_cell_voltage * cells;
+	bw->volt.warn_yellow = bw->yellow_cell_voltage * cells;
 	bw->volt.mix = bw->mix;
 	bw->volt.bar_type = bw->bar_type;
 	bw->volt.format = sVoltFormat;
@@ -453,6 +475,8 @@ void render_horizon(struct horizon_t *h)
 	cos_roll = cos(DEG2RAD(h->roll));
 	sin_roll = -1 * sin(DEG2RAD(h->roll));
 
+	boundary = { h->x - WIDTH / 2, h->y - HEIGHT / 2, h->x + WIDTH / 2, h->y + HEIGHT / 2 };
+
 
 	if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
 	{
@@ -495,8 +519,7 @@ void render_horizon(struct horizon_t *h)
 	OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
 	OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
 
-
-
+	boundary = { 0,0,SCR_X_SIZE, SCR_Y_SIZE };
 
 
 }
@@ -1005,4 +1028,102 @@ void osd_render_vgraph(vario_graph_widget_t *w)
 
 
 
+}
+
+
+#define X_SIZE 250
+#define Y_SIZE 250
+
+#define X_POS 380
+#define Y_POS 100
+
+void render()
+{
+	char buf[10];
+	unsigned long d = (unsigned long)g.home.distance;
+	unsigned int r = (X_SIZE / 2) - 2;
+	int x, y;
+	int min_increment;
+	long i, scale;
+	struct point ils_points[5] = { { -4, -6 },{ -4, 6 },{ 0, 10 },{ 4, 6 },{ 4, -6 } };
+	struct polygon ils;
+	ils.len = 5;
+	ils.points = ils_points;
+	struct point uav_points[4] = { { 0, 0 },{ 6, 8 },{ 0, -8 },{ -6, 8 } };
+
+	struct polygon uav;
+	uav.len = 4;
+	uav.points = uav_points;
+
+
+	struct polygon *p;
+
+	x = (X_SIZE / 2) - 1;
+	y = (Y_SIZE / 2) - 1;
+
+
+	if (g.pthy_redraw)
+	{
+		
+		OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + X_POS, 0 + Y_POS, x + X_POS, r * 2 + Y_POS);
+		OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, 0 + X_POS, y + Y_POS, r * 2 + X_POS, y + Y_POS);
+		OSD256_Circle(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + X_POS, y + Y_POS, r);
+		OSD256_Circle(PTH_Y, COLOR_REC_25_WHITE | REC_MIX, x + X_POS, y + Y_POS, r+2);
+	}
+
+	/* auto scale */
+	min_increment = 250;
+	scale = ((d / min_increment) + 1) * min_increment;
+	OSD256_printf(X_POS, Y_POS, OSD256_FONT_WHITE, 1, "%um", (unsigned int)scale);
+
+	i = (long)d * r;
+	i /= scale;
+
+
+	/* radar fixed at uav heading, home moves */
+	x += sin(DEG2RAD(g.home.direction)) * i;
+	y -= cos(DEG2RAD(g.home.direction)) * i;
+	scale_polygon(&ils, 2);
+	transform_polygon(&ils, x, y, g.launch_heading - g.heading - 180);
+	p = &ils;
+
+
+
+	/* radar always facing north, uav moves */
+//	x += sin(DEG2RAD(g.home.uav_bearing)) * i;
+//	y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
+//	transform_polygon(&uav, x, y, g.heading);
+//	p = &uav;
+
+	/* radar always facing launch direction, uav moves */
+//	x += sin(DEG2RAD(g.home.uav_bearing - g.launch_heading)) * i;
+//	y -= cos(DEG2RAD(g.home.uav_bearing - g.launch_heading)) * i;
+//	transform_polygon(&uav, x, y, g.heading - g.launch_heading);
+//	p = &uav;
+		
+		//		break;
+	//	case 3:
+	//		/* testing waypoints */
+	//		/* radar always facing north, uav moves with waypoints */
+	//		if (priv->wp_seq > 0) {
+	//			long i_wp = (long)priv->wp_distance * r;
+	//			i_wp /= scale;
+	//			int x_wp = x, y_wp = y;
+	//			x_wp += sin(DEG2RAD(priv->wp_target_bearing - priv->heading)) * i_wp;
+	//			y_wp -= cos(DEG2RAD(priv->wp_target_bearing - priv->heading)) * i_wp;
+	//			sprintf(buf, "%d", priv->wp_seq);
+	//			draw_str(buf, x_wp, y_wp, ca, 0);
+	//		}
+	//		x += sin(DEG2RAD(priv->home->uav_bearing)) * i;
+	//		y -= cos(DEG2RAD(priv->home->uav_bearing)) * i;
+	//		transform_polygon(&uav, x, y, priv->heading);
+	//		p = &uav;
+	//		break;
+	//	}
+	//*/
+	move_polygon(p, X_POS, Y_POS);
+	move_polygon(p, -1, -1);
+	draw_polygon(p, COLOR_BLACK);
+	move_polygon(p, 1, 1);
+	draw_polygon(p, COLOR_WHITE);
 }

@@ -478,7 +478,7 @@ void do_settings_save()
 void update_test_byte()
 {
 
-	tw_write_register(0x242, g.test_byte);
+	tw_write_register(0x246, g.test_byte);
 
 }
 
