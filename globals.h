@@ -73,6 +73,12 @@ struct global_variables_t {
 	float		  cos_yaw, sin_yaw;		// Precalculated yaw sin/cos values
 
 
+	unsigned short wp_seq;
+	unsigned short wp_distance;
+	short wp_target_bearing;
+	
+
+
 	int           b1_power;				//Battery 1 Power (Watts)
 	float         b1_current;           
 	float         b1_voltage;

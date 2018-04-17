@@ -489,6 +489,15 @@ void read_mavlink()
 				mavlink_send_msg(&msg2);
 
 			}
+			break;
+			case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
+				g.wp_distance = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
+				g.wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
+				break;
+			case MAVLINK_MSG_ID_MISSION_CURRENT:
+				g.wp_seq = mavlink_msg_mission_current_get_seq(&msg);
+				break;
+			
 
 
 

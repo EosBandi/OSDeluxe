@@ -134,7 +134,7 @@ void loop ()
 	g.detected_cell_count = 0;					//0 means not detected yet
 
 	//Commented out for quick start, need to run at every powerup
-	//init_font_tables();
+	init_font_tables();
 	init_bitmaps();
 
 	OSD256_clear_screen(PTH_X,0);

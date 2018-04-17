@@ -55,7 +55,7 @@ const char* flight_modes_copter_long[] = {
 
 const char* flight_modes_copter_short[] = {
 	"STAB" ,			//STABILIZE = 0,  // manual airframe angle with manual throttle
-	"AVRO" ,				//ACRO = 1,  // manual body-frame angular rate with manual throttle
+	"ACRO" ,				//ACRO = 1,  // manual body-frame angular rate with manual throttle
 	"AltHLD" ,		//ALT_HOLD = 2,  // manual airframe angle with automatic throttle
 	"AUTO" ,				//AUTO = 3,  // fully automatic waypoint control using mission commands
 	"GUIDED" ,				//GUIDED = 4,  // fully automatic fly to coordinate or fly at velocity/direction using GCS immediate commands
@@ -629,7 +629,7 @@ void render_horizona(struct horizon_t *h)
 void osd_mode_render(struct mode_widget_t *mw)
 {
 
-	char mode[20];
+	char mode[32];
 
 	unsigned int cust_mode;
 	unsigned char mode_list_size;
@@ -670,8 +670,10 @@ void osd_mode_render(struct mode_widget_t *mw)
 		strcpy(mode, "unknown");
 
 	}
-
-
+	if (g.mode == 3 && g.wp_seq > 0)
+	{
+		sprintf(mode, "%s %u>%u", mode, g.wp_distance, g.wp_seq);
+	}
 
 
 
@@ -1081,11 +1083,11 @@ void render()
 
 
 	/* radar fixed at uav heading, home moves */
-	x += sin(DEG2RAD(g.home.direction)) * i;
-	y -= cos(DEG2RAD(g.home.direction)) * i;
-	scale_polygon(&ils, 2);
-	transform_polygon(&ils, x, y, g.launch_heading - g.heading - 180);
-	p = &ils;
+	//x += sin(DEG2RAD(g.home.direction)) * i;
+	//y -= cos(DEG2RAD(g.home.direction)) * i;
+	//scale_polygon(&ils, 2);
+	//transform_polygon(&ils, x, y, g.launch_heading - g.heading - 180);
+	//p = &ils;
 
 
 
@@ -1101,26 +1103,23 @@ void render()
 //	transform_polygon(&uav, x, y, g.heading - g.launch_heading);
 //	p = &uav;
 		
-		//		break;
-	//	case 3:
 	//		/* testing waypoints */
 	//		/* radar always facing north, uav moves with waypoints */
-	//		if (priv->wp_seq > 0) {
-	//			long i_wp = (long)priv->wp_distance * r;
-	//			i_wp /= scale;
-	//			int x_wp = x, y_wp = y;
-	//			x_wp += sin(DEG2RAD(priv->wp_target_bearing - priv->heading)) * i_wp;
-	//			y_wp -= cos(DEG2RAD(priv->wp_target_bearing - priv->heading)) * i_wp;
-	//			sprintf(buf, "%d", priv->wp_seq);
-	//			draw_str(buf, x_wp, y_wp, ca, 0);
-	//		}
-	//		x += sin(DEG2RAD(priv->home->uav_bearing)) * i;
-	//		y -= cos(DEG2RAD(priv->home->uav_bearing)) * i;
-	//		transform_polygon(&uav, x, y, priv->heading);
-	//		p = &uav;
-	//		break;
-	//	}
-	//*/
+	if (g.wp_seq > 0) {
+		long i_wp = (long)g.wp_distance * r;
+		i_wp /= scale;
+		int x_wp = x, y_wp = y;
+		x_wp += sin(DEG2RAD(g.wp_target_bearing - g.heading)) * i_wp;
+		y_wp -= cos(DEG2RAD(g.wp_target_bearing - g.heading)) * i_wp;
+		OSD256_printf(x_wp + X_POS-6, y_wp+Y_POS-10, OSD256_FONT_WHITE, 1, "%d", g.wp_seq);
+	}
+	x += sin(DEG2RAD(g.home.uav_bearing)) * i;
+	y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
+	transform_polygon(&uav, x, y, g.heading);
+	p = &uav;
+
+			
+			
 	move_polygon(p, X_POS, Y_POS);
 	move_polygon(p, -1, -1);
 	draw_polygon(p, COLOR_BLACK);
