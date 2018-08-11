@@ -12,14 +12,15 @@ struct bitmap_t bitmaps[] = {
 	{ 897, 60,32,20, COLOR_DARK_YELLOW, ekf_state },			// 7 BMP_EKF_STATE_YELLOW
 	{ 897, 80,32,20, COLOR_RED | BLINK, ekf_state },			// 8 BMP_EKF_STATE_RED
 	{ 897, 100,32,20, COLOR_25_WHITE, ekf_state },				// 9 BMP_EKF_STATE_GRAY
-	{ 929, 40,32,20, COLOR_GREEN, vibe_state },				// 10 BMP_VIB_STATE_GREEN
+	{ 929, 40,32,20, COLOR_GREEN, vibe_state },				    // 10 BMP_VIB_STATE_GREEN
 	{ 929, 60,32,20, COLOR_DARK_YELLOW, vibe_state },			// 11 BMP_VIB_STATE_YELLOW
 	{ 929, 80,32,20, COLOR_RED | BLINK, vibe_state },			// 12 BMP_VIB_STATE_RED
 	{ 929, 100,32,20, COLOR_25_WHITE, vibe_state },				// 13 BMP_VIB_STATE_GRAY
 	{ 0,  300,16,15,    COLOR_WHITE, small_ball },				// 14 BMP_BALL_WHITE
 	{ 16, 300,16,15,    COLOR_GREEN, small_ball },				// 15 BMP_BALL_GREEN
 	{ 32, 300,16,15,    COLOR_RED, small_ball },				// 16 BMP_BALL_RED
-	{ 48, 300,16,15,    COLOR_BLUE, small_ball }				// 17 BMP_BALL_BLUE
+	{ 48, 300,16,15,    COLOR_BLUE, small_ball },				// 17 BMP_BALL_BLUE
+    { 945, 0, 40, 40, COLOR_ORANGE, gps_icon }					// 18 BMP_GPS_ICON_YELLOW
 };
 
 
@@ -75,10 +76,12 @@ void init_font_tables()
 	CreateScrathFntTab(SCRATCH, COLOR_YELLOW, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 180, 609, 239);
 
-	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 7/8...");
 
+	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 7/8...");
 	CreateScrathFntTab(SCRATCH, COLOR_GREEN, 0, 0);
 	OSD256_Block_Transfer(SCRATCH, SCRATCH, 0, 0, 0, 240, 609, 299);
+
+
 
 	//This must be the last one
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 8/8...");

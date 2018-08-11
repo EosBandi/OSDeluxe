@@ -221,8 +221,12 @@ void read_mavlink()
 
                 if (getBit(g.base_mode, 7))
                     g.arming_status = true;
-                else
-                    g.arming_status = false;
+				else
+				{
+					g.arming_status = false;
+					init_home();
+					g.launch_heading = NO_HEADING;
+				}
 
                 if (waitingMAVBeats == 1)
                 {
@@ -249,7 +253,7 @@ void read_mavlink()
                 g.groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
                 g.heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
                 g.throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
-                g.altitude = mavlink_msg_vfr_hud_get_alt(&msg);
+                //g.altitude = mavlink_msg_vfr_hud_get_alt(&msg);
                 g.vario = mavlink_msg_vfr_hud_get_climb(&msg);
 
             }
@@ -331,11 +335,8 @@ void read_mavlink()
                 osd.gps.sat = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
                 osd.gps.fix = mavlink_msg_gps_raw_int_get_fix_type(&msg);
 
-				//osd.gps.hdop = 1.2;
-				//osd.gps.sat = 8;
-				//osd.gps.fix = GPS_FIX_TYPE_3D_FIX;
-
                 osd.stat.gps_status = STATUS_OK;
+
                 if (osd.gps.fix < GPS_FIX_TYPE_3D_FIX)
                 {
                     osd.stat.gps_status = STATUS_CRITICAL;
@@ -388,6 +389,7 @@ void read_mavlink()
 
 				g.vx = (float)mavlink_msg_global_position_int_get_vx(&msg) / 100.0f;
 				g.vy = (float)mavlink_msg_global_position_int_get_vy(&msg) / 100.0f;
+                g.altitude = mavlink_msg_global_position_int_get_relative_alt(&msg) /1000;
 
 
                 // Do home widget calculation

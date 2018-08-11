@@ -48,7 +48,7 @@ void setup ()
 
     // Setup for Master mode, pins 18/19, external pullups, 400kHz, 10ms default timeout
     Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 4000000, I2C_OP_MODE_IMM);
-    Wire.setDefaultTimeout (10000); // 10ms
+    Wire.setDefaultTimeout (1000); // 10ms
 
 
 	//Open USB serial port for debug and UI
@@ -134,6 +134,7 @@ void loop ()
 	g.detected_cell_count = 0;					//0 means not detected yet
 
 	//Commented out for quick start, need to run at every powerup
+	
 	//init_font_tables();
 	init_bitmaps();
 
@@ -152,11 +153,17 @@ void loop ()
 
 	OSD256_set_display_page(0);
 	
+	g.launch_heading = 2;
 
-	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 575);
-	
+	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 304, 0, 0, 0, 719, 431);
+	g.visible_osd_page = 0x01;
 
-//Main loop
+
+	default_settings();
+	 osd.mode.visible = 0x01;
+
+
+         //Main loop
 while (1)
 {
 	now = millis();
@@ -168,7 +175,13 @@ while (1)
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
 	
 	osd_boxes_render();
+    
+	now = millis();
+	//render(r);
+    //r = r - 5;
+    //if (r < 50) r = 200;
 
+	//debug("%u\n", millis() - now);
 
 	if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
 
@@ -219,6 +232,8 @@ while (1)
 	if (osd.gs.visible & g.visible_osd_page) osd_groundspeed_render(&osd.gs);
 
 	if (osd.thr.visible & g.visible_osd_page) osd_throttle_render(&osd.thr);
+
+	if (osd.msg_list_widget.visible & g.visible_osd_page) message_list_render();
 
 	//Switch working page for smooth redraw
 	OSD256_set_display_page(OSD256_wr_page);
@@ -332,7 +347,7 @@ while (1)
 	}
 
 	if (g.debug_looptime) debug("Looptime : %lu\n", millis() - now);
-	//debug("Loop time: %lu\n", millis() - now);
+	debug("Loop time: %lu\n", millis() - now);
 	//debug("Bytes waiting: %u\n", Serial1.available());
 
 

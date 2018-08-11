@@ -4,6 +4,7 @@
 
 
 
+int wrap360(int x);
 
 
 

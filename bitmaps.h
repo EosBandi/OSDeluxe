@@ -33,6 +33,7 @@ enum bitmap_names_t {
 	BMP_BALL_GREEN,
 	BMP_BALL_RED,
 	BMP_BALL_BLUE,
+	BMP_GPS_ICON_ORANGE,
 };
 
 

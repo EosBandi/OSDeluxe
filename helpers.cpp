@@ -25,9 +25,8 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #include "osdeluxe.h"
 
 
-void detect_battery_cells()
-{
-
-
-
+int wrap360(int x) {
+	if (x >= 360) x = x % 360;
+	if (x < 0) x = x + 360;
+	return x;
 }

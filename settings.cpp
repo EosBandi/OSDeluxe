@@ -132,11 +132,14 @@ void default_settings()
 
 	osd.gps.x = 10;
     osd.gps.y = 460;
-    osd.gps.sat_warn = 5;
+    osd.gps.sat_warn = 6;
     osd.gps.color = COLOR_YELLOW;
     osd.gps.sat = 0;
     osd.gps.hdop = 999;
-	osd.gps.visible = 0x00;
+	osd.gps.visible = 0x01;
+    osd.gps.hdop_warn = 1.4f;
+    osd.gps.hdop_critical = 2.0f;
+    osd.gps.sat_critical = 5;
     
 
 	osd.batt1_v.x = 600;
@@ -284,7 +287,7 @@ void default_settings()
 
 	osd.msg_list_widget.x = 4;
 	osd.msg_list_widget.y = 20;
-	osd.msg_list_widget.visible = 0x01;
+	osd.msg_list_widget.visible = 0x04;
 
 
 	osd.move.x = 7;

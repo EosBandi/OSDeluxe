@@ -274,11 +274,16 @@ void tw_write_buf (U16 wrADDR, U8 *wrBUF, U8 wrCNT)
     Wire.beginTransmission (0x42);
     Wire.write (wrADDR >> 8);
     Wire.write (wrADDR & 0x00FF);
-    for (i = 0; i < wrCNT; i++)
+
+	//Wire.write(wrBUF, wrCNT);
+    
+	for (i = 0; i < wrCNT; i++)
     {
         Wire.write (wrBUF[i]);
     }
-    Wire.endTransmission ();
+	
+	
+	Wire.endTransmission ();
 }
 
 void OSD256_set_display_page(char rd_page)

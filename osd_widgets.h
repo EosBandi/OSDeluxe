@@ -317,6 +317,6 @@ void osd_render_vgraph(vario_graph_widget_t *w);
 void osd_render_radar(radar_widget_t *w);
 
 
-//void render();
+void render(unsigned int r);
 
 #endif

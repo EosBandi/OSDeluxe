@@ -99,9 +99,65 @@ void find_launch_heading()
 	if (g.launch_heading != NO_HEADING)
 		return;
 
-	if ((g.throttle > 10) &&
-		(g.airspeed > 5) &&
-		(g.altitude > 5))
+	if ((g.throttle > 10) && (g.airspeed > 5) && (g.altitude > 5))
+	{
 		g.launch_heading = g.heading;
+		message_buffer_add_line("Launch direction recorded", 4);
+
+	}
+
+
+}
+
+
+void render(unsigned int r)
+{
+#define SIZE		400
+#define CENTER_X	360
+#define CENTER_Y	288
+
+#define MAX_DISTANCE 15
+
+
+	struct sector_t
+	{
+		int start;
+		int end;
+
+	};
+
+	sector_t sectors[] = {
+	
+	{-112,   -68},
+	{-67,   -23},
+	{-22,    22},
+	{23,    67},
+	{68,   112},
+	{113,  157},
+	{-202, -158},
+	{-157, -113}
+	};
+
+
+
+	if (g.pthy_redraw)
+	{
+
+		OSD256_Circle(PTH_Y, COLOR_REC_50_WHITE | REC_MIX, CENTER_X, CENTER_Y, SIZE / 2);
+		OSD256_Circle(PTH_Y, COLOR_REC_50_WHITE | REC_MIX , CENTER_X, CENTER_Y, SIZE / 3);
+		OSD256_Circle(PTH_Y, COLOR_REC_50_WHITE | REC_MIX, CENTER_X, CENTER_Y, SIZE / 4);
+
+	}
+
+
+	int start_angle = -112, end_angle = -68;
+    //r = SIZE / 2;
+
+	for (int i = sectors[0].start; i < sectors[7].end ; i = i + (1000/r)) 
+	{
+		//OSD256_printf(CENTER_X-8 + cos(DEG2RAD(i)) * r, CENTER_Y-10 + sin(DEG2RAD(i)) * r,OSD256_FONT_RED,0,"X"); 
+		OSD256_display_bitmap(BMP_BALL_BLUE, CENTER_X - 8 + cos(DEG2RAD(i)) * r, CENTER_Y - 10 + sin(DEG2RAD(i)) * r);
+	}
+
 
 }
