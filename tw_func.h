@@ -136,7 +136,7 @@ struct boundary_t {
 };
 
 
-extern boundary_t boundary;
+extern boundary_t osd_draw_boundary;
 
 extern U8 cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
@@ -249,6 +249,7 @@ U8 tw_read_register_bit(unsigned int rdADDR, U8 _flg);
 void tw_write_register_bit(unsigned int wrADDR, U8 _flg, U8 _data);
 
 void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font);
+void displayscratch();
 
 
 

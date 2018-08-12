@@ -130,7 +130,7 @@ void loop ()
 	g.debug_looptime = 0;
 	memset(&g.vario_graph, 0, sizeof(g.vario_graph));
 	g.vgraph_idx = 0;
-	boundary = { 0,0,SCR_X_SIZE, SCR_Y_SIZE };
+	osd_draw_boundary = { 0,0,SCR_X_SIZE, SCR_Y_SIZE };
 	g.pthy_redraw = true;
 	g.launch_heading = NO_HEADING;
 	g.detected_cell_count = 0;					//0 means not detected yet
@@ -150,21 +150,12 @@ void loop ()
 
 
 	OSD256_wr_page = 1;
-	
-	//OSD256_wr_page = 0;				//show font table
 
 	OSD256_set_display_page(0);
-	
-
-	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 431);
-	
 	g.visible_osd_page = 0x01;
 
 
-	//default_settings();
-	 //osd.mode.visible = 0x01;
-
-         //Main loop
+    //Main loop
 while (1)
 {
 	now = millis();

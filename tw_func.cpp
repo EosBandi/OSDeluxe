@@ -33,7 +33,7 @@ unsigned int ADDR_buf, count_TW2835;
 U8 OSD256_wr_page;
 U8 OSD256_font_color;
 
-boundary_t boundary;						//Dynamically defined boundary for restrict drawing
+boundary_t osd_draw_boundary;						//Dynamically defined boundary for restrict drawing
 
 
 void tw_init()
@@ -1027,8 +1027,8 @@ void OSD256_setpixel_fast(U8 pth, U16 start_X, U16 start_Y)
 	U8 reg205, reg206, reg207, reg208, reg209;
 	U8 reg24e;
 
-	if (start_X < boundary.x0 || start_X > boundary.x1) return;
-	if (start_Y < boundary.y0 || start_Y > boundary.y1) return;
+	if (start_X < osd_draw_boundary.x0 || start_X > osd_draw_boundary.x1) return;
+	if (start_Y < osd_draw_boundary.y0 || start_Y > osd_draw_boundary.y1) return;
 
 	if (pth == PTH_Y) {
 		start_X >>= 1;
@@ -1227,3 +1227,14 @@ void OSD256_box(U8 _pth, U16 x, U16 y, U16 w, U16 h, U8 color)
 	OSD256_Block_fill(_pth, DISPLAY, x, y, x + w - 1, y + h - 1, color);
 };
 
+//Display scratch memory (check fonts and bitmaps) and stops program
+void displayscratch()
+
+{
+	OSD256_wr_page = 0;
+    OSD256_set_display_page(0);
+    OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 431);
+    while (1)
+        ;
+
+}

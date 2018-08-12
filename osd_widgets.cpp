@@ -465,7 +465,7 @@ void render_horizon(struct horizon_t *h)
     cos_roll = cos(DEG2RAD(h->roll));
     sin_roll = -1 * sin(DEG2RAD(h->roll));
 
-    boundary = { (unsigned short)(h->x - WIDTH / 2), (unsigned short)(h->y - HEIGHT / 2), (unsigned short)(h->x + WIDTH / 2), (unsigned short)(h->y + HEIGHT / 2) };
+    osd_draw_boundary = { (unsigned short)(h->x - WIDTH / 2), (unsigned short)(h->y - HEIGHT / 2), (unsigned short)(h->x + WIDTH / 2), (unsigned short)(h->y + HEIGHT / 2) };
 
     if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
     {
@@ -509,7 +509,7 @@ void render_horizon(struct horizon_t *h)
     OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
     OSD256_drawline(PTH_X, COLOR_BLACK, x0, y0 + 2, x1, y1 + 2);
 
-    boundary = { 0, 0, SCR_X_SIZE, SCR_Y_SIZE };
+    osd_draw_boundary = { 0, 0, SCR_X_SIZE, SCR_Y_SIZE };
 }
 
 #define SCALE_A 6
