@@ -58,7 +58,7 @@ void setup ()
 	//Open Serial1 port for MavLink communication
     Serial1.begin(115200);
 	//Open Serial 2 port for input from weight cell
-	Serial2.begin(115200);
+	//Serial2.begin(115200);
 
 
 }
@@ -168,9 +168,6 @@ while (1)
 	
 	osd_boxes_render();
     
-	now = millis();
-
-
 	if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
 
 	if (osd.radar2.visible & g.visible_osd_page) osd_render_radar(&osd.radar2);
@@ -179,51 +176,51 @@ while (1)
 
 	if (osd.vgraph.visible & g.visible_osd_page) osd_render_vgraph(&osd.vgraph);
 
-	if (osd.compass.visible & g.visible_osd_page) osd_compass_render(&osd.compass);
+	if (osd.compass.visible & g.visible_osd_page) osd_render_compass(&osd.compass);
 
-	if (osd.center_cross_visible & g.visible_osd_page) osd_center_marker();
+	if (osd.center_cross_visible & g.visible_osd_page) osd_render_center_marker();
 
-	if (osd.move.visible & g.visible_osd_page) movement_render(&osd.move);
+	if (osd.move.visible & g.visible_osd_page) osd_render_move(&osd.move);
 
-	if (osd.horizon.visible & g.visible_osd_page) render_horizon(&osd.horizon);
+	if (osd.horizon.visible & g.visible_osd_page) osd_render_horizon(&osd.horizon);
 	
-	if (osd.gps.visible & g.visible_osd_page) osd_gps_render( &osd.gps );
+	if (osd.gps.visible & g.visible_osd_page) osd_render_gps( &osd.gps );
 
-	if (osd.stat.visible & g.visible_osd_page) osd_status_render(&osd.stat);
+	if (osd.stat.visible & g.visible_osd_page) osd_render_status(&osd.stat);
 
-	if (osd.batt1_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt1_v, g.b1_voltage);
+	if (osd.batt1_v.visible & g.visible_osd_page)  osd_render_batt_volt(&osd.batt1_v, g.b1_voltage);
 
-	if (osd.batt2_v.visible & g.visible_osd_page)  osd_batt_volt_render(&osd.batt2_v, g.b2_voltage);
+	if (osd.batt2_v.visible & g.visible_osd_page)  osd_render_batt_volt(&osd.batt2_v, g.b2_voltage);
 
-	if (osd.batt1_cap.visible  & g.visible_osd_page) osd_batt_cap_render(&osd.batt1_cap, g.b1_remaining_capacity);
+	if (osd.batt1_cap.visible  & g.visible_osd_page) osd_render_batt_cap(&osd.batt1_cap, g.b1_remaining_capacity);
 
-	if (osd.batt1_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt1_curr, g.b1_current);
+	if (osd.batt1_curr.visible  & g.visible_osd_page) osd_render_batt_curr(&osd.batt1_curr, g.b1_current);
 
-	if (osd.batt2_curr.visible  & g.visible_osd_page) osd_batt_curr_render(&osd.batt2_curr, g.b2_current);
+	if (osd.batt2_curr.visible  & g.visible_osd_page) osd_render_batt_curr(&osd.batt2_curr, g.b2_current);
 	
-	if (osd.batt1_power.visible & g.visible_osd_page) osd_batt_power_render(&osd.batt1_power, g.b1_power);
+	if (osd.batt1_power.visible & g.visible_osd_page) osd_render_batt_power(&osd.batt1_power, g.b1_power);
 
-	if (osd.batt2_power.visible & g.visible_osd_page) osd_batt_power_render(&osd.batt2_power, g.b2_power);
+	if (osd.batt2_power.visible & g.visible_osd_page) osd_render_batt_power(&osd.batt2_power, g.b2_power);
 
-	if (osd.alt.visible & g.visible_osd_page) osd_altitude_render(&osd.alt);
+	if (osd.alt.visible & g.visible_osd_page) osd_render_altitude(&osd.alt);
 
-	if (osd.vario.visible & g.visible_osd_page) osd_vario_render(&osd.vario);
+	if (osd.vario.visible & g.visible_osd_page) osd_render_vario(&osd.vario);
 
-	if (osd.home_w.visible & g.visible_osd_page) osd_home_render(&osd.home_w);
+	if (osd.home_w.visible & g.visible_osd_page) osd_render_home(&osd.home_w);
 
-	if (osd.mode.visible & g.visible_osd_page) osd_mode_render(&osd.mode);
+	if (osd.mode.visible & g.visible_osd_page) osd_render_flmode(&osd.mode);
 
-	if (osd.pull.visible & g.visible_osd_page) osd_pull_render(&osd.pull);
+	if (osd.pull.visible & g.visible_osd_page) osd_render_pull_force(&osd.pull);
 
-    if (osd.msg_widget.visible & g.visible_osd_page)  message_buffer_render();
+    if (osd.msg_widget.visible & g.visible_osd_page)  osd_render_message_buffer();
 
-	if (osd.gs.visible & g.visible_osd_page) osd_groundspeed_render(&osd.gs);
+	if (osd.gs.visible & g.visible_osd_page) osd_render_groundspeed(&osd.gs);
 
-	if (osd.thr.visible & g.visible_osd_page) osd_throttle_render(&osd.thr);
+	if (osd.thr.visible & g.visible_osd_page) osd_render_throttle(&osd.thr);
 
-	if (osd.msg_list_widget.visible & g.visible_osd_page) message_list_render();
+	if (osd.msg_list_widget.visible & g.visible_osd_page) osd_render_message_list();
 
-	if (osd.rssi.visible & g.visible_osd_page) osd_rssi_render(&osd.rssi);
+	if (osd.rssi.visible & g.visible_osd_page) osd_render_rssi(&osd.rssi);
 
 	//Switch working page for smooth redraw
 	OSD256_set_display_page(OSD256_wr_page);
@@ -313,32 +310,8 @@ while (1)
 		}
 	}
 	*/
-	//0x111 enhance mode.... keep looking
-    //0x57 coring for shapening
-	//a7 0d instead of 0x0c
-
-
-	//0x1a2 50 vagy 90 Y path megjelenitese :D
-
-
-	if (Serial.available() != 0)
-	{
-		char ch = Serial.read();
-		if (ch == '1') {
-			tw_write_register(0x1a8, 0x25);
-			debug("ON\n");
-		}
-		else 
-		{
-			tw_write_register(0x1a8,0x20);
-
-			debug("OFF\n");
-		}
-	}
 
 	if (g.debug_looptime) debug("Looptime : %lu\n", millis() - now);
-	debug("Loop time: %lu\n", millis() - now);
-	//debug("Bytes waiting: %u\n", Serial1.available());
 
 
 

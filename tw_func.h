@@ -152,13 +152,7 @@ struct polygon_t {
 
 
 extern boundary_t osd_draw_boundary;
-
-extern uint8_t cnt, count, data_buf[20];
-extern uint16_t ADDR_buf;
-extern uint8_t OSD256_font_color;
 extern uint8_t OSD256_wr_page;
-
-
 extern struct osd_settings osd;  
 
 

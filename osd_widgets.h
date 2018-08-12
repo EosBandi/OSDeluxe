@@ -296,36 +296,36 @@ struct radar_widget_t {
 
 
 void osd_bar_render(struct bar *b);
-void osd_gps_render(struct gps_widget_t *g);
+void osd_render_gps(struct gps_widget_t *g);
 
-void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage);
-void osd_batt_cap_render(struct batt_cap_widget_t *bw, uint8_t remaining_capacity);
+void osd_render_batt_volt(struct batt_volt_widget_t *bw, float voltage);
+void osd_render_batt_cap(struct batt_cap_widget_t *bw, uint8_t remaining_capacity);
 //void osd_battery_render( struct battery_widget_t *bw);
-void osd_batt_curr_render(struct batt_curr_widget_t *bw, float current);
-void osd_batt_power_render(struct batt_power_widget_t *bw, int power);
+void osd_render_batt_curr(struct batt_curr_widget_t *bw, float current);
+void osd_render_batt_power(struct batt_power_widget_t *bw, int power);
 
-void osd_status_render( struct status_widget_t *s);
-void osd_altitude_render( struct alt_widget_t *aw);
-void osd_groundspeed_render(struct gs_widget_t *gs);
-void osd_vario_render(struct vario_widget_t *vw);
-void osd_home_render(struct home_widget_t *hw);
-void osd_center_marker();
-void render_horizon(struct horizon_t *horizon);
+void osd_render_status( struct status_widget_t *s);
+void osd_render_altitude( struct alt_widget_t *aw);
+void osd_render_groundspeed(struct gs_widget_t *gs);
+void osd_render_vario(struct vario_widget_t *vw);
+void osd_render_home(struct home_widget_t *hw);
+void osd_render_center_marker();
+void osd_render_horizon(struct horizon_t *horizon);
 void render_horizona(struct horizon_t *horizon);
-void osd_mode_render( struct mode_widget_t *mw);
-void osd_pull_render(struct pull_widget_t *pw);
+void osd_render_flmode( struct mode_widget_t *mw);
+void osd_render_pull_force(struct pull_widget_t *pw);
 void rc_control(void);
-void osd_throttle_render(struct throttle_widget_t *t);
-void movement_render(move_widget_t *m);
+void osd_render_throttle(struct throttle_widget_t *t);
+void osd_render_move(move_widget_t *m);
 
 void message_buffer_add_line(const char *message, char severity);
-void message_buffer_render(void);
-void message_list_render();
+void osd_render_message_buffer(void);
+void osd_render_message_list();
 void osd_boxes_render();
-void osd_compass_render(compass_widget_t *c);
+void osd_render_compass(compass_widget_t *c);
 void osd_render_vgraph(vario_graph_widget_t *w);
 void osd_render_radar(radar_widget_t *w);
-void osd_rssi_render(struct rssi_widget_t *r);
+void osd_render_rssi(struct rssi_widget_t *r);
 
 void render(unsigned int r);
 

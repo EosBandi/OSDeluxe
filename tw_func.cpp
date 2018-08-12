@@ -24,17 +24,15 @@
 
 #include "OSDeluxe.h"
 
-uint8_t cnt, count, data_buf[20];
-uint16_t ADDR_buf;
-uint8_t OSD256_wr_page;
-uint8_t OSD256_font_color;
-boundary_t osd_draw_boundary;						//Dynamically defined boundary for restrict drawing
+
+uint8_t cnt, data_buf[20];							// Generic buffer for writing data bursts to tw2837
+uint8_t OSD256_wr_page;								// Actual page to be written by OSD256 functions
+boundary_t osd_draw_boundary;						// Dynamically defined boundary for restrict drawing via setpixel_fast
 
 
 void tw_init()
 {
-
-
+	
 	//Output video format selection
 	//bit 7 - 1-50Hz, 625 line
 	tw_write_register(0x100, 0x80);
@@ -44,9 +42,6 @@ void tw_init()
 
 	//Enable black background for channels with no video
 	tw_write_register(0x0c3, 0xf0);
-
-	
-
 
 	static uint8_t pg1_a0_video_path[] =
 	{
@@ -145,7 +140,7 @@ void tw_init()
 
     for (uint8_t i = 0; i < 18; i++)
     {
-        ADDR_buf = 0x20B;
+        //ADDR_buf = 0x20B;
         cnt = 0;
         data_buf[cnt] = colortable[i][0];
         cnt++;
@@ -155,12 +150,12 @@ void tw_init()
         cnt++;
         data_buf[cnt] = 0x80 + i;
         cnt++;
-        tw_write_buf (ADDR_buf, data_buf, cnt);
+        tw_write_buf (0x20b, data_buf, cnt);
     }
 
     for (uint8_t i = 0; i < 4; i++)
     {
-        ADDR_buf = 0x20B;
+        //ADDR_buf = 0x20B;
         cnt = 0;
         data_buf[cnt] = colortable_rec[i][0];
         cnt++;
@@ -170,7 +165,7 @@ void tw_init()
         cnt++;
         data_buf[cnt] = 0x80 + 64 +i;
         cnt++;
-        tw_write_buf (ADDR_buf, data_buf, cnt);
+        tw_write_buf (0x20b, data_buf, cnt);
     }
 
 

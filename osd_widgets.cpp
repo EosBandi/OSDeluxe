@@ -177,7 +177,7 @@ void osd_bar_render(struct bar *b)
     OSD256_printf(b->x - 2, b->y + b->h + 2, color, 0, b->format, b->val);
 }
 
-void osd_gps_render(struct gps_widget_t *g)
+void osd_render_gps(struct gps_widget_t *g)
 {
 
     char color;
@@ -202,7 +202,7 @@ void osd_gps_render(struct gps_widget_t *g)
     OSD256_printf(g->x + 42, g->y + 22, color, 0, "%2.2f", g->hdop);
 }
 
-void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
+void osd_render_batt_volt(struct batt_volt_widget_t *bw, float voltage)
 {
     uint8_t cells = 0;
 
@@ -245,7 +245,7 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
     osd_bar_render(&bw->volt);
 }
 
-void osd_batt_cap_render(struct batt_cap_widget_t *bw, uint8_t remaining_capacity)
+void osd_render_batt_cap(struct batt_cap_widget_t *bw, uint8_t remaining_capacity)
 {
 
     bw->cap.x = bw->x;
@@ -270,11 +270,11 @@ void osd_batt_cap_render(struct batt_cap_widget_t *bw, uint8_t remaining_capacit
     osd_bar_render(&bw->cap);
 }
 
-void osd_batt_curr_render(struct batt_curr_widget_t *bw, float current) { OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW, 0, "%5.1fA", current); }
+void osd_render_batt_curr(struct batt_curr_widget_t *bw, float current) { OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW, 0, "%5.1fA", current); }
 
-void osd_batt_power_render(struct batt_power_widget_t *bw, int power) { OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW, 0, "%4uW", power); }
+void osd_render_batt_power(struct batt_power_widget_t *bw, int power) { OSD256_printf(bw->x, bw->y, OSD256_FONT_YELLOW, 0, "%4uW", power); }
 
-void osd_status_render(struct status_widget_t *s)
+void osd_render_status(struct status_widget_t *s)
 {
 
     // Display notification bars
@@ -327,7 +327,7 @@ void osd_status_render(struct status_widget_t *s)
     }
 }
 
-void osd_pull_render(struct pull_widget_t *pw)
+void osd_render_pull_force(struct pull_widget_t *pw)
 {
     char color;
 
@@ -339,13 +339,13 @@ void osd_pull_render(struct pull_widget_t *pw)
     OSD256_printf(pw->x, pw->y, color, 0, "%2.2f N", pw->pull);
 }
 
-void osd_altitude_render(struct alt_widget_t *aw) { OSD256_printf(aw->x, aw->y, OSD256_FONT_YELLOW, 0, "\x5c\x5d%dm", (int)g.altitude); }
+void osd_render_altitude(struct alt_widget_t *aw) { OSD256_printf(aw->x, aw->y, OSD256_FONT_YELLOW, 0, "\x5c\x5d%dm", (int)g.altitude); }
 
-void osd_groundspeed_render(struct gs_widget_t *gs) { OSD256_printf(gs->x, gs->y, OSD256_FONT_YELLOW, 0, "\x5f %.0f\x7b\x7c", g.groundspeed * 3.6); }
+void osd_render_groundspeed(struct gs_widget_t *gs) { OSD256_printf(gs->x, gs->y, OSD256_FONT_YELLOW, 0, "\x5f %.0f\x7b\x7c", g.groundspeed * 3.6); }
 
-void osd_throttle_render(struct throttle_widget_t *t) { OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "\x7d\x7e%u", g.rcin[3]); }
+void osd_render_throttle(struct throttle_widget_t *t) { OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "\x7d\x7e%u", g.rcin[3]); }
 
-void osd_rssi_render(struct rssi_widget_t *r) {
+void osd_render_rssi(struct rssi_widget_t *r) {
 	
 	if (g.rssi <= osd.rssi.rssi_critical || g.remote_rssi <= osd.rssi.rssi_critical)
 	{
@@ -364,7 +364,7 @@ void osd_rssi_render(struct rssi_widget_t *r) {
 
 
 
-void osd_vario_render(struct vario_widget_t *vw)
+void osd_render_vario(struct vario_widget_t *vw)
 {
 
     uint8_t mix;
@@ -410,7 +410,7 @@ void osd_vario_render(struct vario_widget_t *vw)
     }
 }
 
-void osd_home_render(struct home_widget_t *hw)
+void osd_render_home(struct home_widget_t *hw)
 {
 
     struct polygon_t home_arrow;
@@ -427,7 +427,7 @@ void osd_home_render(struct home_widget_t *hw)
         OSD256_printf(hw->x - 56, hw->y + 35, OSD256_FONT_YELLOW, 0, "no home");
 }
 
-void osd_center_marker()
+void osd_render_center_marker()
 {
     if (g.pthy_redraw)
     {
@@ -450,7 +450,7 @@ void osd_center_marker()
 #define WIDTH 400
 #define HEIGHT 300
 
-void render_horizon(struct horizon_t *h)
+void osd_render_horizon(struct horizon_t *h)
 {
     short y, i;
     short x0, x1, y0, y1;
@@ -610,7 +610,7 @@ void render_horizona(struct horizon_t *h)
     }
 }
 
-void osd_mode_render(struct mode_widget_t *mw)
+void osd_render_flmode(struct mode_widget_t *mw)
 {
 
     char mode[32];
@@ -741,7 +741,7 @@ void message_buffer_add_line(const char *message, char severity)
     g.message_archive_severity[g.message_archive_line] = severity;
 }
 
-void message_buffer_render()
+void osd_render_message_buffer()
 {
     long display_time = 5000;
     long now;
@@ -784,7 +784,7 @@ void message_buffer_render()
     }
 }
 
-void message_list_render()
+void osd_render_message_list()
 {
 
     for (uint8_t i = 0; i < MESSAGE_BUFFER_LINES; i++)
@@ -793,7 +793,7 @@ void message_list_render()
     }
 }
 
-void movement_render(move_widget_t *m)
+void osd_render_move(move_widget_t *m)
 {
 
     // osd.vx x movement in 100*m/s
@@ -901,7 +901,7 @@ void osd_boxes_render()
     }
 }
 
-void osd_compass_render(compass_widget_t *c)
+void osd_render_compass(compass_widget_t *c)
 {
     const char cardinals[] = { 'N', 'E', 'S', 'W' };
     int i, j, x;

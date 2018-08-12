@@ -788,9 +788,6 @@
     <ClCompile Include="home_calc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="horizon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="i2c_t3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

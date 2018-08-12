@@ -364,7 +364,6 @@
     <ClCompile Include="bitmaps.cpp" />
     <ClCompile Include="helpers.cpp" />
     <ClCompile Include="home_calc.cpp" />
-    <ClCompile Include="horizon.cpp" />
     <ClCompile Include="i2c_t3.cpp" />
     <ClCompile Include="mavlink.cpp" />
     <ClCompile Include="osd_widgets.cpp" />
