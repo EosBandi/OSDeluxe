@@ -358,6 +358,7 @@
     <ClInclude Include="tw_func.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="utils.h" />
     <ClInclude Include="__vm\.OSDeluxe.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
