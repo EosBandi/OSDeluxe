@@ -38,52 +38,56 @@ global_variables_t g;
 
 void setup ()
 {
-
     pinMode (LED_PIN, OUTPUT);
     pinMode (TW_RESET_PIN, OUTPUT);
 
+
+	//Reset TW2837
     delay (1000);
     digitalWrite (TW_RESET_PIN, LOW);
     delay (500);
     digitalWrite (TW_RESET_PIN, HIGH);
     delay (500);
 
-    // Setup for Master mode, pins 18/19, external pullups, 400kHz, 10ms default timeout
+    // Setup for Master mode, pins 18/19, internal pullups, 4Mhz, 10ms default timeout
+	// It is not a mistake TW2837 works fine on 4Mhz I2C speed
+
     Wire.begin (I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 4000000, I2C_OP_MODE_IMM);
     Wire.setDefaultTimeout (1000); // 10ms
 
 
 	//Open USB serial port for debug and UI
     Serial.begin (115200);
+
 	//Open Serial1 port for MavLink communication
+	//TODO: make it configurable
     Serial1.begin(115200);
-	//Open Serial 2 port for input from weight cell
-	//Serial2.begin(115200);
-
-
 }
 
 void loop ()
 {
-
+	//Led ON
 	digitalWrite(LED_PIN, HIGH);
 
+	//Initn TW2837 registers
     tw_init ();
 
 	g.pip_page = 0;
 
 	tw_write_register(0x0c8, 0x03);
 	tw_write_register(0x057, 0x00);  // Extra coring for sharepning
-	//tw_write_register(0x1aa, 0x66);  // middle bandwith for Y DAC, reduce color crawl
 
 	tw_write_register(0x240, 0x01);
 
 	//We will use these screens 
-	//Don't clear all since pages larger than 0 share memory with scratch table
-	OSD256_clear_screen(PTH_X, 0);
-	OSD256_clear_screen(PTH_X, 1);
-	OSD256_clear_screen(PTH_Y, 0);
-	OSD256_set_display_page(0);
+	//Don't clear all since pages above 0 share memory with scratch table (Not mentioned in the datasheet)
+
+	OSD256_clear_screen(PTH_X, 0);	// Main Path page 0 
+	OSD256_clear_screen(PTH_X, 1);	// Main Path page 1
+
+	OSD256_clear_screen(PTH_Y, 0);	// Secondary Path page 0 - draw static elements on this page
+
+	OSD256_set_display_page(0);     // Display page 0
 
 	load_settings();
 	if ((osd.eeprom_version != EEPROM_VERSION) || (osd.settings_size != sizeof(osd))  )
@@ -92,15 +96,17 @@ void loop ()
 		save_settings();
 	}
 
-	update_vout_settings();
-	update_vin_settings();
-	update_pip();
+	update_vout_settings();			// Apply vout settings from saved values
+	update_vin_settings();			// Apply vin settings from saved values
+	update_pip();					// Set up PIP state 
 
 
 
 	g.displayed_mode = -1;        // Signal startup
+
 	g.mode = 0;
 	
+	//Clear buffers for mavlink messages
 	memset(&g.message_buffer, 0, sizeof(g.message_buffer) );
 	memset(&g.message_archive, 0, sizeof(g.message_archive));
 
@@ -108,7 +114,7 @@ void loop ()
 	g.message_buffer_display_time = 0;
 
 
-	//This is for selecting different sets
+	// Start with osd_page 1 and pip page 0
 	g.visible_osd_page = 0x01; //bit coded 
 	g.pip_page = 0x00;
 
@@ -120,6 +126,7 @@ void loop ()
 	//Display both fields !!!!
 	tw_write_register(0x20f, 0x0f);
 
+	//OSD write will use page0
 	OSD256_wr_page = 0;
 
 
@@ -147,12 +154,11 @@ void loop ()
 	tw_write_register(0x240, 0x01);
 
 	unsigned long now;
-
-
+	
+	//As start we display page 0 and write to page 1 (to enusure flicker free display refresh)
+	//OSD256_wr_page and set_display_page only influence PTH_X display path
 	OSD256_wr_page = 1;
-
 	OSD256_set_display_page(0);
-	g.visible_osd_page = 0x01;
 
 
     //Main loop
@@ -160,69 +166,43 @@ while (1)
 {
 	now = millis();
 
-
 	read_mavlink();
 
-
+	//Clear actual write page (not the one that is displayed)
 	OSD256_clear_screen(PTH_X, OSD256_wr_page);
 	
+
+	//Render OSD elements
 	osd_boxes_render();
-    
 	if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
-
 	if (osd.radar2.visible & g.visible_osd_page) osd_render_radar(&osd.radar2);
-
 	if (osd.radar3.visible & g.visible_osd_page) osd_render_radar(&osd.radar3);
-
 	if (osd.vgraph.visible & g.visible_osd_page) osd_render_vgraph(&osd.vgraph);
-
 	if (osd.compass.visible & g.visible_osd_page) osd_render_compass(&osd.compass);
-
 	if (osd.center_cross_visible & g.visible_osd_page) osd_render_center_marker();
-
 	if (osd.move.visible & g.visible_osd_page) osd_render_move(&osd.move);
-
 	if (osd.horizon.visible & g.visible_osd_page) osd_render_horizon(&osd.horizon);
-	
 	if (osd.gps.visible & g.visible_osd_page) osd_render_gps( &osd.gps );
-
 	if (osd.stat.visible & g.visible_osd_page) osd_render_status(&osd.stat);
-
 	if (osd.batt1_v.visible & g.visible_osd_page)  osd_render_batt_volt(&osd.batt1_v, g.b1_voltage);
-
 	if (osd.batt2_v.visible & g.visible_osd_page)  osd_render_batt_volt(&osd.batt2_v, g.b2_voltage);
-
 	if (osd.batt1_cap.visible  & g.visible_osd_page) osd_render_batt_cap(&osd.batt1_cap, g.b1_remaining_capacity);
-
 	if (osd.batt1_curr.visible  & g.visible_osd_page) osd_render_batt_curr(&osd.batt1_curr, g.b1_current);
-
 	if (osd.batt2_curr.visible  & g.visible_osd_page) osd_render_batt_curr(&osd.batt2_curr, g.b2_current);
-	
 	if (osd.batt1_power.visible & g.visible_osd_page) osd_render_batt_power(&osd.batt1_power, g.b1_power);
-
 	if (osd.batt2_power.visible & g.visible_osd_page) osd_render_batt_power(&osd.batt2_power, g.b2_power);
-
 	if (osd.alt.visible & g.visible_osd_page) osd_render_altitude(&osd.alt);
-
 	if (osd.vario.visible & g.visible_osd_page) osd_render_vario(&osd.vario);
-
 	if (osd.home_w.visible & g.visible_osd_page) osd_render_home(&osd.home_w);
-
 	if (osd.mode.visible & g.visible_osd_page) osd_render_flmode(&osd.mode);
-
 	if (osd.pull.visible & g.visible_osd_page) osd_render_pull_force(&osd.pull);
-
     if (osd.msg_widget.visible & g.visible_osd_page)  osd_render_message_buffer();
-
 	if (osd.gs.visible & g.visible_osd_page) osd_render_groundspeed(&osd.gs);
-
 	if (osd.thr.visible & g.visible_osd_page) osd_render_throttle(&osd.thr);
-
 	if (osd.msg_list_widget.visible & g.visible_osd_page) osd_render_message_list();
-
 	if (osd.rssi.visible & g.visible_osd_page) osd_render_rssi(&osd.rssi);
 
-	//Switch working page for smooth redraw
+	// Renders done, switch working page for smooth redraw
 	OSD256_set_display_page(OSD256_wr_page);
 	if (OSD256_wr_page == 0) OSD256_wr_page = 1;
 	else OSD256_wr_page = 0;
