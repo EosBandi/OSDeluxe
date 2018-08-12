@@ -480,9 +480,6 @@ struct param_def parameters[] = {
 
 	PARAM("DEBUG_LOOPTIME", MAV_PARAM_TYPE_UINT8, &g.debug_looptime,NULL),
 
-
-	PARAM("XXX", MAV_PARAM_TYPE_UINT8, &g.test_byte, &update_test_byte),
-
 	PARAM_END
 };
 
@@ -499,13 +496,6 @@ void do_settings_save()
 	g.write_settings = 0;
 	save_settings();
 	message_buffer_add_line(STR_SETTINGS_SAVED, 4);
-
-}
-
-void update_test_byte()
-{
-
-	tw_write_register(0x246, g.test_byte);
 
 }
 
