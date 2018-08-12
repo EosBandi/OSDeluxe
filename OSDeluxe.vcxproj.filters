@@ -21,9 +21,6 @@
     <ClInclude Include="__vm\.OSDeluxe.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="home_calc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -788,9 +785,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="home_calc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

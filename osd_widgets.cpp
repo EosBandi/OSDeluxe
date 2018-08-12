@@ -413,13 +413,13 @@ void osd_vario_render(struct vario_widget_t *vw)
 void osd_home_render(struct home_widget_t *hw)
 {
 
-    struct polygon home_arrow;
-    struct point home_arrow_points[5] = { { 0, -20 }, { +20, +20 }, { 0, -2 }, { -20, +20 } };
+    struct polygon_t home_arrow;
+    struct point_t home_arrow_points[5] = { { 0, -20 }, { +20, +20 }, { 0, -2 }, { -20, +20 } };
     home_arrow.len = 4;
 
     home_arrow.points = home_arrow_points;
-    transform_polygon(&home_arrow, hw->x, hw->y, hw->orientation);
-    draw_polygon(&home_arrow, COLOR_WHITE);
+    OSD256_transform_polygon(&home_arrow, hw->x, hw->y, hw->orientation);
+    OSD256_draw_polygon(&home_arrow, COLOR_WHITE);
 
     if (g.home.lock == HOME_LOCKED)
         OSD256_printf(hw->x - 56, hw->y + 35, OSD256_FONT_YELLOW, 0, "% 4u m", hw->home_distance);
@@ -856,7 +856,7 @@ void movement_render(move_widget_t *m)
         OSD256_drawline(PTH_Y, 0x11 | REC_MIX, m->x + (s + 1) / 2, m->y, m->x + (s + 1) / 2, m->y + s);
         OSD256_drawline(PTH_Y, 0x11 | REC_MIX, m->x, m->y + (s + 1) / 2, m->x + s, m->y + (s + 1) / 2);
 
-        OSD256_Circle(PTH_Y, 0x99, m->x + s / 2, m->y + s / 2, m->size / 4);
+        OSD256_circle(PTH_Y, 0x99, m->x + s / 2, m->y + s / 2, m->size / 4);
     }
     // reverse y offset
     OSD256_display_bitmap(bitmap, centerx + offsetx, centery - offsety);
@@ -993,18 +993,18 @@ void osd_render_radar(radar_widget_t *w)
     int x, y;
     int min_increment;
     long i, scale;
-    struct point ils_points[5] = { { -4, -6 }, { -4, 6 }, { 0, 10 }, { 4, 6 }, { 4, -6 } };
-    struct polygon ils;
+    struct point_t ils_points[5] = { { -4, -6 }, { -4, 6 }, { 0, 10 }, { 4, 6 }, { 4, -6 } };
+    struct polygon_t ils;
 
     ils.len = 5;
     ils.points = ils_points;
-    struct point uav_points[4] = { { 0, 0 }, { 6, 8 }, { 0, -8 }, { -6, 8 } };
+    struct point_t uav_points[4] = { { 0, 0 }, { 6, 8 }, { 0, -8 }, { -6, 8 } };
 
-    struct polygon uav;
+    struct polygon_t uav;
     uav.len = 4;
     uav.points = uav_points;
 
-    struct polygon *p;
+    struct polygon_t *p;
 
     x = (w->size / 2) - 1;
     y = (w->size / 2) - 1;
@@ -1014,8 +1014,8 @@ void osd_render_radar(radar_widget_t *w)
 
         OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + w->x, 0 + w->y, x + w->x, r * 2 + w->y);
         OSD256_drawline(PTH_Y, COLOR_REC_WHITE | REC_MIX, 0 + w->x, y + w->y, r * 2 + w->x, y + w->y);
-        OSD256_Circle(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + w->x, y + w->y, r);
-        OSD256_Circle(PTH_Y, COLOR_REC_25_WHITE | REC_MIX, x + w->x, y + w->y, r + 2);
+        OSD256_circle(PTH_Y, COLOR_REC_WHITE | REC_MIX, x + w->x, y + w->y, r);
+        OSD256_circle(PTH_Y, COLOR_REC_25_WHITE | REC_MIX, x + w->x, y + w->y, r + 2);
     }
 
     /* auto scale */
@@ -1032,16 +1032,16 @@ void osd_render_radar(radar_widget_t *w)
         /* radar fixed at uav heading, home moves */
         x += sin(DEG2RAD(g.home.direction)) * i;
         y -= cos(DEG2RAD(g.home.direction)) * i;
-        scale_polygon(&ils, w->scale);
-        transform_polygon(&ils, x, y, g.launch_heading - g.heading - 180);
+        OSD256_scale_polygon(&ils, w->scale);
+        OSD256_transform_polygon(&ils, x, y, g.launch_heading - g.heading - 180);
         p = &ils;
         break;
     case 1:
         /* radar always facing north, uav moves */
         x += sin(DEG2RAD(g.home.uav_bearing)) * i;
         y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
-        scale_polygon(&uav, w->scale);
-        transform_polygon(&uav, x, y, g.heading);
+        OSD256_scale_polygon(&uav, w->scale);
+        OSD256_transform_polygon(&uav, x, y, g.heading);
         p = &uav;
         break;
     case 2:
@@ -1057,17 +1057,17 @@ void osd_render_radar(radar_widget_t *w)
         }
         x += sin(DEG2RAD(g.home.uav_bearing)) * i;
         y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
-        scale_polygon(&uav, w->scale);
-        transform_polygon(&uav, x, y, g.heading);
+        OSD256_scale_polygon(&uav, w->scale);
+        OSD256_transform_polygon(&uav, x, y, g.heading);
         p = &uav;
         break;
     default:	//should not happen, just to satisfy compiller
         p = &uav;
         break;
     }
-    move_polygon(p, w->x, w->y);
-    move_polygon(p, -1, -1);
-    draw_polygon(p, COLOR_BLACK);
-    move_polygon(p, 1, 1);
-    draw_polygon(p, COLOR_WHITE);
+    OSD256_move_polygon(p, w->x, w->y);
+    OSD256_move_polygon(p, -1, -1);
+    OSD256_draw_polygon(p, COLOR_BLACK);
+    OSD256_move_polygon(p, 1, 1);
+    OSD256_draw_polygon(p, COLOR_WHITE);
 }

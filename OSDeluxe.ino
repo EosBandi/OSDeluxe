@@ -137,8 +137,8 @@ void loop ()
 
 	//Commented out for quick start, need to run at every powerup
 	
-	init_font_tables();
-	init_bitmaps();
+	OSD256_init_font_tables();
+	OSD256_init_bitmaps();
 
 	OSD256_clear_screen(PTH_X,0);
 	OSD256_clear_screen(PTH_X,1);

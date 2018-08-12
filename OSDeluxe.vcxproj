@@ -86,9 +86,6 @@
   <ItemGroup>
     <ClInclude Include="bitmaps.h" />
     <ClInclude Include="globals.h" />
-    <ClInclude Include="graphics.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
     <ClInclude Include="helpers.h" />
     <ClInclude Include="home_calc.h">
       <FileType>CppCode</FileType>
@@ -365,7 +362,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitmaps.cpp" />
-    <ClCompile Include="graphics.cpp" />
     <ClCompile Include="helpers.cpp" />
     <ClCompile Include="home_calc.cpp" />
     <ClCompile Include="horizon.cpp" />

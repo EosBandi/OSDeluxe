@@ -31,10 +31,12 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #define MESSAGE_BUFFER_LINES 20
 #define NO_HEADING 0xfff
 
+
+//Globally used variables are put into a struct for referencing
+
 struct global_variables_t
 {
 
-    // Global variables
     unsigned char mav_type;  // MAV type from mavlink heartbeat;
     unsigned char base_mode; // It comes from the arming...
     int heading;
@@ -119,10 +121,10 @@ struct global_variables_t
     uint8_t write_settings;
     uint8_t debug_looptime;
 
-    bool pthy_redraw; // indicated that we need to redraw osd contect on y path.
-
+    bool pthy_redraw; // indicated that we need to redraw osd content on y path.
     bool powerup; // Are we resetting or powering up from zero.
-    uint8_t detected_cell_count;
+
+	uint8_t detected_cell_count;
 };
 
 extern global_variables_t g;

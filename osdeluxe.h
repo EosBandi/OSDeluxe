@@ -51,7 +51,6 @@
 #include "tw_font.h"
 #include "tw_func.h"
 #include "bitmaps.h"
-#include "graphics.h"
 #include "osd_widgets.h"
 #include "s1debug.h"
 #include "settings.h"

@@ -26,23 +26,5 @@
 #ifndef GRAPHICS_H
 #define	GRAPHICS_H
 
-struct point {
-    int x, y;
-};
-
-struct point3d {
-    int x, y, z;
-};
-
-struct polygon {
-    struct point *points;
-    uint8_t len;
-};
-
-void transform_polygon(struct polygon *p, int x, int y, int rot);
-void move_polygon(struct polygon *p, int x, int y);
-void draw_polygon(struct polygon *p, char color);
-void draw_circle(int xm, int ym, int r);
-void scale_polygon(struct polygon *p, float scale);
 
 #endif

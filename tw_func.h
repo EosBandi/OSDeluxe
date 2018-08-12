@@ -136,15 +136,25 @@ struct boundary_t {
 };
 
 
+struct point_t {
+    int x, y;
+};
+
+struct point3d_t {
+    int x, y, z;
+};
+
+struct polygon_t {
+    struct point_t *points;
+    uint8_t len;
+};
+
+
+
 extern boundary_t osd_draw_boundary;
 
 extern uint8_t cnt, count, data_buf[20];
-extern unsigned int  ADDR_buf, count_TW2835;
-//extern uint8_t OSD_work_field, OSD_display_field;
-//extern uint8_t OSD_path; //0-display, 1-record
-//extern uint8_t rec_color_shadow, rec_color, rec_color_background;
-//extern uint8_t disp_color, disp_color_background, disp_color_shadow;
-
+extern uint16_t ADDR_buf;
 extern uint8_t OSD256_font_color;
 extern uint8_t OSD256_wr_page;
 
@@ -204,55 +214,49 @@ const uint8_t colortable_rec[4][3] = {
 
 
 
+// tw2837 low level functions
 void tw_init();
 void tw_write_buf(uint16_t wrADDR, uint8_t *wrBUF, uint8_t wrCNT);
-
-
-
 void tw_write_register(unsigned int wrADDR, uint8_t content);
 uint8_t tw_read_register(unsigned int rdADDR);
-
+uint8_t tw_read_register_bit(unsigned int rdADDR, uint8_t _flg);
+void tw_write_register_bit(unsigned int wrADDR, uint8_t _flg, uint8_t _data);
 void tw_ch_set_window (uint8_t _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H);
 void tw_ch_settings (uint8_t _ch, uint8_t _on_off, uint8_t _popup);
 void tw_ch_set_input(char ch, char input);
 
+
+//TW2837 256color OSD functions
+
 void OSD256_set_display_page(char rd_page);
+void OSD256_clear_screen(uint8_t _pth, uint8_t page);
+void OSD256_OSG_Mode_Selection(uint8_t mode);
 
+void OSD256_write_font0(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib);
+void OSD256_write_font1(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib);
 
+void OSD256_block_fill(uint8_t _pth, uint8_t dst, uint16_t start_X, uint16_t start_Y, uint16_t end_X, uint16_t end_Y, uint8_t color);
+void OSD256_block_transfer(uint8_t src, uint8_t dst, uint16_t src_start_x, uint16_t src_start_y, uint16_t dst_start_x, uint16_t dst_start_y, uint16_t dst_end_x, uint16_t dst_end_y);
 
-
-void WriteOSD256Fnt0(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib);
-void WriteOSD256Fnt1(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib);
-
-void OSD256_Block_fill(uint8_t _pth, uint8_t dst, uint16_t start_X, uint16_t start_Y, uint16_t end_X, uint16_t end_Y, uint8_t color);
-
-void OSD256_Block_Transfer(uint8_t src, uint8_t dst, uint16_t src_start_x, uint16_t src_start_y, uint16_t dst_start_x, uint16_t dst_start_y, uint16_t dst_end_x, uint16_t dst_end_y);
 void OSD256_putc(uint16_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t font);
-
 void OSD256_puts(char *str, uint16_t posx, uint16_t posy, uint8_t color);
 void OSD256_printf(uint16_t posx, uint16_t posy, char color, char font, const char *format, ...);
-
 void OSD256_printf_slow(uint16_t posx, uint16_t posy, char color, char font, const char *format, ...);
-
-void OSD256_clear_screen(uint8_t _pth, uint8_t page);
 
 void OSD256_set_drawcolor(uint8_t color);
 void OSD256_setpixel(uint8_t _pth, uint8_t color, uint16_t start_X, uint16_t start_Y);
 void OSD256_setpixel_fast(uint8_t _pth, uint16_t start_x, uint16_t start_Y);
 void OSD256_drawline(uint8_t _pth, uint8_t color, int x, int y, int x2, int y2);
-void OSD256_Circle(uint8_t _pth, uint8_t color, int  xCenter, int yCenter, int radius);
+void OSD256_circle(uint8_t _pth, uint8_t color, int  xCenter, int yCenter, int radius);
 void OSD256_box(uint8_t _pth, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color);
 
-void OSD256_load_bitmap(uint8_t dst, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height, uint8_t color, const char *bitmap);
+void OSD256_transform_polygon(struct polygon_t *p, int x, int y, int rot);
+void OSD256_move_polygon(struct polygon_t *p, int x, int y);
+void OSD256_draw_polygon(struct polygon_t *p, char color);
+void OSD256_scale_polygon(struct polygon_t *p, float scale);
 
-uint8_t tw_read_register_bit(unsigned int rdADDR, uint8_t _flg);
-void tw_write_register_bit(unsigned int wrADDR, uint8_t _flg, uint8_t _data);
-
-void CreateScrathFntTab(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font);
-void displayscratch();
-
-
-
+void OSD256_create_scratch_font_table(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font);
+void OSD256_displayscratch();
 
 
 #endif

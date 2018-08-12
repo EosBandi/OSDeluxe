@@ -24,15 +24,10 @@
 
 #include "OSDeluxe.h"
 
-
-
-
 uint8_t cnt, count, data_buf[20];
-unsigned int ADDR_buf, count_TW2835;
-
+uint16_t ADDR_buf;
 uint8_t OSD256_wr_page;
 uint8_t OSD256_font_color;
-
 boundary_t osd_draw_boundary;						//Dynamically defined boundary for restrict drawing
 
 
@@ -409,11 +404,10 @@ void tw_ch_set_input(char ch, char input)
 
 void OSD256_OSG_Mode_Selection(uint8_t mode)
 {
-	uint8_t tmp;
 	tw_write_register(0x241, mode & 0x3);
 }
 
-void WriteOSD256Fnt0(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib)
+void OSD256_write_font0(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib)
 {
 	uint8_t reg40, tmp;
 	const uint8_t *ptr;
@@ -498,7 +492,7 @@ void WriteOSD256Fnt0(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx
 	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
 }
 
-void CreateScrathFntTab(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font)
+void OSD256_create_scratch_font_table(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font)
 {
 	uint8_t i, j;
 
@@ -510,7 +504,7 @@ void CreateScrathFntTab(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font
 			{
 				uint8_t tmp = i * 8 + j;
 
-				WriteOSD256Fnt0(dst, (tmp % 38), (tmp / 38), tmp, color, attrib);
+				OSD256_write_font0(dst, (tmp % 38), (tmp / 38), tmp, color, attrib);
 			}
 		}
 	}
@@ -518,15 +512,15 @@ void CreateScrathFntTab(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font
 	{
 		for (i = 0; i < 96; i++)
 		{
-			WriteOSD256Fnt1(dst, (i % 16), (i / 16), i, color, attrib);
+			OSD256_write_font1(dst, (i % 16), (i / 16), i, color, attrib);
 
 		}
 	}
 }
 
-void OSD256_Block_fill(uint8_t _pth, uint8_t dst, uint16_t start_X, uint16_t start_Y, uint16_t end_X, uint16_t end_Y, uint8_t color)
+void OSD256_block_fill(uint8_t _pth, uint8_t dst, uint16_t start_X, uint16_t start_Y, uint16_t end_X, uint16_t end_Y, uint8_t color)
 {
-	uint8_t reg40, tmp;
+	uint8_t tmp;
 	uint8_t reg205, reg206, reg207, reg208, reg209, reg20a, reg24e, reg24f;
 	uint8_t reg241, reg242, reg243;
 
@@ -616,7 +610,7 @@ void OSD256_Block_fill(uint8_t _pth, uint8_t dst, uint16_t start_X, uint16_t sta
 }
 
 // src/dst 0 - sratch, 1 - display
-void OSD256_Block_Transfer(uint8_t src, uint8_t dst, uint16_t src_start_x, uint16_t src_start_y,
+void OSD256_block_transfer(uint8_t src, uint8_t dst, uint16_t src_start_x, uint16_t src_start_y,
 	uint16_t dst_start_x, uint16_t dst_start_y, uint16_t dst_end_x, uint16_t dst_end_y)
 {
 
@@ -732,7 +726,7 @@ void OSD256_putc( uint16_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color
 	src_start_y = src_start_y + color_y;
 
 
-	OSD256_Block_Transfer(SCRATCH, DISPLAY, src_start_x, src_start_y,
+	OSD256_block_transfer(SCRATCH, DISPLAY, src_start_x, src_start_y,
 		dst_start_x, _pos_y, dst_end_x, dst_end_y);
 
 }
@@ -785,14 +779,14 @@ void OSD256_printf_slow(uint16_t posx, uint16_t posy, char color, char font, con
 
 	for (uint8_t a = 0; a < strlen(buf); a++)
 	{
-		if (font) WriteOSD256Fnt1(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
-		else WriteOSD256Fnt0(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
+		if (font) OSD256_write_font1(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
+		else OSD256_write_font0(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
 		_posX++;
 	}
 
 }
 
-void WriteOSD256Fnt1(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib)
+void OSD256_write_font1(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib)
 {
 	uint8_t reg40, tmp;
 	const uint8_t *ptr;
@@ -871,74 +865,6 @@ void WriteOSD256Fnt1(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx
 }
 
 
-void OSD256_load_bitmap(uint8_t dst, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height, uint8_t color, const char *bitmap)
-{
-	uint8_t reg40, tmp;
-	uint16_t tmp1;
-
-
-	tw_write_register(0x20a, 0x0);					        //... y path 0x20, x Path 0x00
-
-	reg40 = tw_read_register(0x240);
-	tw_write_register(0x240, (reg40 | 0x1));			//Enable extend OSD feature
-
-	OSD256_OSG_Mode_Selection(1);				    	// Set OSG operation mode to BMP operation	
-
-	tw_write_register(0x205, start_x);
-	tmp1 = (start_x + width - 1);
-	tw_write_register(0x206, tmp1 );
-
-	tmp = ((start_x & 0xff00) >> 8 << 6) | ((tmp1 & 0xff00) >> 8 << 4);
-	tw_write_register(0x24e, tmp);
-	tw_write_register(0x207, start_y);
-	tmp1 = start_y + height - 1;
-
-	tw_write_register(0x208, tmp1);
-
-	tmp = ((start_y & 0xff00) >> 8 << 2) | ((tmp1 & 0xff00) >> 8);
-
-	tw_write_register(0x209, tmp);
-
-	//Set OSG_DSTCTL           0 scratch 1 display   
-	if (dst == 1)
-		tmp = 0x4;				//To Display buffer
-	else
-		tmp = 0;					//scratch 
-
-	tw_write_register(0x24f, tmp | 0x1);
-
-
-
-
-	for (tmp1 = 0; tmp1< (height*width /2); tmp1++)
-	{
-		uint8_t pix;
-		
-
-		pix = (bitmap[tmp1] & 0xf0) >> 4;
-
-		if (pix == 0) pix = 0xff;
-		else if (pix == 3) pix = color;
-		else if (pix == 1) pix = COLOR_BLACK;
-		else if (pix == 2) pix = COLOR_25_WHITE;
-		else if (pix == 4) pix = COLOR_WHITE;
-
-		tw_write_register(0x200, pix);
-
-		pix = (bitmap[tmp1] & 0xf);
-		if (pix == 0) pix = 0xff;
-		else if (pix == 3) pix = color;
-		else if (pix == 1) pix = COLOR_BLACK;
-		else if (pix == 2) pix = COLOR_25_WHITE;
-		else if (pix == 4) pix = COLOR_WHITE;
-		tw_write_register(0x200, pix);
-
-		WAIT_OSG_WRSTALL;
-	}
-	WAIT_OSG_IDLE;
-	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
-
-}
 
 
 
@@ -949,7 +875,7 @@ void OSD256_clear_screen(uint8_t _pth, uint8_t page)
 	tmp = OSD256_wr_page;
 
 	OSD256_wr_page = page;
-	OSD256_Block_fill(_pth, DISPLAY, 0, 0, 719, 575, 0xff);
+	OSD256_block_fill(_pth, DISPLAY, 0, 0, 719, 575, 0xff);
 	OSD256_wr_page = tmp;
 
 }
@@ -1071,12 +997,12 @@ void OSD256_drawline(uint8_t _pth, uint8_t color, int x, int y, int x2, int y2)
 	{
 		if (y <= y2)
 		{
-			OSD256_Block_fill(_pth, DISPLAY, x, y, x2, y2, color);
+			OSD256_block_fill(_pth, DISPLAY, x, y, x2, y2, color);
 			return;
 		}
 		else
 		{
-			OSD256_Block_fill(_pth, DISPLAY, x, y2, x2, y, color);
+			OSD256_block_fill(_pth, DISPLAY, x, y2, x2, y, color);
 			return;
 		}
 	}
@@ -1085,12 +1011,12 @@ void OSD256_drawline(uint8_t _pth, uint8_t color, int x, int y, int x2, int y2)
 	{
 		if (x <= x2)
 		{
-			OSD256_Block_fill(_pth, DISPLAY, x, y, x2, y2+1, color);		//A line must be at least 2 pixel tall to shown on both FIELD
+			OSD256_block_fill(_pth, DISPLAY, x, y, x2, y2+1, color);		//A line must be at least 2 pixel tall to shown on both FIELD
 			return;
 		}
 		else
 		{
-			OSD256_Block_fill(_pth, DISPLAY, x2, y, x, y2+1, color);
+			OSD256_block_fill(_pth, DISPLAY, x2, y, x, y2+1, color);
 			return;
 		}
 	}
@@ -1167,7 +1093,7 @@ void OSD256_drawline(uint8_t _pth, uint8_t color, int x, int y, int x2, int y2)
 	}
 }
 
-void OSD256_Circle(uint8_t _pth, uint8_t color, int  xCenter, int yCenter, int radius)
+void OSD256_circle(uint8_t _pth, uint8_t color, int  xCenter, int yCenter, int radius)
 {
 	int tSwitch, y, x = 0;
 	int d;
@@ -1224,16 +1150,87 @@ void OSD256_set_drawcolor(uint8_t color)
 
 void OSD256_box(uint8_t _pth, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color)
 {
-	OSD256_Block_fill(_pth, DISPLAY, x, y, x + w - 1, y + h - 1, color);
+	OSD256_block_fill(_pth, DISPLAY, x, y, x + w - 1, y + h - 1, color);
 };
 
+
+void OSD256_transform_polygon(struct polygon_t *p, int x, int y, int rot)
+{
+    struct point_t *pt = p->points;
+    uint8_t i;
+    float angle = DEG2RAD(rot);
+    float cos_rot = cos(angle) * 10000;
+    float sin_rot = sin(angle) * 10000;
+    long cos_l = (long)cos_rot;
+    long sin_l = (long)sin_rot;
+
+    long xr, yr;
+
+    for (i = 0; i < p->len; i++)
+    {
+        xr = ((cos_l * pt->x) - (sin_l * pt->y));
+        xr = (xr + 5000) / 10000;
+        yr = ((cos_l * pt->y) + (sin_l * pt->x));
+        yr = (yr + 5000) / 10000;
+        pt->x = (int)xr;
+        pt->y = (int)yr;
+        pt->x += x;
+        pt->y += y;
+        pt++;
+    }
+}
+
+void OSD256_move_polygon(struct polygon_t *p, int x, int y)
+{
+    struct point_t *pt = p->points;
+    uint8_t i;
+
+    for (i = 0; i < p->len; i++)
+    {
+        pt->x += x;
+        pt->y += y;
+        pt++;
+    }
+}
+
+void OSD256_scale_polygon(struct polygon_t *p, float scale)
+{
+
+    struct point_t *pt = p->points;
+    uint8_t i;
+
+    for (i = 0; i < p->len; i++)
+    {
+        pt->x = pt->x * scale;
+        pt->y = pt->y * scale;
+        pt++;
+    }
+}
+
+void OSD256_draw_polygon(struct polygon_t *p, char color)
+{
+    uint8_t i;
+    struct point_t *pt1 = p->points;
+    struct point_t *pt2 = pt1 + 1;
+
+    for (i = 1; i < p->len; i++)
+    {
+        OSD256_drawline(PTH_X, color, pt1->x, pt1->y, pt2->x, pt2->y);
+        pt1++;
+        pt2++;
+    }
+    pt2 = p->points;
+    OSD256_drawline(PTH_X, color, pt1->x, pt1->y, pt2->x, pt2->y);
+}
+
+
 //Display scratch memory (check fonts and bitmaps) and stops program
-void displayscratch()
+void OSD256_displayscratch()
 
 {
 	OSD256_wr_page = 0;
     OSD256_set_display_page(0);
-    OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 431);
+    OSD256_block_transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 431);
     while (1)
         ;
 
