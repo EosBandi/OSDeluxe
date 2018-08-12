@@ -27,11 +27,11 @@
 
 
 
-U8 cnt, count, data_buf[20];
+uint8_t cnt, count, data_buf[20];
 unsigned int ADDR_buf, count_TW2835;
 
-U8 OSD256_wr_page;
-U8 OSD256_font_color;
+uint8_t OSD256_wr_page;
+uint8_t OSD256_font_color;
 
 boundary_t osd_draw_boundary;						//Dynamically defined boundary for restrict drawing
 
@@ -53,7 +53,7 @@ void tw_init()
 	
 
 
-	static U8 pg1_a0_video_path[] =
+	static uint8_t pg1_a0_video_path[] =
 	{
 		0x60,		// a0  bit67-INX - bit54-INY 
 		0x11,		// a1  1 CBVS output for both VAOYX and VAOCX DAV
@@ -72,7 +72,7 @@ void tw_init()
 	tw_write_buf(0x1a0, pg1_a0_video_path, sizeof(pg1_a0_video_path));
 
 	//video decoder settings Same for all channels
-	static U8 pg0_00_decoder_settings[] =
+	static uint8_t pg0_00_decoder_settings[] =
 	{   0x00,		//00	Read only, no need   
 		0x07,		//01	Read only, no need ? Last three bit Vertical peaking level, 0 default
 		0x02,		//02	Hdelay    //0x0a
@@ -99,7 +99,7 @@ void tw_init()
 
 												//    |       ch1      ||      ch2       ||     ch3        ||     c4
 												//	   0x60  0x61  0x62  0x63  0x64  0x65  0x66  0x67  0x68  0x69  0x6a  0x6b
-	static U8 pg1_60_channel_settings[] = { 0xc0, 0x02, 0x00, 0xc1, 0x02, 0x00, 0xc2, 0x02, 0x00, 0xc3, 0x02, 0x00, 0x00,0xe4 };
+	static uint8_t pg1_60_channel_settings[] = { 0xc0, 0x02, 0x00, 0xc1, 0x02, 0x00, 0xc2, 0x02, 0x00, 0xc3, 0x02, 0x00, 0x00,0xe4 };
 	
 	tw_write_buf(0x160, pg1_60_channel_settings, sizeof(pg1_60_channel_settings));
 
@@ -148,7 +148,7 @@ void tw_init()
     tw_write_register (0x20F, 0x0f);
 
 
-    for (U8 i = 0; i < 18; i++)
+    for (uint8_t i = 0; i < 18; i++)
     {
         ADDR_buf = 0x20B;
         cnt = 0;
@@ -163,7 +163,7 @@ void tw_init()
         tw_write_buf (ADDR_buf, data_buf, cnt);
     }
 
-    for (U8 i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++)
     {
         ADDR_buf = 0x20B;
         cnt = 0;
@@ -191,7 +191,7 @@ void tw_init()
 
 
 
-    U8	tbl_pal_pg0_sfr3[] = {		//... 
+    uint8_t	tbl_pal_pg0_sfr3[] = {		//... 
 	//	0x00,0x00,0x00,0x07,		//...		0xc0~0xc3	//... AUTOBGNDxx on
 		0x00,0x00,0x00,0x00,		//...		0xc0~0xc3	//... AUTOBGNDxx off
 		0x00,0xff,0xf0,0xff,		//...		0xc4~0xc7	//... recommend:full table
@@ -201,7 +201,7 @@ void tw_init()
 
 	tw_write_buf(0x0c0, tbl_pal_pg0_sfr3, sizeof(tbl_pal_pg0_sfr3));
 
-U8	tbl_pal_pg0_sfr1[] = {		//... other decoder part
+uint8_t	tbl_pal_pg0_sfr1[] = {		//... other decoder part
 		0x00,0x77,0x07,0x45,		//...		0x40~0x43	//... update:060626
 		0xa0,0xd0,0x0, 0xf0,		//...		0x44~0x47
 		0xf0,0xf0,0xf0,0x02,		//...		0x48~0x4b
@@ -218,10 +218,10 @@ tw_write_register (0x238, 0b00000101);
 
 }
 
-U8 tw_read_register (unsigned int rdADDR)
+uint8_t tw_read_register (unsigned int rdADDR)
 {
-    U8 page, reg;
-    U8 ret;
+    uint8_t page, reg;
+    uint8_t ret;
 
     page = rdADDR >> 8;
     reg = rdADDR & 0x00ff;
@@ -234,9 +234,9 @@ U8 tw_read_register (unsigned int rdADDR)
     return (ret);
 }
 
-void tw_write_register (unsigned int wrADDR, U8 content)
+void tw_write_register (unsigned int wrADDR, uint8_t content)
 {
-    U8 page, reg;
+    uint8_t page, reg;
 
     page = wrADDR >> 8;
     reg = wrADDR & 0x00ff;
@@ -247,17 +247,17 @@ void tw_write_register (unsigned int wrADDR, U8 content)
     Wire.endTransmission ();
 }
 
-U8 tw_read_register_bit(unsigned int rdADDR, U8 _flg)
+uint8_t tw_read_register_bit(unsigned int rdADDR, uint8_t _flg)
 {
-	U8 val;
+	uint8_t val;
 	
 	val = tw_read_register(rdADDR);
 	return (val & _flg);
 }
 
-void tw_write_register_bit(unsigned int wrADDR, U8 _flg, U8 _data)
+void tw_write_register_bit(unsigned int wrADDR, uint8_t _flg, uint8_t _data)
 {
-	U8 val;
+	uint8_t val;
 
 	val = tw_read_register(wrADDR);
 	val = (val & ~_flg) | _data;
@@ -266,10 +266,10 @@ void tw_write_register_bit(unsigned int wrADDR, U8 _flg, U8 _data)
 }
 
 
-void tw_write_buf (U16 wrADDR, U8 *wrBUF, U8 wrCNT)
+void tw_write_buf (uint16_t wrADDR, uint8_t *wrBUF, uint8_t wrCNT)
 {
 
-    U8 i;
+    uint8_t i;
 
     Wire.beginTransmission (0x42);
     Wire.write (wrADDR >> 8);
@@ -297,7 +297,7 @@ void OSD256_set_display_page(char rd_page)
 }
 
 
-void tw_ch_set_window (U8 _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H)
+void tw_ch_set_window (uint8_t _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H)
 {
     unsigned int _ADDR_1, _ADDR_2;
 
@@ -356,12 +356,12 @@ void tw_ch_set_window (U8 _ch, unsigned int _pos_H, unsigned int _pos_V, unsigne
 
 	}
 
-void tw_ch_settings (U8 _ch, U8 _on_off, U8 _popup)
+void tw_ch_settings (uint8_t _ch, uint8_t _on_off, uint8_t _popup)
 {
 
     if (_ch < 1 || _ch > 4) return;
 
-    U8 value = _ch - 1;
+    uint8_t value = _ch - 1;
     if (_on_off) value |= 0x80;
     if (_popup) value |= 0x40;
     tw_write_register (0x110 + (_ch - 1) * 0x08, value);
@@ -370,7 +370,7 @@ void tw_ch_settings (U8 _ch, U8 _on_off, U8 _popup)
 void tw_ch_set_input(char ch, char input)
 {
 
-	U8 inp;
+	uint8_t inp;
 	switch (input)
 	{
 	case 1:
@@ -407,17 +407,17 @@ void tw_ch_set_input(char ch, char input)
 }
 
 
-void OSD256_OSG_Mode_Selection(U8 mode)
+void OSD256_OSG_Mode_Selection(uint8_t mode)
 {
-	U8 tmp;
+	uint8_t tmp;
 	tw_write_register(0x241, mode & 0x3);
 }
 
-void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib)
+void WriteOSD256Fnt0(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib)
 {
-	U8 reg40, tmp;
-	const U8 *ptr;
-	U16 tmp1;
+	uint8_t reg40, tmp;
+	const uint8_t *ptr;
+	uint16_t tmp1;
 
 
 	tw_write_register(0x20a, 0x0);					//... y path 0x20, x Path 0x00
@@ -464,8 +464,8 @@ void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 
 	for (tmp = 0; tmp<FONT0_Y; tmp++)
 	{
-		U8 pix, pix_data;
-		U8 i, j, mask;
+		uint8_t pix, pix_data;
+		uint8_t i, j, mask;
 
 
 		for (i = 0; i<4; i++)
@@ -498,9 +498,9 @@ void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 	tw_write_register(0x240, reg40); 				// Restore the saved register 2x40 value
 }
 
-void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font)
+void CreateScrathFntTab(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font)
 {
-	U8 i, j;
+	uint8_t i, j;
 
 
 	if (font == 0)
@@ -508,7 +508,7 @@ void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font)
 		for (i = 0; i < 14; i++) {
 			for (j = 0; j < 8; j++)
 			{
-				U8 tmp = i * 8 + j;
+				uint8_t tmp = i * 8 + j;
 
 				WriteOSD256Fnt0(dst, (tmp % 38), (tmp / 38), tmp, color, attrib);
 			}
@@ -524,11 +524,11 @@ void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font)
 	}
 }
 
-void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color)
+void OSD256_Block_fill(uint8_t _pth, uint8_t dst, uint16_t start_X, uint16_t start_Y, uint16_t end_X, uint16_t end_Y, uint8_t color)
 {
-	U8 reg40, tmp;
-	U8 reg205, reg206, reg207, reg208, reg209, reg20a, reg24e, reg24f;
-	U8 reg241, reg242, reg243;
+	uint8_t reg40, tmp;
+	uint8_t reg205, reg206, reg207, reg208, reg209, reg20a, reg24e, reg24f;
+	uint8_t reg241, reg242, reg243;
 
 	//check boundaries, if dst=1 then destination is display, so check screen boundaries
 
@@ -616,11 +616,11 @@ void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16
 }
 
 // src/dst 0 - sratch, 1 - display
-void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y,
-	U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y)
+void OSD256_Block_Transfer(uint8_t src, uint8_t dst, uint16_t src_start_x, uint16_t src_start_y,
+	uint16_t dst_start_x, uint16_t dst_start_y, uint16_t dst_end_x, uint16_t dst_end_y)
 {
 
-	U8 reg40, tmp;
+	uint8_t reg40, tmp;
 
 
 	tw_write_register(0x20a, (OSD256_wr_page & 0x7) << 2);					//... y path 0x20, x Path 0x00
@@ -654,14 +654,14 @@ void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y,
 	tw_write_register(0x240, reg40); 		// Restore the saved register 2x40 value
 }
 
-void OSD256_putc( U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font)
+void OSD256_putc( uint16_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t font)
 {
 
-	U16 src_start_x, src_start_y, dst_start_x, dst_end_x, dst_end_y, color_x, color_y;
+	uint16_t src_start_x, src_start_y, dst_start_x, dst_end_x, dst_end_y, color_x, color_y;
 
-	U8 fnt_tbl_row_size = 38;
-	U8 fnt_height = 20;
-	U8 fnt_width = 16; 
+	uint8_t fnt_tbl_row_size = 38;
+	uint8_t fnt_height = 20;
+	uint8_t fnt_width = 16; 
 
 
 	if (font == 1) {
@@ -738,12 +738,12 @@ void OSD256_putc( U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font)
 }
 
 
-void OSD256_puts(char *str, U16 posx, U16 posy, U8 color, U8 font)
+void OSD256_puts(char *str, uint16_t posx, uint16_t posy, uint8_t color, uint8_t font)
 {
 
-	U16 _posX = posx;
+	uint16_t _posX = posx;
 
-	for (U8 a = 0; a < strlen(str); a++)
+	for (uint8_t a = 0; a < strlen(str); a++)
 	{
 		OSD256_putc(_posX, posy, str[a]-32, color,font);
 		if (font == 0)_posX = _posX + 15;
@@ -759,7 +759,7 @@ void OSD256_puts(char *str, U16 posx, U16 posy, U8 color, U8 font)
 	}
 }
 
-void OSD256_printf(U16 posx, U16 posy, char color, char font, const char *format, ...)
+void OSD256_printf(uint16_t posx, uint16_t posy, char color, char font, const char *format, ...)
 {
 	char buf[128];
 	va_list args;
@@ -772,7 +772,7 @@ void OSD256_printf(U16 posx, U16 posy, char color, char font, const char *format
 }
 
 
-void OSD256_printf_slow(U16 posx, U16 posy, char color, char font, const char *format, ...)
+void OSD256_printf_slow(uint16_t posx, uint16_t posy, char color, char font, const char *format, ...)
 {
 	char buf[128];
 	va_list args;
@@ -783,7 +783,7 @@ void OSD256_printf_slow(U16 posx, U16 posy, char color, char font, const char *f
 
 	byte _posX = posx;
 
-	for (U8 a = 0; a < strlen(buf); a++)
+	for (uint8_t a = 0; a < strlen(buf); a++)
 	{
 		if (font) WriteOSD256Fnt1(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
 		else WriteOSD256Fnt0(DISPLAY, _posX, posy, buf[a] - 32, color, 0);
@@ -792,11 +792,11 @@ void OSD256_printf_slow(U16 posx, U16 posy, char color, char font, const char *f
 
 }
 
-void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib)
+void WriteOSD256Fnt1(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib)
 {
-	U8 reg40, tmp;
-	const U8 *ptr;
-	U16 tmp1;
+	uint8_t reg40, tmp;
+	const uint8_t *ptr;
+	uint16_t tmp1;
 
 
 	tw_write_register(0x20a, 0x0);					        //... y path 0x20, x Path 0x00
@@ -841,8 +841,8 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 
 	for (tmp = 0; tmp<24; tmp++)
 	{
-		U8 pix, pix_data;
-		U8 i, j, mask;
+		uint8_t pix, pix_data;
+		uint8_t i, j, mask;
 
 
 		for (i = 0; i<4; i++)
@@ -871,10 +871,10 @@ void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attri
 }
 
 
-void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height, U8 color, const char *bitmap)
+void OSD256_load_bitmap(uint8_t dst, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height, uint8_t color, const char *bitmap)
 {
-	U8 reg40, tmp;
-	U16 tmp1;
+	uint8_t reg40, tmp;
+	uint16_t tmp1;
 
 
 	tw_write_register(0x20a, 0x0);					        //... y path 0x20, x Path 0x00
@@ -912,7 +912,7 @@ void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height,
 
 	for (tmp1 = 0; tmp1< (height*width /2); tmp1++)
 	{
-		U8 pix;
+		uint8_t pix;
 		
 
 		pix = (bitmap[tmp1] & 0xf0) >> 4;
@@ -942,10 +942,10 @@ void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height,
 
 
 
-void OSD256_clear_screen(U8 _pth, U8 page)
+void OSD256_clear_screen(uint8_t _pth, uint8_t page)
 {
 
-	U8 tmp;
+	uint8_t tmp;
 	tmp = OSD256_wr_page;
 
 	OSD256_wr_page = page;
@@ -954,13 +954,13 @@ void OSD256_clear_screen(U8 _pth, U8 page)
 
 }
 
-void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
+void OSD256_setpixel(uint8_t _pth, uint8_t color, uint16_t start_X, uint16_t start_Y)
 {
-	U8 tmp;
-	U16 end_X, end_Y;
+	uint8_t tmp;
+	uint16_t end_X, end_Y;
 
-	U8 reg205, reg206, reg207, reg208, reg209, reg20a;
-	U8 reg24e, reg24f;
+	uint8_t reg205, reg206, reg207, reg208, reg209, reg20a;
+	uint8_t reg24e, reg24f;
 
 
 	end_X = start_X + 1;
@@ -1019,13 +1019,13 @@ void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y)
 	//WAIT_OSG_IDLE; //do we really need this ?
 }
 
-void OSD256_setpixel_fast(U8 pth, U16 start_X, U16 start_Y)
+void OSD256_setpixel_fast(uint8_t pth, uint16_t start_X, uint16_t start_Y)
 {
-//	U8 tmp;
-	U16 end_X, end_Y;
+//	uint8_t tmp;
+	uint16_t end_X, end_Y;
 
-	U8 reg205, reg206, reg207, reg208, reg209;
-	U8 reg24e;
+	uint8_t reg205, reg206, reg207, reg208, reg209;
+	uint8_t reg24e;
 
 	if (start_X < osd_draw_boundary.x0 || start_X > osd_draw_boundary.x1) return;
 	if (start_Y < osd_draw_boundary.y0 || start_Y > osd_draw_boundary.y1) return;
@@ -1063,7 +1063,7 @@ void OSD256_setpixel_fast(U8 pth, U16 start_X, U16 start_Y)
 }
 
 
-void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
+void OSD256_drawline(uint8_t _pth, uint8_t color, int x, int y, int x2, int y2)
 {
 
 	//First check for special cases such as vertical or horizontal lines
@@ -1099,7 +1099,7 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 	int shortLen = y2 - y;
 	int longLen = x2 - x;
 
-	U8 reg20a;
+	uint8_t reg20a;
 
 	OSD256_set_drawcolor(color);
 	tw_write_register(0x241, 0x02);
@@ -1167,11 +1167,11 @@ void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2)
 	}
 }
 
-void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius)
+void OSD256_Circle(uint8_t _pth, uint8_t color, int  xCenter, int yCenter, int radius)
 {
 	int tSwitch, y, x = 0;
 	int d;
-	U8 reg20a;
+	uint8_t reg20a;
 
 	OSD256_set_drawcolor(color);
 	tw_write_register(0x241, 0x02);
@@ -1217,12 +1217,12 @@ void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius)
 		x++;
 	}
 }
-void OSD256_set_drawcolor(U8 color)
+void OSD256_set_drawcolor(uint8_t color)
 {
 	tw_write_register(0x243, color);
 }
 
-void OSD256_box(U8 _pth, U16 x, U16 y, U16 w, U16 h, U8 color)
+void OSD256_box(uint8_t _pth, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color)
 {
 	OSD256_Block_fill(_pth, DISPLAY, x, y, x + w - 1, y + h - 1, color);
 };

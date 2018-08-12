@@ -40,13 +40,13 @@
 
 struct osd_settings {
 
-	U8   eeprom_version;								// version for eeporm content version.
-	U16  settings_size;
+	uint8_t   eeprom_version;								// version for eeporm content version.
+	uint16_t  settings_size;
 
 
 	vin_params_t vin_params[4];					// Video in
 
-//	U8 ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
+//	uint8_t ctr2_video_on[3];				// Enabled video inputs in crt2 channel 
 
 	bool color_bar_x = false;
 	bool color_bar_y = false;
@@ -102,9 +102,9 @@ struct osd_settings {
 
 	rssi_widget_t rssi;
 
-	U8 center_cross_visible = 0x01;
+	uint8_t center_cross_visible = 0x01;
 
-	U8 ctr_ch[4];
+	uint8_t ctr_ch[4];
 
 
 
@@ -113,7 +113,7 @@ struct osd_settings {
 
 
 void default_settings();
-U8   load_settings();
+uint8_t   load_settings();
 void save_settings();
 
 

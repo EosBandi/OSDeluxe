@@ -43,7 +43,7 @@ void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
     }
 }
 
-const static U8 mavlink_stream_map[] = {
+const static uint8_t mavlink_stream_map[] = {
     MAV_DATA_STREAM_ALL,
     /* SCALED_IMU2, SCALED_PRESSURE, SENSOR_OFFSETS */
     MAV_DATA_STREAM_RAW_SENSORS,
@@ -65,9 +65,9 @@ const static U8 mavlink_stream_map[] = {
 
 struct mavlink_config
 {
-    U8 streams[8];
-    U8 uav_sysid, osd_sysid;
-    U8 heartbeat;
+    uint8_t streams[8];
+    uint8_t uav_sysid, osd_sysid;
+    uint8_t heartbeat;
     uint8_t shell_rate;
 };
 
@@ -112,7 +112,7 @@ int parse_error = 0;
 
 #define MAX_STREAMS 7
 
-bool getBit(U8 byte, int position) // position in range 0-7
+bool getBit(uint8_t byte, int position) // position in range 0-7
 {
     return (byte >> position) & 0x1;
 }
@@ -151,7 +151,7 @@ void heartbeat_validation(void)
 
 void request_mavlink_rates(void)
 {
-    const U8 MAVStreams[MAX_STREAMS] = { MAV_DATA_STREAM_RAW_SENSORS, 
+    const uint8_t MAVStreams[MAX_STREAMS] = { MAV_DATA_STREAM_RAW_SENSORS, 
                                                     MAV_DATA_STREAM_EXTENDED_STATUS,
                                                     MAV_DATA_STREAM_RC_CHANNELS,
                                                     MAV_DATA_STREAM_POSITION,
@@ -447,7 +447,7 @@ void read_mavlink()
 			break;
 			case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 			{
-				U8 sys, comp;
+				uint8_t sys, comp;
 
 				sys = mavlink_msg_param_request_list_get_target_system(&msg);
 				comp = mavlink_msg_param_request_list_get_target_component(&msg);
@@ -462,7 +462,7 @@ void read_mavlink()
 			break;
 			case MAVLINK_MSG_ID_PARAM_SET:
 			{
-				U8 sys, comp;
+				uint8_t sys, comp;
 				mavlink_message_t msg2;
 				unsigned int len;
 				char param_name[17];
@@ -548,7 +548,7 @@ void mavlink_send_msg(mavlink_message_t *msg)
 {
 
     unsigned int len;
-    U8 buf[MAVLINK_MAX_PACKET_LEN];
+    uint8_t buf[MAVLINK_MAX_PACKET_LEN];
 
     len = mavlink_msg_to_send_buffer(buf, msg);
     

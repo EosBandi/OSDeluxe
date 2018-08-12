@@ -95,16 +95,16 @@ struct global_variables_t
     char system_status; // Se MAVLINK_STATE enum
 
     char message_buffer[MESSAGE_BUFFER_LINES][52]; // 20 line of 52 character message_buffer
-    U8 message_severity[MESSAGE_BUFFER_LINES];
-    U8 message_buffer_line;
-    U8 message_buffer_display_line;
+    uint8_t message_severity[MESSAGE_BUFFER_LINES];
+    uint8_t message_buffer_line;
+    uint8_t message_buffer_display_line;
     long message_buffer_display_time;
     bool message_display; // we have message to display in the buffer
     bool clear_req;
 
     char message_archive[MESSAGE_BUFFER_LINES][52];
     char message_archive_severity[MESSAGE_BUFFER_LINES];
-    U8 message_archive_line = 0;
+    uint8_t message_archive_line = 0;
 
     bool displayed_arming_status;
     unsigned long armed_start_time;
@@ -116,13 +116,13 @@ struct global_variables_t
 
     char test_byte;
 
-    U8 write_settings;
-    U8 debug_looptime;
+    uint8_t write_settings;
+    uint8_t debug_looptime;
 
     bool pthy_redraw; // indicated that we need to redraw osd contect on y path.
 
     bool powerup; // Are we resetting or powering up from zero.
-    U8 detected_cell_count;
+    uint8_t detected_cell_count;
 };
 
 extern global_variables_t g;

@@ -33,8 +33,8 @@
 
 
 // Common definitions used all over the code
-#define U8  unsigned char 
-#define U16 unsigned short
+//#define uint8_t  unsigned char 
+//#define uint16_t unsigned short
 
 
 #include <Arduino.h>

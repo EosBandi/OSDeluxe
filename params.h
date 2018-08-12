@@ -36,14 +36,14 @@ struct param_value {
             int param_int16;
             unsigned int param_uint16;
             char param_int8;
-            U8 param_uint8;
+            uint8_t param_uint8;
     };
 };
 
 
 struct param_def {
     char name[17];
-    U8 type;
+    uint8_t type;
     void *value;
 	void(*cbk)(void);
 };
@@ -52,11 +52,11 @@ extern struct param_def parameters[];
 
 void get_parameter_count();
 unsigned int get_parameter_index(char *name);
-float cast2float(void *value, U8 type);
+float cast2float(void *value, uint8_t type);
 void cast2param(struct param_def *p, float v);
 float get_parameter_value(int idx, char *name);
 void send_param_list();
-int params_set_value(char *name, float value, U8 trigger_cbk);
+int params_set_value(char *name, float value, uint8_t trigger_cbk);
 void update_vin_settings();
 void update_vout_settings();
 void update_pip();

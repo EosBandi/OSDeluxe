@@ -51,10 +51,10 @@ enum number_pos {
 
 
  struct bar {
-     U16  x;  // x position (4 pixels 0-180)
-     U16 y;  // y position (field 0-288)
-     U16  w;  // width in 4pixels
-     U16 h;  // height
+     uint16_t  x;  // x position (4 pixels 0-180)
+     uint16_t y;  // y position (field 0-288)
+     uint16_t  w;  // width in 4pixels
+     uint16_t h;  // height
      float max;         // maximum displayable value    
      float min;         // minimum displayable value
      float val;         // value to display
@@ -67,25 +67,25 @@ enum number_pos {
  };
 
 struct gps_widget_t {
-    U16 x;
-    U16 y;
-    U8 sat;
-    U8 sat_warn;			//Warning level, makes the status yellow (It belongs to the status widget, but for PARAMS it easier to put here
-	U8 sat_critical;     //Critical level, makes status red, and gps indicator also red
+    uint16_t x;
+    uint16_t y;
+    uint8_t sat;
+    uint8_t sat_warn;			//Warning level, makes the status yellow (It belongs to the status widget, but for PARAMS it easier to put here
+	uint8_t sat_critical;     //Critical level, makes status red, and gps indicator also red
     float         hdop;
     float         hdop_warn;		//Warning level see above (hdop above this)
 	float		  hdop_critical;	//Critical level see above  (hdop above this)
-    U8  fix;
-    U8 color;
-	U8 visible;
+    uint8_t  fix;
+    uint8_t color;
+	uint8_t visible;
 };
 
 
 struct batt_volt_widget_t {
-	U16 x;
-	U16 y;
+	uint16_t x;
+	uint16_t y;
 	struct bar volt;
-	U8 cells;
+	uint8_t cells;
 	float min_cell_voltage;
 	float max_cell_voltage;
 	float red_cell_voltage;
@@ -93,204 +93,204 @@ struct batt_volt_widget_t {
 	bartype bar_type;
 	bool mix;
 	bool box;
-	U8 visible;
+	uint8_t visible;
 };
 
 
 struct batt_cap_widget_t {
-	U16 x;
-	U16 y;
+	uint16_t x;
+	uint16_t y;
 	struct bar cap;
 	int max_capacity;
 	bartype bar_type;
 	bool mix;
 	bool box;
-	U8 visible;
+	uint8_t visible;
 };
 
 
 struct batt_curr_widget_t {
-	U16 x;
-	U16 y;
+	uint16_t x;
+	uint16_t y;
 	bool mix;
 	bool box;
-	U8 visible;
+	uint8_t visible;
 };
 
 struct batt_power_widget_t
 {
-	U16 x;
-	U16 y;
-	U8 visible;
+	uint16_t x;
+	uint16_t y;
+	uint8_t visible;
 };
 
 struct status_widget_t {
-    U16 x;
-    U16 y;
+    uint16_t x;
+    uint16_t y;
 
     status_info gps_status;
     status_info ekf_status;
     status_info vibe_status;
 
     bool mix;
-	U8 visible;
+	uint8_t visible;
 };
 
 struct alt_widget_t {
-    U16 x;
-    U16 y;
+    uint16_t x;
+    uint16_t y;
     bool mix;
-	U8 visible;
+	uint8_t visible;
 };
 
 struct gs_widget_t {
-	U16 x;
-	U16 y;
-	U8 visible;
+	uint16_t x;
+	uint16_t y;
+	uint8_t visible;
 };
 
 struct rssi_widget_t {
-    U16 x;
-    U16 y;
-    U8 visible;
-    U8 rssi_warning;
-    U8 rssi_critical;
+    uint16_t x;
+    uint16_t y;
+    uint8_t visible;
+    uint8_t rssi_warning;
+    uint8_t rssi_critical;
 
 };
 
 
 struct throttle_widget_t {
-	U16 x;
-	U16 y;
-	U8  visible;
+	uint16_t x;
+	uint16_t y;
+	uint8_t  visible;
 };
 
 
 struct pull_widget_t {
-	U16 x;
-	U16 y;
+	uint16_t x;
+	uint16_t y;
 	float pull;
 	bool mix;
 	float warning;			//Warning level in Newtons
-	U8 visible;
+	uint8_t visible;
 };
 
 struct move_widget_t {
-	U16 x;
-	U16 y;
-	U16  size;
+	uint16_t x;
+	uint16_t y;
+	uint16_t  size;
 	float		   max;
 	char		   visible;
 
 };
 
 struct vario_widget_t {
-    U16 x;
-    U16 y;
-    U16 h;
-    U16 w;
+    uint16_t x;
+    uint16_t y;
+    uint16_t h;
+    uint16_t w;
     number_pos num_pos;
     float vario_max;
     bool mix;
-	U8 visible;
+	uint8_t visible;
 };
 
 struct vario_graph_widget_t {
-	U16 x;
-	U16 y;
-	U16 h;
-	U16 w;
+	uint16_t x;
+	uint16_t y;
+	uint16_t h;
+	uint16_t w;
 
 	float vario_max;
 	bool  mix;
-	U8 visible;
+	uint8_t visible;
 };
 
 
 struct home_widget_t {
-    U16 x;
-    U16 y;
+    uint16_t x;
+    uint16_t y;
     float orientation;
     unsigned int home_distance;    
-	U8 visible;
+	uint8_t visible;
 };
 
 struct horizon_t {
-    U16  x;
-    U16  y;
+    uint16_t  x;
+    uint16_t  y;
 
     int pitch;
     int roll;
 
-	U8 visible;
+	uint8_t visible;
 };
 
 struct mode_widget_t {
-    U16 mode_x;
-    U16 mode_y;
+    uint16_t mode_x;
+    uint16_t mode_y;
 	char		   mode_centered;
 	char		   mode_short;
 
-    U16 fs_x;
-    U16 fs_y;
+    uint16_t fs_x;
+    uint16_t fs_y;
 	char		   fs_centered;
 
-	U16 arm_x;
-    U16 arm_y;
+	uint16_t arm_x;
+    uint16_t arm_y;
 	char		   arm_centered;
 
-	U8 visible;
+	uint8_t visible;
 
 };
 
 
 struct compass_widget_t {
-	U16 x;
-	U16 y;
+	uint16_t x;
+	uint16_t y;
 
-	U8 visible;
+	uint8_t visible;
 };
 
 struct message_widget_t {
 
-	U16  x;
-	U16  y;
+	uint16_t  x;
+	uint16_t  y;
 	bool mix;
-	U8 visible;
+	uint8_t visible;
 
 };
 
 struct message_list_widget_t {
-	U16 x;
-	U16 y;
+	uint16_t x;
+	uint16_t y;
 	bool mix;
 	
-	U8 visible;
+	uint8_t visible;
 };
 
 
 struct box_t {
-	U16 x;
-	U16 y;
-	U16 w;
-	U16 h;
+	uint16_t x;
+	uint16_t y;
+	uint16_t w;
+	uint16_t h;
 
-	U8 color;
-	U8 mix;
+	uint8_t color;
+	uint8_t mix;
 
-	U8 visible;
+	uint8_t visible;
 
 };
 
 
 struct radar_widget_t {
-	U16 x;
-	U16 y;
-	U16 size;
-	U8  scale;
-	U8 type;
+	uint16_t x;
+	uint16_t y;
+	uint16_t size;
+	uint8_t  scale;
+	uint8_t type;
 
-	U8 visible;
+	uint8_t visible;
 };
 
 
@@ -299,7 +299,7 @@ void osd_bar_render(struct bar *b);
 void osd_gps_render(struct gps_widget_t *g);
 
 void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage);
-void osd_batt_cap_render(struct batt_cap_widget_t *bw, U8 remaining_capacity);
+void osd_batt_cap_render(struct batt_cap_widget_t *bw, uint8_t remaining_capacity);
 //void osd_battery_render( struct battery_widget_t *bw);
 void osd_batt_curr_render(struct batt_curr_widget_t *bw, float current);
 void osd_batt_power_render(struct batt_power_widget_t *bw, int power);

@@ -511,7 +511,7 @@ void update_test_byte()
 
 void update_pip()
 {
-	for (U8 i = 1; i<5; i++)
+	for (uint8_t i = 1; i<5; i++)
 	{
 		tw_ch_set_input(i, osd.video_channels[g.pip_page][i].input);
 	
@@ -529,7 +529,7 @@ void update_pip()
 
 void update_vout_settings()
 {
-	U8 reg1ab = 0;
+	uint8_t reg1ab = 0;
 	if (osd.color_bar_x) reg1ab =  reg1ab | 0x08;
 	if (osd.color_kill_x) reg1ab = reg1ab | 0x04;
 	tw_write_register(0x1ab, reg1ab);
@@ -538,7 +538,7 @@ void update_vout_settings()
 	if (osd.vout2_gain > 7) osd.vout2_gain = 7;
 	if (osd.vout3_gain > 7) osd.vout3_gain = 7;
 	
-	U8 reg041 = 0;
+	uint8_t reg041 = 0;
 	reg041 = (osd.vout2_gain << 4) + osd.vout1_gain;
 	tw_write_register(0x041, reg041);
 	tw_write_register(0x042, osd.vout3_gain);
@@ -641,7 +641,7 @@ float get_parameter_value(int idx, char *name)
 	}
 }
 
-int params_set_value(char *name, float value, U8 trigger_cbk)
+int params_set_value(char *name, float value, uint8_t trigger_cbk)
 {
 	struct param_def *p;
 	int idx;
@@ -660,15 +660,15 @@ int params_set_value(char *name, float value, U8 trigger_cbk)
 
 
 
-float cast2float(void *value, U8 type)
+float cast2float(void *value, uint8_t type)
 {
 	switch (type) {
 	case MAV_PARAM_TYPE_UINT8:
-		return (float) *((U8*)(value));
+		return (float) *((uint8_t*)(value));
 	case MAV_PARAM_TYPE_INT8:
 		return (float) *((char*)(value));
 	case MAV_PARAM_TYPE_UINT16:
-		return (float) *((U16*)(value));
+		return (float) *((uint16_t*)(value));
 	case MAV_PARAM_TYPE_INT16:
 		return (float) *((short*)(value));
 	case MAV_PARAM_TYPE_REAL32:
@@ -682,13 +682,13 @@ void cast2param(struct param_def *p, float v)
 {
 	switch (p->type) {
 	case MAV_PARAM_TYPE_UINT8:
-		*((U8*)(p->value)) = (U8)v;
+		*((uint8_t*)(p->value)) = (uint8_t)v;
 		break;
 	case MAV_PARAM_TYPE_INT8:
 		*((char*)(p->value)) = (char)v;
 		break;
 	case MAV_PARAM_TYPE_UINT16:
-		*((U16*)(p->value)) = (U16)v;
+		*((uint16_t*)(p->value)) = (uint16_t)v;
 		break;
 	case MAV_PARAM_TYPE_INT16:
 		*((short*)(p->value)) = (short)v;

@@ -204,7 +204,7 @@ void osd_gps_render(struct gps_widget_t *g)
 
 void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
 {
-    U8 cells = 0;
+    uint8_t cells = 0;
 
     // Autodetect cell count if necessary
     if (bw->cells == 0) // cells = 0 means autodetect
@@ -245,7 +245,7 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
     osd_bar_render(&bw->volt);
 }
 
-void osd_batt_cap_render(struct batt_cap_widget_t *bw, U8 remaining_capacity)
+void osd_batt_cap_render(struct batt_cap_widget_t *bw, uint8_t remaining_capacity)
 {
 
     bw->cap.x = bw->x;
@@ -367,7 +367,7 @@ void osd_rssi_render(struct rssi_widget_t *r) {
 void osd_vario_render(struct vario_widget_t *vw)
 {
 
-    U8 mix;
+    uint8_t mix;
     float val, f, fh;
 
     val = g.vario;
@@ -458,7 +458,7 @@ void render_horizon(struct horizon_t *h)
     float cx, cy;
     // float pitchrad, rollrad;
     float cos_roll, sin_roll;
-    U8 c1;
+    uint8_t c1;
 
     // pitchrad = DEG2RAD(h->pitch);
     // rollrad  = DEG2RAD(h->roll);
@@ -523,7 +523,7 @@ void render_horizona(struct horizon_t *h)
     float cx, cy;
     // float pitchrad, rollrad;
     float cos_roll, sin_roll;
-    U8 c1;
+    uint8_t c1;
 
     // pitchrad = DEG2RAD(h->pitch);
     // rollrad  = DEG2RAD(h->roll);
@@ -616,7 +616,7 @@ void osd_mode_render(struct mode_widget_t *mw)
     char mode[32];
 
     unsigned int cust_mode;
-    U8 mode_list_size;
+    uint8_t mode_list_size;
 
     cust_mode = g.mode;
 
@@ -787,7 +787,7 @@ void message_buffer_render()
 void message_list_render()
 {
 
-    for (U8 i = 0; i < MESSAGE_BUFFER_LINES; i++)
+    for (uint8_t i = 0; i < MESSAGE_BUFFER_LINES; i++)
     {
         OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 24, OSD256_FONT_WHITE, 1, "%s", g.message_archive[i]);
     }
@@ -800,8 +800,8 @@ void movement_render(move_widget_t *m)
     // osd.vy y movement in 100*m/s
     // osd.move.max maximum in normal m/s -> must convert to *100
 
-    U16 s;
-    U16 centerx, centery;
+    uint16_t s;
+    uint16_t centerx, centery;
     int offsetx, offsety;
     float maximum;
     bitmap_names_t bitmap = BMP_BALL_WHITE;
@@ -864,7 +864,7 @@ void movement_render(move_widget_t *m)
 
 void osd_boxes_render()
 {
-    U8 color;
+    uint8_t color;
 
     if (g.pthy_redraw)
     {
@@ -906,10 +906,10 @@ void osd_compass_render(compass_widget_t *c)
     const char cardinals[] = { 'N', 'E', 'S', 'W' };
     int i, j, x;
 
-    U16 x_center = 75 + c->x;
-    U16 y_center = 25 + c->y;
-    U16 range = 150;
-    U16 chr_pos;
+    uint16_t x_center = 75 + c->x;
+    uint16_t y_center = 25 + c->y;
+    uint16_t range = 150;
+    uint16_t chr_pos;
 
     OSD256_printf(x_center - 8, c->y + 12, OSD256_FONT_WHITE, 0, "\x8f");
 
@@ -950,8 +950,8 @@ void osd_compass_render(compass_widget_t *c)
 void osd_render_vgraph(vario_graph_widget_t *w)
 {
 
-    U16 y_center;
-    U8 mix = 0;
+    uint16_t y_center;
+    uint8_t mix = 0;
     float val;
 
     val = g.vario;

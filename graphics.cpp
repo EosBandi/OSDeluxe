@@ -29,7 +29,7 @@
 void transform_polygon(struct polygon *p, int x, int y, int rot)
 {
     struct point *pt = p->points;
-    U8 i;
+    uint8_t i;
     float angle = DEG2RAD(rot);
     float cos_rot = cos(angle) * 10000;
     float sin_rot = sin(angle) * 10000;
@@ -54,7 +54,7 @@ void transform_polygon(struct polygon *p, int x, int y, int rot)
 void move_polygon(struct polygon *p, int x, int y)
 {
     struct point *pt = p->points;
-    U8 i;
+    uint8_t i;
 
     for (i = 0; i < p->len; i++) {
         pt->x += x;
@@ -68,7 +68,7 @@ void scale_polygon(struct polygon *p, float scale)
 {
 
 	struct point *pt = p->points;
-	U8 i;
+	uint8_t i;
 
 	for (i = 0; i < p->len; i++) {
 		pt->x = pt->x * scale;
@@ -82,7 +82,7 @@ void scale_polygon(struct polygon *p, float scale)
 
 void draw_polygon(struct polygon *p, char color)
 {
-   U8 i;
+   uint8_t i;
    struct point *pt1 = p->points;
    struct point *pt2 = pt1+1;
 

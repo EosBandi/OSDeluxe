@@ -28,7 +28,7 @@ void init_bitmaps()
 {
 	char tmp = sizeof(bitmaps) / sizeof(bitmap_t);			//get the number of bitmaps
 
-	for (U8 i = 0; i < tmp; i++)
+	for (uint8_t i = 0; i < tmp; i++)
 	{
 		OSD256_load_bitmap(SCRATCH, bitmaps[i].startx, bitmaps[i].starty, bitmaps[i].width, bitmaps[i].height, bitmaps[i].color, bitmaps[i].image);
 	}

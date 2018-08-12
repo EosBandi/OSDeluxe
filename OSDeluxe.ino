@@ -240,7 +240,7 @@ while (1)
         g.ctr_saved_state[0] = g.ctr_state[0]; // Save it, to prevent unneccessary state changes in the main loop
     	g.pip_page = g.ctr_state[0];
 
-		for (U8 i = 1; i < 5; i++)
+		for (uint8_t i = 1; i < 5; i++)
 		{
 			tw_ch_set_input(i, osd.video_channels[g.pip_page][i].input);
 

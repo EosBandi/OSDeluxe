@@ -129,24 +129,24 @@ struct vin_params_t
 };
 
 struct boundary_t {
-	U16 x0;
-	U16 y0;
-	U16 x1;
-	U16 y1;
+	uint16_t x0;
+	uint16_t y0;
+	uint16_t x1;
+	uint16_t y1;
 };
 
 
 extern boundary_t osd_draw_boundary;
 
-extern U8 cnt, count, data_buf[20];
+extern uint8_t cnt, count, data_buf[20];
 extern unsigned int  ADDR_buf, count_TW2835;
-//extern U8 OSD_work_field, OSD_display_field;
-//extern U8 OSD_path; //0-display, 1-record
-//extern U8 rec_color_shadow, rec_color, rec_color_background;
-//extern U8 disp_color, disp_color_background, disp_color_shadow;
+//extern uint8_t OSD_work_field, OSD_display_field;
+//extern uint8_t OSD_path; //0-display, 1-record
+//extern uint8_t rec_color_shadow, rec_color, rec_color_background;
+//extern uint8_t disp_color, disp_color_background, disp_color_shadow;
 
-extern U8 OSD256_font_color;
-extern U8 OSD256_wr_page;
+extern uint8_t OSD256_font_color;
+extern uint8_t OSD256_wr_page;
 
 
 extern struct osd_settings osd;  
@@ -156,7 +156,7 @@ extern struct osd_settings osd;
 // TW2837 extended OSD graphic mode, does not handle colot table indexes 1,2,3,4 So 
 // White colors are moved to 14-15-16-17
 
-const U8 colortable[18][3] = {
+const uint8_t colortable[18][3] = {
 {0x00, 0x80, 0x80},							//Black         0
 {0x3f, 0x80, 0x80},							//25%white      1
 {0x7f, 0x80, 0x80},							//50%white      2
@@ -178,7 +178,7 @@ const U8 colortable[18][3] = {
 
 };
 
-const U8 colortable_rec[4][3] = {
+const uint8_t colortable_rec[4][3] = {
 {0x00, 0x80, 0x80},							//Black         
 {0xf0, 0x80, 0x80},							//100%white     
 {0x7f, 0x80, 0x80},							//50%white              
@@ -205,15 +205,15 @@ const U8 colortable_rec[4][3] = {
 
 
 void tw_init();
-void tw_write_buf(U16 wrADDR, U8 *wrBUF, U8 wrCNT);
+void tw_write_buf(uint16_t wrADDR, uint8_t *wrBUF, uint8_t wrCNT);
 
 
 
-void tw_write_register(unsigned int wrADDR, U8 content);
-U8 tw_read_register(unsigned int rdADDR);
+void tw_write_register(unsigned int wrADDR, uint8_t content);
+uint8_t tw_read_register(unsigned int rdADDR);
 
-void tw_ch_set_window (U8 _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H);
-void tw_ch_settings (U8 _ch, U8 _on_off, U8 _popup);
+void tw_ch_set_window (uint8_t _ch, unsigned int _pos_H, unsigned int _pos_V, unsigned int _len_H);
+void tw_ch_settings (uint8_t _ch, uint8_t _on_off, uint8_t _popup);
 void tw_ch_set_input(char ch, char input);
 
 void OSD256_set_display_page(char rd_page);
@@ -221,34 +221,34 @@ void OSD256_set_display_page(char rd_page);
 
 
 
-void WriteOSD256Fnt0(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib);
-void WriteOSD256Fnt1(U8 dst, U8 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 attrib);
+void WriteOSD256Fnt0(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib);
+void WriteOSD256Fnt1(uint8_t dst, uint8_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t attrib);
 
-void OSD256_Block_fill(U8 _pth, U8 dst, U16 start_X, U16 start_Y, U16 end_X, U16 end_Y, U8 color);
+void OSD256_Block_fill(uint8_t _pth, uint8_t dst, uint16_t start_X, uint16_t start_Y, uint16_t end_X, uint16_t end_Y, uint8_t color);
 
-void OSD256_Block_Transfer(U8 src, U8 dst, U16 src_start_x, U16 src_start_y, U16 dst_start_x, U16 dst_start_y, U16 dst_end_x, U16 dst_end_y);
-void OSD256_putc(U16 _pos_x, U16 _pos_y, U8 _indx, U8 color, U8 font);
+void OSD256_Block_Transfer(uint8_t src, uint8_t dst, uint16_t src_start_x, uint16_t src_start_y, uint16_t dst_start_x, uint16_t dst_start_y, uint16_t dst_end_x, uint16_t dst_end_y);
+void OSD256_putc(uint16_t _pos_x, uint16_t _pos_y, uint8_t _indx, uint8_t color, uint8_t font);
 
-void OSD256_puts(char *str, U16 posx, U16 posy, U8 color);
-void OSD256_printf(U16 posx, U16 posy, char color, char font, const char *format, ...);
+void OSD256_puts(char *str, uint16_t posx, uint16_t posy, uint8_t color);
+void OSD256_printf(uint16_t posx, uint16_t posy, char color, char font, const char *format, ...);
 
-void OSD256_printf_slow(U16 posx, U16 posy, char color, char font, const char *format, ...);
+void OSD256_printf_slow(uint16_t posx, uint16_t posy, char color, char font, const char *format, ...);
 
-void OSD256_clear_screen(U8 _pth, U8 page);
+void OSD256_clear_screen(uint8_t _pth, uint8_t page);
 
-void OSD256_set_drawcolor(U8 color);
-void OSD256_setpixel(U8 _pth, U8 color, U16 start_X, U16 start_Y);
-void OSD256_setpixel_fast(U8 _pth, U16 start_x, U16 start_Y);
-void OSD256_drawline(U8 _pth, U8 color, int x, int y, int x2, int y2);
-void OSD256_Circle(U8 _pth, U8 color, int  xCenter, int yCenter, int radius);
-void OSD256_box(U8 _pth, U16 x, U16 y, U16 w, U16 h, U8 color);
+void OSD256_set_drawcolor(uint8_t color);
+void OSD256_setpixel(uint8_t _pth, uint8_t color, uint16_t start_X, uint16_t start_Y);
+void OSD256_setpixel_fast(uint8_t _pth, uint16_t start_x, uint16_t start_Y);
+void OSD256_drawline(uint8_t _pth, uint8_t color, int x, int y, int x2, int y2);
+void OSD256_Circle(uint8_t _pth, uint8_t color, int  xCenter, int yCenter, int radius);
+void OSD256_box(uint8_t _pth, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color);
 
-void OSD256_load_bitmap(U8 dst, U16 start_x, U16 start_y, U16 width, U16 height, U8 color, const char *bitmap);
+void OSD256_load_bitmap(uint8_t dst, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height, uint8_t color, const char *bitmap);
 
-U8 tw_read_register_bit(unsigned int rdADDR, U8 _flg);
-void tw_write_register_bit(unsigned int wrADDR, U8 _flg, U8 _data);
+uint8_t tw_read_register_bit(unsigned int rdADDR, uint8_t _flg);
+void tw_write_register_bit(unsigned int wrADDR, uint8_t _flg, uint8_t _data);
 
-void CreateScrathFntTab(U8 dst, U8 color, U8 attrib, U8 font);
+void CreateScrathFntTab(uint8_t dst, uint8_t color, uint8_t attrib, uint8_t font);
 void displayscratch();
 
 

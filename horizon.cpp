@@ -52,7 +52,7 @@ void render_roll_indicator()
 
     int y, i, j;
     int x0, x1, y0, y1;
-    U8 size, gap;
+    uint8_t size, gap;
     char buf[10];
     float offset;
     float cx, cy;

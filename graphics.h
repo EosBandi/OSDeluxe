@@ -36,7 +36,7 @@ struct point3d {
 
 struct polygon {
     struct point *points;
-    U8 len;
+    uint8_t len;
 };
 
 void transform_polygon(struct polygon *p, int x, int y, int rot);

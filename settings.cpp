@@ -45,7 +45,7 @@ void save_settings()
 
 }
 
-U8 load_settings()
+uint8_t load_settings()
 {
   unsigned int address = 0;
   char *ptr;
