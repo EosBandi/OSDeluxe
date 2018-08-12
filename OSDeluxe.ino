@@ -246,10 +246,10 @@ while (1)
     //check heartbeat
     heartbeat_validation();
 
-	//Send five params at once, to speed up parameter download time
+	//Send eight params at once, to speed up parameter download time
 	if (param_send_index != total_params)
 	{
-		for (int i = 0; i < 8; i++)send_param_list();
+		for (int i = 0; i < 8; i++) send_param_list();
 	}
 	
 	//Send out mavlink heartbeat
