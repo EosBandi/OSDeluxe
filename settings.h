@@ -100,6 +100,7 @@ struct osd_settings {
 	radar_widget_t radar2;
 	radar_widget_t radar3;
 
+	rssi_widget_t rssi;
 
 	U8 center_cross_visible = 0x01;
 

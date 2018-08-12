@@ -26,116 +26,105 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
-#define EEPROM_VERSION 0x07
-
-
+#define EEPROM_VERSION 0x08
 
 #define MESSAGE_BUFFER_LINES 20
 #define NO_HEADING 0xfff
 
+struct global_variables_t
+{
+
+    // Global variables
+    unsigned char mav_type;  // MAV type from mavlink heartbeat;
+    unsigned char base_mode; // It comes from the arming...
+    int heading;
+    float airspeed;
+    float groundspeed;
+    int throttle;
+    bool arming_status;
+    home_data_t home;
+    int launch_heading;
+
+    unsigned int mode;
+
+    float altitude;
+    float vario;
+
+    float variot;
+
+    short vario_graph[80];
+    unsigned char vgraph_idx;
+
+    int ekfvel;
+    int ekfposh;
+    int ekfposv;
+    int ekfcompass;
+    int ekfterrain;
+
+    float vx;               // X speed in m/s
+    float vy;               // Y speed in m/s
+    float yaw;              // Yaw in rad
+    float cos_yaw, sin_yaw; // Precalculated yaw sin/cos values
+
+    unsigned short wp_seq;
+    unsigned short wp_distance;
+    short wp_target_bearing;
+
+    unsigned char rssi;
+    unsigned char remote_rssi;
 
 
-struct global_variables_t {
+    int b1_power; // Battery 1 Power (Watts)
+    float b1_current;
+    float b1_voltage;
+    unsigned char b1_remaining_capacity;
 
-	//Global variables
-	unsigned char mav_type;             //MAV type from mavlink heartbeat;
-	unsigned char base_mode;            //It comes from the arming...
-	int           heading;
-	float         airspeed;
-	float         groundspeed;
-	int           throttle;
-	bool          arming_status;
-	home_data_t   home;
-	int			  launch_heading;
+    int b2_power; // Battery 1 Power (Watts)
+    float b2_current;
+    float b2_voltage;
 
+    unsigned char ctr_state[4];
+    unsigned char ctr_saved_state[4];
 
+    unsigned char visible_osd_page; // The OSD page to show. (bit coded)
+    unsigned char pip_page;
 
-	unsigned int  mode;
+    unsigned int rcin[17];
+    unsigned int rc_rssi;
 
-	float         altitude;
-	float         vario;
+    char system_status; // Se MAVLINK_STATE enum
 
-	float		  variot;
+    char message_buffer[MESSAGE_BUFFER_LINES][52]; // 20 line of 52 character message_buffer
+    U8 message_severity[MESSAGE_BUFFER_LINES];
+    U8 message_buffer_line;
+    U8 message_buffer_display_line;
+    long message_buffer_display_time;
+    bool message_display; // we have message to display in the buffer
+    bool clear_req;
 
-	short         vario_graph[80];
-	unsigned char vgraph_idx;
+    char message_archive[MESSAGE_BUFFER_LINES][52];
+    char message_archive_severity[MESSAGE_BUFFER_LINES];
+    U8 message_archive_line = 0;
 
+    bool displayed_arming_status;
+    unsigned long armed_start_time;
 
-	int           ekfvel;
-	int           ekfposh;
-	int           ekfposv;
-	int           ekfcompass;
-	int           ekfterrain;
+    int displayed_mode;
 
-	float		  vx;					// X speed in m/s
-	float		  vy;					// Y speed in m/s
-	float		  yaw;					// Yaw in rad
-	float		  cos_yaw, sin_yaw;		// Precalculated yaw sin/cos values
+    unsigned long last_capacity_query;
+    unsigned long last_outgoing_heartbeat;
 
+    char test_byte;
 
-	unsigned short wp_seq;
-	unsigned short wp_distance;
-	short wp_target_bearing;
-	
+    U8 write_settings;
+    U8 debug_looptime;
 
+    bool pthy_redraw; // indicated that we need to redraw osd contect on y path.
 
-	int           b1_power;				//Battery 1 Power (Watts)
-	float         b1_current;           
-	float         b1_voltage;
-	unsigned char b1_remaining_capacity;
-
-
-	int           b2_power;				//Battery 1 Power (Watts)
-	float         b2_current;
-	float         b2_voltage;
-
-
-	unsigned char ctr_state[4];
-	unsigned char ctr_saved_state[4];
-
-	unsigned char visible_osd_page;			//The OSD page to show. (bit coded)
-	unsigned char pip_page;
-
-	unsigned int  rcin[17];
-	unsigned int  rc_rssi;
-
-	char		   system_status;   //Se MAVLINK_STATE enum 
-
-	char           message_buffer[MESSAGE_BUFFER_LINES][52];               //20 line of 52 character message_buffer
-	U8           message_severity[MESSAGE_BUFFER_LINES];
-	U8           message_buffer_line;
-	U8			 message_buffer_display_line;
-	long           message_buffer_display_time;
-	bool           message_display; //we have message to display in the buffer
-	bool           clear_req;
-
-	char		  message_archive[MESSAGE_BUFFER_LINES][52];
-	char		  message_archive_severity[MESSAGE_BUFFER_LINES];
-	U8			  message_archive_line = 0;
-
-
-	bool          displayed_arming_status;
-	unsigned long armed_start_time;
-
-	int displayed_mode;
-
-	unsigned long last_capacity_query;
-	unsigned long last_outgoing_heartbeat;
-
-	char test_byte;
-
-	U8 write_settings;
-	U8 debug_looptime;
-
-	bool pthy_redraw;					//indicated that we need to redraw osd contect on y path.
-
-	bool powerup;						//Are we resetting or powering up from zero.
-	U8 detected_cell_count;
-
+    bool powerup; // Are we resetting or powering up from zero.
+    U8 detected_cell_count;
 };
 
-
 extern global_variables_t g;
-
 
 #endif

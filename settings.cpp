@@ -318,5 +318,11 @@ void default_settings()
 	osd.radar3.type = 2;
 	osd.radar3.visible = 0x00;
 
+	osd.rssi.x = 580;
+    osd.rssi.y = 20;
+    osd.rssi.rssi_critical = 20;
+    osd.rssi.rssi_warning = 50;
+    osd.rssi.visible = 0x01;
+
 
 }

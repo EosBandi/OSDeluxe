@@ -26,6 +26,11 @@
 #define	OSDELUXE_H
 
 
+#define VERSION "1.0b"
+#define BUILD __DATE__
+
+
+
 
 // Common definitions used all over the code
 #define U8  unsigned char 

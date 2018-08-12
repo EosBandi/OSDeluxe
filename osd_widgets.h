@@ -149,6 +149,16 @@ struct gs_widget_t {
 	U8 visible;
 };
 
+struct rssi_widget_t {
+    U16 x;
+    U16 y;
+    U8 visible;
+    U8 rssi_warning;
+    U8 rssi_critical;
+
+};
+
+
 struct throttle_widget_t {
 	U16 x;
 	U16 y;
@@ -308,14 +318,14 @@ void rc_control(void);
 void osd_throttle_render(struct throttle_widget_t *t);
 void movement_render(move_widget_t *m);
 
-void message_buffer_add_line(char *message, char severity);
+void message_buffer_add_line(const char *message, char severity);
 void message_buffer_render(void);
 void message_list_render();
 void osd_boxes_render();
 void osd_compass_render(compass_widget_t *c);
 void osd_render_vgraph(vario_graph_widget_t *w);
 void osd_render_radar(radar_widget_t *w);
-
+void osd_rssi_render(struct rssi_widget_t *r);
 
 void render(unsigned int r);
 

@@ -25,8 +25,10 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #ifndef _STRINGS_H_
 #define _STRINGS_H_
 
-
+#define STR_NO_HEARTBEAT			"No MAVLink heartbeat received!"
+#define STR_LAUNCH_DIRECTION_OK		"Launch direction recorded"
+#define STR_SETTINGS_SAVED			"OSD settings saved to EEPROM"
+#define STR_BATTERY_DETECTED		"Battery detected as %uS"
 
 
 #endif
-

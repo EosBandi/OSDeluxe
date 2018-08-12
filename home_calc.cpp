@@ -102,14 +102,13 @@ void find_launch_heading()
 	if ((g.throttle > 10) && (g.airspeed > 5) && (g.altitude > 5))
 	{
 		g.launch_heading = g.heading;
-		message_buffer_add_line("Launch direction recorded", 4);
+		message_buffer_add_line(STR_LAUNCH_DIRECTION_OK , 4);
 
 	}
 
 
 }
-
-
+/*
 void render(unsigned int r)
 {
 #define SIZE		400
@@ -161,3 +160,4 @@ void render(unsigned int r)
 
 
 }
+*/

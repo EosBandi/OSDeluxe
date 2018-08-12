@@ -217,7 +217,7 @@ void osd_batt_volt_render(struct batt_volt_widget_t *bw, float voltage)
                 if (cells > 12) cells = 12; // Quick fix for 12S systems
                 g.detected_cell_count = cells;
                 char str[32];
-                sprintf(str, "Battery detected as %uS", cells);
+                sprintf(str, STR_BATTERY_DETECTED, cells);
                 message_buffer_add_line(str, 4);
             }
         }
@@ -345,6 +345,25 @@ void osd_groundspeed_render(struct gs_widget_t *gs) { OSD256_printf(gs->x, gs->y
 
 void osd_throttle_render(struct throttle_widget_t *t) { OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "\x7d\x7e%u", g.rcin[3]); }
 
+void osd_rssi_render(struct rssi_widget_t *r) {
+	
+	if (g.rssi <= osd.rssi.rssi_critical || g.remote_rssi <= osd.rssi.rssi_critical)
+	{
+        OSD256_printf(r->x, r->y, OSD256_FONT_RED_BLINK, 0, "\x83 %u/%u", g.rssi, g.remote_rssi); 
+		return;
+	}
+
+	if (g.rssi <= osd.rssi.rssi_warning || g.remote_rssi <= osd.rssi.rssi_warning)
+    {
+        OSD256_printf(r->x, r->y, OSD256_FONT_RED, 0, "\x83 %u/%u", g.rssi, g.remote_rssi);
+        return;
+    }
+
+	OSD256_printf(r->x, r->y, OSD256_FONT_YELLOW, 0, "\x83 %u/%u", g.rssi, g.remote_rssi); 
+}
+
+
+
 void osd_vario_render(struct vario_widget_t *vw)
 {
 
@@ -433,10 +452,9 @@ void osd_center_marker()
 
 void render_horizon(struct horizon_t *h)
 {
-    int y, i, j;
-    int x0, x1, y0, y1;
-    int size, gap;
-    float offset;
+    short y, i;
+    short x0, x1, y0, y1;
+    short size;
     float cx, cy;
     // float pitchrad, rollrad;
     float cos_roll, sin_roll;
@@ -447,7 +465,7 @@ void render_horizon(struct horizon_t *h)
     cos_roll = cos(DEG2RAD(h->roll));
     sin_roll = -1 * sin(DEG2RAD(h->roll));
 
-    boundary = { h->x - WIDTH / 2, h->y - HEIGHT / 2, h->x + WIDTH / 2, h->y + HEIGHT / 2 };
+    boundary = { (unsigned short)(h->x - WIDTH / 2), (unsigned short)(h->y - HEIGHT / 2), (unsigned short)(h->x + WIDTH / 2), (unsigned short)(h->y + HEIGHT / 2) };
 
     if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
     {
@@ -493,7 +511,8 @@ void render_horizon(struct horizon_t *h)
 
     boundary = { 0, 0, SCR_X_SIZE, SCR_Y_SIZE };
 }
-#define SCALE 6
+
+#define SCALE_A 6
 
 void render_horizona(struct horizon_t *h)
 {
@@ -523,9 +542,9 @@ void render_horizona(struct horizon_t *h)
     for (i = -RANGE / 2; i <= RANGE / 2; i++)
     {
         y = h->y - i;
-        j = (h->pitch * SCALE) + i;
+        j = (h->pitch * SCALE_A) + i;
 
-        if (j % (MINOR_TICK * SCALE) == 0)
+        if (j % (MINOR_TICK * SCALE_A) == 0)
         {
             if (j == 0)
             {
@@ -534,7 +553,7 @@ void render_horizona(struct horizon_t *h)
             }
             else
             {
-                if (j % (MAJOR_TICK * SCALE) == 0)
+                if (j % (MAJOR_TICK * SCALE_A) == 0)
                     size = MAJOR_LINE; // tick
                 else
                     size = MINOR_LINE; // small tick
@@ -583,9 +602,9 @@ void render_horizona(struct horizon_t *h)
                 OSD256_drawline(PTH_X, c1, x0, y0, x1, y1);
             }
 
-            if ((j != 0) && (j % (MAJOR_TICK * SCALE) == 0))
+            if ((j != 0) && (j % (MAJOR_TICK * SCALE_A) == 0))
             {
-                OSD256_printf((cx - 20), (cy - 15), OSD256_FONT_WHITE, 1, "% 03d", j / SCALE);
+                OSD256_printf((cx - 20), (cy - 15), OSD256_FONT_WHITE, 1, "% 03d", j / SCALE_A);
             }
         }
     }
@@ -685,7 +704,7 @@ void osd_mode_render(struct mode_widget_t *mw)
 void rc_control() {}
 
 // line 0 is a display line
-void message_buffer_add_line(char *message, char severity)
+void message_buffer_add_line(const char *message, char severity)
 {
     // Check if we are standing at the last line of the buffer.
     if (g.message_buffer_line == MESSAGE_BUFFER_LINES - 1)
@@ -969,7 +988,6 @@ void osd_render_vgraph(vario_graph_widget_t *w)
 
 void osd_render_radar(radar_widget_t *w)
 {
-    char buf[10];
     unsigned long d = (unsigned long)g.home.distance;
     unsigned int r = (w->size / 2) - 2;
     int x, y;
@@ -1041,6 +1059,9 @@ void osd_render_radar(radar_widget_t *w)
         y -= cos(DEG2RAD(g.home.uav_bearing)) * i;
         scale_polygon(&uav, w->scale);
         transform_polygon(&uav, x, y, g.heading);
+        p = &uav;
+        break;
+    default:	//should not happen, just to satisfy compiller
         p = &uav;
         break;
     }

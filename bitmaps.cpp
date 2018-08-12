@@ -49,7 +49,7 @@ void init_font_tables()
 	OSD256_printf_slow(15, 13, COLOR_WHITE, 0, "PIP OSD for ARDU");
 	OSD256_printf_slow(31, 13, COLOR_YELLOW, 0, "PILOT");
 
-	OSD256_printf_slow(6, 15, COLOR_WHITE, 0, "firmware version 1.0 build 12345");
+	OSD256_printf_slow(6, 15, COLOR_WHITE, 0, "firmware version %s %s",VERSION, BUILD);
 
 
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 1/8...");

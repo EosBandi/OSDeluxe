@@ -95,6 +95,12 @@ struct param_def parameters[] = {
 	PARAM("GPS_SAT_CRITICAL", MAV_PARAM_TYPE_UINT8, &osd.gps.sat_critical, NULL),
 	PARAM("GPS_HDOP_CRITCAL", MAV_PARAM_TYPE_REAL32, &osd.gps.hdop_critical, NULL),
 
+	PARAM("RSSI_POSX", MAV_PARAM_TYPE_UINT16, &osd.rssi.x, NULL),
+	PARAM("RSSI_POSY", MAV_PARAM_TYPE_UINT16, &osd.rssi.y, NULL),
+	PARAM("RSSI_WARNING", MAV_PARAM_TYPE_UINT8, &osd.rssi.rssi_warning, NULL),
+	PARAM("RSSI_CRITICAL", MAV_PARAM_TYPE_UINT8, &osd.rssi.rssi_critical, NULL),
+
+
 //     01234567890123456
 	PARAM("BAT1V_POSX", MAV_PARAM_TYPE_UINT16, &osd.batt1_v.x, NULL),
 	PARAM("BAT1V_POSY", MAV_PARAM_TYPE_UINT16, &osd.batt1_v.y, NULL),
@@ -222,6 +228,7 @@ struct param_def parameters[] = {
 	PARAM("PAGE_RADAR1", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
 	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
 	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
+    PARAM("PAGE_RSSI",MAV_PARAM_TYPE_UINT8, &osd.rssi.visible, &do_update_pthy),
 
 	PARAM("PAGE_BOX_1", MAV_PARAM_TYPE_INT16, &osd.boxes[0].visible, &do_update_pthy),
 	PARAM("PAGE_BOX_2", MAV_PARAM_TYPE_INT16, &osd.boxes[1].visible, &do_update_pthy),
@@ -491,7 +498,7 @@ void do_settings_save()
 {
 	g.write_settings = 0;
 	save_settings();
-	message_buffer_add_line("OSD settings saved to EEPROM", 4);
+	message_buffer_add_line(STR_SETTINGS_SAVED, 4);
 
 }
 

@@ -23,10 +23,12 @@
 
  */
 
+
+
+
+
+
 #include "OSDeluxe.h"
-
-
-
 
 #define TW_RESET_PIN 14
 #define LED_PIN 13
@@ -135,7 +137,7 @@ void loop ()
 
 	//Commented out for quick start, need to run at every powerup
 	
-	//init_font_tables();
+	init_font_tables();
 	init_bitmaps();
 
 	OSD256_clear_screen(PTH_X,0);
@@ -149,19 +151,18 @@ void loop ()
 
 	OSD256_wr_page = 1;
 	
-	//OSD256_wr_page = 0;
+	//OSD256_wr_page = 0;				//show font table
 
 	OSD256_set_display_page(0);
 	
-	g.launch_heading = 2;
 
-	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 304, 0, 0, 0, 719, 431);
+	//OSD256_Block_Transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 431);
+	
 	g.visible_osd_page = 0x01;
 
 
-	default_settings();
-	 osd.mode.visible = 0x01;
-
+	//default_settings();
+	 //osd.mode.visible = 0x01;
 
          //Main loop
 while (1)
@@ -177,11 +178,7 @@ while (1)
 	osd_boxes_render();
     
 	now = millis();
-	//render(r);
-    //r = r - 5;
-    //if (r < 50) r = 200;
 
-	//debug("%u\n", millis() - now);
 
 	if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
 
@@ -234,6 +231,8 @@ while (1)
 	if (osd.thr.visible & g.visible_osd_page) osd_throttle_render(&osd.thr);
 
 	if (osd.msg_list_widget.visible & g.visible_osd_page) message_list_render();
+
+	if (osd.rssi.visible & g.visible_osd_page) osd_rssi_render(&osd.rssi);
 
 	//Switch working page for smooth redraw
 	OSD256_set_display_page(OSD256_wr_page);

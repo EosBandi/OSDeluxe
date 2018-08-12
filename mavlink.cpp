@@ -129,7 +129,7 @@ void heartbeat_validation(void)
     {
         if (waitingMAVBeats && (now > (last_nobeat_message + 5000)) )         //Do not flood message queue with No heartbeat messages
         {
-            message_buffer_add_line("No MAVLink heartbeat received!", 1);     //TODO:Move strings to an external definition
+            message_buffer_add_line(STR_NO_HEARTBEAT, 1);     //TODO:Move strings to an external definition
             last_nobeat_message = now;
         }
         heatbeat_start_time = 0;
@@ -501,6 +501,10 @@ void read_mavlink()
 				break;
 			
 
+			case MAVLINK_MSG_ID_RADIO:
+                g.rssi = mavlink_msg_radio_get_rssi(&msg);
+                g.remote_rssi = mavlink_msg_radio_get_remrssi(&msg);
+                break;
 
 
             default:
