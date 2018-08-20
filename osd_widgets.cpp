@@ -781,6 +781,7 @@ void osd_render_message_buffer()
         if (g.message_severity[0] <= 3) color = OSD256_FONT_RED;
 
         OSD256_printf(osd.msg_widget.x, osd.msg_widget.y, color, 1, "%s", g.message_buffer[0]);
+        
     }
 }
 

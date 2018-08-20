@@ -41,8 +41,6 @@
 #define TW_RD  22
 #define TW_AEN 15
 
-#define TW_DATA GPIOD_PDOR 
-
 #endif
 
 #define LED_PIN 13
@@ -68,9 +66,6 @@ void setup()
 
 
 	setWriteDirInline();
-
-
-
 #endif
 
 
@@ -86,7 +81,6 @@ void setup()
     // It is not a mistake TW2837 works fine on 4Mhz I2C speed
 
 #ifndef TW2837_I2C
-
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 4000000, I2C_OP_MODE_IMM);
     Wire.setDefaultTimeout(1000); // 10ms
 #endif 
@@ -100,20 +94,6 @@ void setup()
 
 void loop()
 {
-
-
-
-
-
-	uint8_t x;
-    
-    tw_write_register(0x0c8, 0x03);
-
-
-	x = tw_read_register(0x0c8);
-    debug("0xc8 : %d\n", x);
-
-
     // Led ON
     digitalWrite(LED_PIN, HIGH);
 

@@ -255,9 +255,9 @@ uint8_t tw_read_register(unsigned int rdADDR)
 
     GPIOD_PDDR = 0;
     PORTD_GPCLR = 0x000F0100;
-    P1;	
+    P05;	
     digitalWriteFast(TW_RD, 0);
-    P1;
+    P05;
     ret = *(volatile uint8_t *)(&GPIOD_PDIR);
     digitalWriteFast(TW_RD, 1);
     digitalWriteFast(TW_CS, 1); // clear Chip Select

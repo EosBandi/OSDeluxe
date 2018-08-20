@@ -85,6 +85,7 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 // display persistence) and a Teensy 3.2 compiling with
 // Teensyduino/Arduino 1.8.1, "faster" setting
 #if F_CPU == 96000000
+#define P05 __asm__(NOP4)
 #define P1 __asm__(NOP4 NOP4)
 #define P2 __asm__(NOP6 NOP6 NOP6)
 #define P3 __asm__(NOP6 NOP6 NOP6 NOP6 NOP3)
@@ -92,6 +93,7 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #define P5 __asm__(NOP6 NOP6 NOP6 NOP6 NOP6 NOP6 NOP6 NOP4 NOP3)
 
 #elif F_CPU == 72000000
+#define P05 __asm__(NOP3)
 #define P1 __asm__(NOP6)
 #define P2 __asm__(NOP6 NOP6)
 #define P3 __asm__(NOP6 NOP6 NOP6 NOP3)
@@ -99,6 +101,7 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #define P5 __asm__(NOP6 NOP6 NOP6 NOP6 NOP4 NOP4 NOP3)
 
 #elif F_CPU == 48000000
+#define P05 __asm__("nop\n\t nop\n\t")
 #define P1 __asm__(NOP4)
 #define P2 __asm__(NOP6 NOP3)
 #define P3 __asm__(NOP6 NOP4 NOP3)
@@ -108,4 +111,3 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #endif
 
 #endif
-
