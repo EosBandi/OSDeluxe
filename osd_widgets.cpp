@@ -514,7 +514,7 @@ void osd_render_horizon(struct horizon_t *h)
 
 #define SCALE_A 6
 
-void render_horizona(struct horizon_t *h)
+void osd_render_horizona(struct horizon_t *h)
 {
     int y, i, j;
     int x0, x1, y0, y1;

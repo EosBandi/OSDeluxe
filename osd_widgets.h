@@ -311,7 +311,7 @@ void osd_render_vario(struct vario_widget_t *vw);
 void osd_render_home(struct home_widget_t *hw);
 void osd_render_center_marker();
 void osd_render_horizon(struct horizon_t *horizon);
-void render_horizona(struct horizon_t *horizon);
+void osd_render_horizona(struct horizon_t *horizon);
 void osd_render_flmode( struct mode_widget_t *mw);
 void osd_render_pull_force(struct pull_widget_t *pw);
 void rc_control(void);
