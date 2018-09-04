@@ -26,7 +26,7 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
-#define EEPROM_VERSION 0x08
+#define EEPROM_VERSION 0x0c
 
 #define MESSAGE_BUFFER_LINES 20
 #define NO_HEADING 0xfff

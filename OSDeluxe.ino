@@ -191,15 +191,14 @@ void loop()
 
         read_mavlink();
 
-        osd.home_w.orientation++;
-        g.heading++;
-        osd.horizon.visible = 0x01;
-        osd.horizon.pitch = random(-20,20);
-        osd.horizon.roll = random(-20, 20);
-        g.vario = random(-5, 5);
-
         // Clear actual write page (not the one that is displayed)
         OSD256_clear_screen(PTH_X, OSD256_wr_page);
+        g.visible_osd_page = 0x01;
+        g.pip_page = 0x01;
+
+
+
+
 
         // Render OSD elements
         osd_boxes_render();
