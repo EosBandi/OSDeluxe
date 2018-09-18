@@ -514,7 +514,7 @@ void osd_render_horizon(struct horizon_t *h)
 
 #define SCALE_A 6
 
-void render_horizona(struct horizon_t *h)
+void osd_render_horizona(struct horizon_t *h)
 {
     int y, i, j;
     int x0, x1, y0, y1;
@@ -781,6 +781,7 @@ void osd_render_message_buffer()
         if (g.message_severity[0] <= 3) color = OSD256_FONT_RED;
 
         OSD256_printf(osd.msg_widget.x, osd.msg_widget.y, color, 1, "%s", g.message_buffer[0]);
+        
     }
 }
 

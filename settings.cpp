@@ -92,15 +92,15 @@ void default_settings()
 
 		                    // sharp, sat, contr, bright, enhance, hmir, vmir, bound, peak
 	osd.vin_params[0] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 0, 0};
-	osd.vin_params[1] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
-	osd.vin_params[2] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1, 0};
-	osd.vin_params[3] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 1 ,0};
+	osd.vin_params[1] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 0, 0};
+	osd.vin_params[2] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 0, 0};
+	osd.vin_params[3] = { 0x00, 0x50, 0x64, 0x00, 1, 0, 0, 0 ,0};
 
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
-	osd.video_channels[0][1] = { 1, 1, 0, 0, 0, 180 };
-	osd.video_channels[0][2] = { 2, 0, 1, 0, 0, 64 };
-	osd.video_channels[0][3] = { 3, 0, 1, 116, 0, 64 };
-	osd.video_channels[0][4] = { 4, 0, 1, 64, 0, 52 };
+	osd.video_channels[0][1] = { 1, 1, 0, 30, 48, 120 };
+	osd.video_channels[0][2] = { 2, 1, 1, 120, 0, 61 };
+	osd.video_channels[0][3] = { 3, 1, 1, 60, 0, 61 };
+	osd.video_channels[0][4] = { 4, 1, 1, 0, 0, 61 };
 	
 							//   input, enable, popup, pos_h, pos_vm, lenh, 
 	osd.video_channels[1][1] = { 1, 1, 0, 0, 0, 180 };

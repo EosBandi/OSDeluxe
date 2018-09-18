@@ -186,7 +186,7 @@ void OSD256_init_font_tables()
 	OSD256_printf_slow(8, 19, COLOR_YELLOW | BLINK, 0, "Initializing font table 8/8...");
 	OSD256_create_scratch_font_table(SCRATCH, COLOR_WHITE, 0, 0);
 
-
+	delay(1000);
 
 
 }
