@@ -22,42 +22,26 @@
 
  */
 
-#ifndef OSDELUXE_H
-#define	OSDELUXE_H
+#ifndef _CLI_h
+#define _CLI_h
 
-
-#define VERSION "1.0b"
-#define BUILD __DATE__
-
-
-// Common definitions used all over the code
-//#define uint8_t  unsigned char 
-//#define uint16_t unsigned short
-
-
-#include <Arduino.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <EEPROM.h>
-#include "i2c_t3.h"
-
-#include "strings.h"
-#include "home_calc.h"
-#include "globals.h"
-#include "utils.h"
-#include "tw_font.h"
-#include "tw_func.h"
-#include "bitmaps.h"
-#include "osd_widgets.h"
-#include "s1debug.h"
-#include "settings.h"
-#include "mavlink.h"
-#include "params.h"
-#include "helpers.h"
-#include "cli.h"
-
-
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "arduino.h"
+#else
+#include "WProgram.h"
 #endif
 
+extern char cli[256];
 
+void init_cli();
+void read_cli();
+void process_cli(char *cmdline);
+
+void cli_do_help();
+void cli_do_list_params(char *name);
+void cli_do_set_param(char *cmdline);
+
+
+bool match(const char *pattern, const char *candidate, int p, int c);
+
+#endif

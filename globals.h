@@ -26,7 +26,7 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
-#define EEPROM_VERSION 0x0c
+#define EEPROM_VERSION 0x0f
 
 #define MESSAGE_BUFFER_LINES 20
 #define NO_HEADING 0xfff
@@ -67,6 +67,10 @@ struct global_variables_t
     float vy;               // Y speed in m/s
     float yaw;              // Yaw in rad
     float cos_yaw, sin_yaw; // Precalculated yaw sin/cos values
+
+	int pitch;
+    int roll;
+
 
     unsigned short wp_seq;
     unsigned short wp_distance;

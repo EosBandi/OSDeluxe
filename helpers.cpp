@@ -30,3 +30,4 @@ int wrap360(int x) {
 	if (x < 0) x = x + 360;
 	return x;
 }
+float angle2rad(int a) { return (a * (PI / 180)); }

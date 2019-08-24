@@ -78,6 +78,8 @@ void default_settings()
 
 	memset(&osd.boxes, 0, sizeof(osd.boxes));
 	
+
+	//Boxes (max 8)  x,y,w,h,color, mix   (color 0-black, 1-white, 2-50% white, 3-25%white)
 	osd.boxes[0] = { 0,540,720,29,3,1,1 };
 
 	osd.color_bar_x = 0;
@@ -324,5 +326,13 @@ void default_settings()
     osd.rssi.rssi_warning = 50;
     osd.rssi.visible = 0x01;
 
+	osd.pt_widget.x = 60;
+    osd.pt_widget.y = 150;
+    osd.pt_widget.visible = 0x01;
 
+	osd.ekf_detail.x = 100;
+    osd.ekf_detail.y = 100;
+    osd.ekf_detail.w = 40;
+    osd.ekf_detail.h = 200;
+    osd.ekf_detail.visible = 0x01;
 }

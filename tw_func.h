@@ -243,6 +243,9 @@ void OSD256_setpixel_fast(uint8_t _pth, uint16_t start_x, uint16_t start_Y);
 void OSD256_drawline(uint8_t _pth, uint8_t color, int x, int y, int x2, int y2);
 void OSD256_circle(uint8_t _pth, uint8_t color, int  xCenter, int yCenter, int radius);
 void OSD256_box(uint8_t _pth, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color);
+void OSD256_angled_line(uint8_t _pth, uint16_t center_x, uint16_t center_y, uint16_t length, uint16_t angle);
+
+
 
 void OSD256_transform_polygon(struct polygon_t *p, int x, int y, int rot);
 void OSD256_move_polygon(struct polygon_t *p, int x, int y);

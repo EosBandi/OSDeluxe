@@ -191,11 +191,11 @@ struct param_def parameters[] = {
 	PARAM("RADAR2_SCALE", MAV_PARAM_TYPE_UINT8, &osd.radar2.scale, &do_update_pthy),
 	PARAM("RADAR2_TYPE", MAV_PARAM_TYPE_UINT8, &osd.radar2.type, &do_update_pthy),
 
-	PARAM("RADAR3_POSX", MAV_PARAM_TYPE_UINT16, &osd.radar2.x, &do_update_pthy),
-	PARAM("RADAR3_POSY", MAV_PARAM_TYPE_UINT16, &osd.radar2.y, &do_update_pthy),
-	PARAM("RADAR3_SIZE", MAV_PARAM_TYPE_UINT16, &osd.radar2.size, &do_update_pthy),
-	PARAM("RADAR3_SCALE", MAV_PARAM_TYPE_UINT8, &osd.radar2.scale, &do_update_pthy),
-	PARAM("RADAR3_TYPE", MAV_PARAM_TYPE_UINT8, &osd.radar2.type, &do_update_pthy),
+	PARAM("RADAR3_POSX", MAV_PARAM_TYPE_UINT16, &osd.radar3.x, &do_update_pthy),
+	PARAM("RADAR3_POSY", MAV_PARAM_TYPE_UINT16, &osd.radar3.y, &do_update_pthy),
+	PARAM("RADAR3_SIZE", MAV_PARAM_TYPE_UINT16, &osd.radar3.size, &do_update_pthy),
+	PARAM("RADAR3_SCALE", MAV_PARAM_TYPE_UINT8, &osd.radar3.scale, &do_update_pthy),
+	PARAM("RADAR3_TYPE", MAV_PARAM_TYPE_UINT8, &osd.radar3.type, &do_update_pthy),
 
 	PARAM("CTR_RC_CH_1", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[0], NULL),
 	PARAM("CTR_RC_CH_2", MAV_PARAM_TYPE_UINT8, &osd.ctr_ch[1], NULL),
@@ -223,11 +223,12 @@ struct param_def parameters[] = {
 	PARAM("PAGE_MESSAGE", MAV_PARAM_TYPE_UINT8, &osd.msg_widget.visible, NULL),
 	PARAM("PAGE_GS", MAV_PARAM_TYPE_UINT8, &osd.gs.visible, NULL),
 	PARAM("PAGE_THROTTLE", MAV_PARAM_TYPE_UINT8, &osd.thr.visible, NULL),
-	PARAM("PAGE_MOVE", MAV_PARAM_TYPE_UINT8, &osd.move.visible, NULL),
+    PARAM("PAGE_MOVE", MAV_PARAM_TYPE_UINT8, &osd.move.visible, NULL), 
+	PARAM("PAGE_PT", MAV_PARAM_EXT_TYPE_UINT8, &osd.pt_widget.visible, NULL),
 	PARAM("PAGE_CENTER_M", MAV_PARAM_TYPE_UINT8, &osd.center_cross_visible , &do_update_pthy),
 	PARAM("PAGE_RADAR1", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
-	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
-	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
+	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar2.visible, &do_update_pthy),
+	PARAM("PAGE_RADAR3", MAV_PARAM_TYPE_UINT8, &osd.radar3.visible, &do_update_pthy),
     PARAM("PAGE_RSSI",MAV_PARAM_TYPE_UINT8, &osd.rssi.visible, &do_update_pthy),
 
 	PARAM("PAGE_BOX_1", MAV_PARAM_TYPE_INT16, &osd.boxes[0].visible, &do_update_pthy),
@@ -471,6 +472,11 @@ struct param_def parameters[] = {
 	PARAM("BOX_8_HEIGHT", MAV_PARAM_TYPE_INT16, &osd.boxes[7].h, &do_update_pthy),
 	PARAM("BOX_8_COLOR", MAV_PARAM_TYPE_INT8, &osd.boxes[7].color, &do_update_pthy),
 	PARAM("BOX_8_MIX", MAV_PARAM_TYPE_INT8, &osd.boxes[7].mix, &do_update_pthy),
+
+	PARAM("PT_IND_X", MAV_PARAM_TYPE_INT16, &osd.pt_widget.x, NULL), 
+	PARAM("PT_IND_Y", MAV_PARAM_TYPE_INT16, &osd.pt_widget.y, NULL),
+
+
 
 	PARAM("TEST_PIP_PAGE",MAV_PARAM_TYPE_UINT8, &g.pip_page, &update_pip),
 	PARAM("TEST_OSD_PAGE", MAV_PARAM_TYPE_UINT8, &g.visible_osd_page, &do_update_pthy),

@@ -93,6 +93,9 @@ struct osd_settings {
 	message_list_widget_t msg_list_widget;
 
 	move_widget_t move;
+    pt_widget_t pt_widget;
+
+	ekf_detail_t ekf_detail;
 
 	box_t boxes[8];
 

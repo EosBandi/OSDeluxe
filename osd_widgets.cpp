@@ -191,8 +191,8 @@ void osd_render_gps(struct gps_widget_t *g)
     {
         OSD256_display_bitmap(BMP_GPS_ICON_ORANGE, g->x, g->y);
         color = OSD256_FONT_YELLOW;
-
-    } else
+    }
+    else
     {
         OSD256_display_bitmap(BMP_GPS_ICON_GREEN, g->x, g->y);
         color = OSD256_FONT_YELLOW;
@@ -345,24 +345,77 @@ void osd_render_groundspeed(struct gs_widget_t *gs) { OSD256_printf(gs->x, gs->y
 
 void osd_render_throttle(struct throttle_widget_t *t) { OSD256_printf(t->x, t->y, OSD256_FONT_YELLOW, 0, "\x7d\x7e%u", g.rcin[3]); }
 
-void osd_render_rssi(struct rssi_widget_t *r) {
-	
-	if (g.rssi <= osd.rssi.rssi_critical || g.remote_rssi <= osd.rssi.rssi_critical)
-	{
-        OSD256_printf(r->x, r->y, OSD256_FONT_RED_BLINK, 0, "\x83 %u/%u", g.rssi, g.remote_rssi); 
-		return;
-	}
+void osd_render_rssi(struct rssi_widget_t *r)
+{
 
-	if (g.rssi <= osd.rssi.rssi_warning || g.remote_rssi <= osd.rssi.rssi_warning)
+    if (g.rssi <= osd.rssi.rssi_critical || g.remote_rssi <= osd.rssi.rssi_critical)
+    {
+        OSD256_printf(r->x, r->y, OSD256_FONT_RED_BLINK, 0, "\x83 %u/%u", g.rssi, g.remote_rssi);
+        return;
+    }
+
+    if (g.rssi <= osd.rssi.rssi_warning || g.remote_rssi <= osd.rssi.rssi_warning)
     {
         OSD256_printf(r->x, r->y, OSD256_FONT_RED, 0, "\x83 %u/%u", g.rssi, g.remote_rssi);
         return;
     }
 
-	OSD256_printf(r->x, r->y, OSD256_FONT_YELLOW, 0, "\x83 %u/%u", g.rssi, g.remote_rssi); 
+    OSD256_printf(r->x, r->y, OSD256_FONT_YELLOW, 0, "\x83 %u/%u", g.rssi, g.remote_rssi);
 }
 
+void osd_render_ekf_detail(ekf_detail_t *w)
+{
+	
+	uint16_t x;
+    x = w->x;
 
+	osd_vertical_bar(x, w->y, w->h, w->w, g.ekfvel, 50, 80, "Vel");
+    x = x + w->w + 20;
+    osd_vertical_bar(x, w->y, w->h, w->w, g.ekfposh, 50, 80, "PsH");
+    x = x + w->w + 20;
+    osd_vertical_bar(x, w->y, w->h, w->w, g.ekfposv, 50, 80, "PsV");
+    x = x + w->w + 20;
+    osd_vertical_bar(x, w->y, w->h, w->w, g.ekfcompass, 50, 80, "CmP");
+
+}
+
+// Draws a vertical bar
+// x,y - left upper position
+// h - height, w - width
+// value - value to display must be between 0 and 100 (scale outside this function)
+// limit1 - value below this draws a green bar, above this and below limit2 draws orange bar
+// limit2 - value above this draws a red bar
+// title  -  Bar title (drawn below the bar)
+
+void osd_vertical_bar(uint16_t x, uint16_t y, uint16_t h, int8_t w, uint16_t value, uint8_t limit1, uint8_t limit2, const char *title)
+{
+
+    uint16_t limit1_pos, limit2_pos; // y position of the limit lines
+    char str[5];					 // String to hold valuen number
+		
+	limit1_pos = h - ((h / 100.0) * limit1);
+    limit2_pos = h - ((h / 100.0) * limit2);
+
+    OSD256_box(PTH_X, x, y, w, h, COLOR_WHITE | MIX);
+    OSD256_box(PTH_X, x + 1, y + 1, w - 2, h - 2, BACKROUND);
+
+    // Set bar color based on limit values
+    uint8_t color = COLOR_GREEN;
+    if (value > limit1) color = COLOR_ORANGE;
+    if (value > limit2) color = COLOR_RED;
+
+    if (value > 100) value = 100; // Limit the value
+
+    uint16_t p = (h / 100.0) * value;
+
+    OSD256_box(PTH_X, x + 1, y + 1 + (h - p), w - 2, p, color);
+    OSD256_drawline(PTH_X, COLOR_WHITE, x, y + limit1_pos, x + w, y + limit1_pos);
+    OSD256_drawline(PTH_X, COLOR_WHITE, x, y + limit2_pos, x + w, y + limit2_pos);
+    sprintf(str, "%d", value);
+    OSD256_printf(x + (w/2) + 1 - (strlen(str) * 14/2), y - 25, OSD256_FONT_YELLOW, 1, str);
+    OSD256_printf(x + (w/2) + 1 - ((strlen(title)*14)/2), y + h + 2, OSD256_FONT_WHITE, 1, title);
+    //OSD256_printf(x , y + h + 2, OSD256_FONT_WHITE, 1, title);
+}
 
 void osd_render_vario(struct vario_widget_t *vw)
 {
@@ -462,12 +515,12 @@ void osd_render_horizon(struct horizon_t *h)
 
     // pitchrad = DEG2RAD(h->pitch);
     // rollrad  = DEG2RAD(h->roll);
-    cos_roll = cos(DEG2RAD(h->roll));
-    sin_roll = -1 * sin(DEG2RAD(h->roll));
+    cos_roll = cos(DEG2RAD(g.roll));
+    sin_roll = -1 * sin(DEG2RAD(g.roll));
 
     osd_draw_boundary = { (unsigned short)(h->x - WIDTH / 2), (unsigned short)(h->y - HEIGHT / 2), (unsigned short)(h->x + WIDTH / 2), (unsigned short)(h->y + HEIGHT / 2) };
 
-    if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
+    if ((abs(g.pitch) > 30) || (abs(g.roll) > 30))
     {
         c1 = COLOR_YELLOW;
     }
@@ -476,7 +529,7 @@ void osd_render_horizon(struct horizon_t *h)
         c1 = COLOR_WHITE;
     }
 
-    i = -(h->pitch * SCALE);
+    i = -(g.pitch * SCALE);
     y = h->y + i;
 
     size = ZERO_LINE; // Zero line
@@ -527,10 +580,10 @@ void osd_render_horizona(struct horizon_t *h)
 
     // pitchrad = DEG2RAD(h->pitch);
     // rollrad  = DEG2RAD(h->roll);
-    cos_roll = cos(DEG2RAD(h->roll));
-    sin_roll = -1 * sin(DEG2RAD(h->roll));
+    cos_roll = cos(DEG2RAD(g.roll));
+    sin_roll = -1 * sin(DEG2RAD(g.roll));
 
-    if ((abs(h->pitch) > 30) || (abs(h->roll) > 30))
+    if ((abs(g.pitch) > 30) || (abs(g.roll) > 30))
     {
         c1 = COLOR_ORANGE;
     }
@@ -542,7 +595,7 @@ void osd_render_horizona(struct horizon_t *h)
     for (i = -RANGE / 2; i <= RANGE / 2; i++)
     {
         y = h->y - i;
-        j = (h->pitch * SCALE_A) + i;
+        j = (g.pitch * SCALE_A) + i;
 
         if (j % (MINOR_TICK * SCALE_A) == 0)
         {
@@ -781,7 +834,6 @@ void osd_render_message_buffer()
         if (g.message_severity[0] <= 3) color = OSD256_FONT_RED;
 
         OSD256_printf(osd.msg_widget.x, osd.msg_widget.y, color, 1, "%s", g.message_buffer[0]);
-        
     }
 }
 
@@ -900,6 +952,39 @@ void osd_boxes_render()
             }
         }
     }
+}
+
+void osd_render_pt_indicator(pt_widget_t *w)
+{
+
+    char s_roll[5];
+    char s_pitch[5];
+    uint16_t fx;
+
+    sprintf(s_roll, "%d", g.roll);
+    sprintf(s_pitch, "%d", g.pitch);
+
+    struct polygon_t pitch_indicator;
+    struct point_t pitch_indicator_points[7] = { { -20, 0 }, { 20, 0 }, { 20, -10 }, { 10, 0 } };
+
+    struct polygon_t roll_indicator;
+    struct point_t roll_indicator_points[5] = { { 0, -10 }, { 0, 0 }, { -20, 0 }, { 20, 0 }, { 0, 0 } };
+
+    pitch_indicator.len = 4;
+    roll_indicator.len = 5;
+
+    fx = strlen(s_pitch) * 16 / 2;
+    OSD256_printf(w->x + 40 - fx, w->y - 10, OSD256_FONT_YELLOW, 1, "%d", g.pitch);
+    pitch_indicator.points = pitch_indicator_points;
+    OSD256_transform_polygon(&pitch_indicator, w->x, w->y, g.pitch);
+    OSD256_draw_polygon(&pitch_indicator, COLOR_WHITE);
+
+    fx = strlen(s_roll) * 16 / 2;
+    OSD256_printf(w->x + 40 - fx, w->y + 30, OSD256_FONT_YELLOW, 1, "%d", g.roll);
+
+    roll_indicator.points = roll_indicator_points;
+    OSD256_transform_polygon(&roll_indicator, w->x, w->y + 40, g.roll);
+    OSD256_draw_polygon(&roll_indicator, COLOR_WHITE);
 }
 
 void osd_render_compass(compass_widget_t *c)
@@ -1062,7 +1147,7 @@ void osd_render_radar(radar_widget_t *w)
         OSD256_transform_polygon(&uav, x, y, g.heading);
         p = &uav;
         break;
-    default:	//should not happen, just to satisfy compiller
+    default: // should not happen, just to satisfy compiller
         p = &uav;
         break;
     }

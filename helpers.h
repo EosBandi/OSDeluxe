@@ -30,7 +30,7 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 
 int wrap360(int x);
 
-
+float angle2rad(int a);
 
 
 

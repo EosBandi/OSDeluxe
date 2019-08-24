@@ -37,9 +37,9 @@ static uint8_t current_page = 0xff; // Actual selected TW2837 data page (to avoi
 
 #define TW_RESET 23
 
-#define TW_CS 12
-#define TW_WR 11
-#define TW_RD 22
+#define TW_CS 22
+#define TW_WR 12
+#define TW_RD 11
 #define TW_AEN 15
 
 #define TW_DATA GPIOD_PDOR
@@ -1219,6 +1219,22 @@ void OSD256_circle(uint8_t _pth, uint8_t color, int xCenter, int yCenter, int ra
 void OSD256_set_drawcolor(uint8_t color) { tw_write_register(0x243, color); }
 
 void OSD256_box(uint8_t _pth, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t color) { OSD256_block_fill(_pth, DISPLAY, x, y, x + w - 1, y + h - 1, color); };
+
+void OSD256_angled_line(uint8_t _pth, uint8_t _color, uint16_t center_x, uint16_t center_y, uint16_t length, uint16_t angle)
+{ 
+	uint16_t sx, sy, ex, ey;
+    float angle_radian;
+	
+	angle_radian = DEG2RAD(angle);
+
+    sx = center_x + cos(angle_radian) * -length;
+    sy = center_y + sin(angle_radian) * -length;
+    ex = center_x + cos(angle_radian) * length;
+    ey = center_y + sin(angle_radian) * length;
+
+	OSD256_drawline(_pth, _color, sx, sy, ex, ey);
+}
+
 
 void OSD256_transform_polygon(struct polygon_t *p, int x, int y, int rot)
 {
