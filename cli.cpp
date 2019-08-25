@@ -152,6 +152,28 @@ void process_cli(char *cmdline)
         return;
     }
 
+	if (strcmp(command, "default") == 0)
+    {
+        default_settings();
+        Serial.printf("Default settings loaded\r\n");
+        return;
+    }
+
+	if (strcmp(command, "save") == 0)
+    {
+        save_settings();
+        Serial.printf("Settings saved to EEPROM\r\n");
+        return;
+    }
+
+	if (strcmp(command, "load") == 0)
+    {
+        load_settings();
+        Serial.printf("Settings loaded from EEPROM\r\n");
+        return;
+    }
+
+
     if (strcmp(command, "set") == 0)
     {
         char *subcommand = strsep(&cmdline, " "); // Get the second token (set what)

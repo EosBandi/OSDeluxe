@@ -172,6 +172,7 @@ void read_mavlink()
     while (Serial1.available() > 0)
     {
         uint8_t c = Serial1.read();
+        //debug("%c", c);
         // trying to grab msg
         if (mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &mv_status))
         {   
@@ -259,6 +260,12 @@ void read_mavlink()
                 g.b1_remaining_capacity = mavlink_msg_sys_status_get_battery_remaining(&msg);      // Remaining battery energy: (0%: 0, 100%: 100)
                 if (g.b1_remaining_capacity == 255) g.b1_remaining_capacity = 100;
                 g.b1_power = g.b1_voltage * g.b1_current;
+
+
+
+
+
+
             }
             break;
 
@@ -358,9 +365,13 @@ void read_mavlink()
                 g.vibey = mavlink_msg_vibration_get_vibration_y(&msg);
                 g.vibez = mavlink_msg_vibration_get_vibration_z(&msg);
 
+				g.clip0 = mavlink_msg_vibration_get_clipping_0(&msg);
+                g.clip1 = mavlink_msg_vibration_get_clipping_1(&msg);
+                g.clip2 = mavlink_msg_vibration_get_clipping_2(&msg);
+
                 osd.stat.vibe_status = STATUS_OK;
-                if (g.vibex > 20 || g.vibey > 20 || g.vibez > 20) osd.stat.vibe_status = STATUS_WARNING;
-                if (g.vibex >= 30 || g.vibey >= 30 || g.vibez >= 30) osd.stat.vibe_status = STATUS_CRITICAL;
+                if (g.vibex > 30 || g.vibey > 30 || g.vibez > 30) osd.stat.vibe_status = STATUS_WARNING;
+                if (g.vibex >= 50 || g.vibey >= 50 || g.vibez >= 50) osd.stat.vibe_status = STATUS_CRITICAL;
             }
             break;
 

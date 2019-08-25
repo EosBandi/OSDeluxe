@@ -1311,7 +1311,7 @@ void OSD256_displayscratch()
 {
     OSD256_wr_page = 0;
     OSD256_set_display_page(0);
-    OSD256_block_transfer(SCRATCH, DISPLAY, 0, 0, 0, 0, 719, 431);
+    OSD256_block_transfer(SCRATCH, DISPLAY, 1023-719, 0, 0, 0, 719, 431);
     while (1)
         ;
 }

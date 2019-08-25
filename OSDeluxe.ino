@@ -88,9 +88,8 @@ void setup()
 
     // Open USB serial port for debug and UI
     Serial.begin(115200);
-    Serial.println("Test");
 
-    // Open Serial1 port for MavLink communication
+	// Open Serial1 port for MavLink communication
     // TODO: make it configurable
     Serial1.begin(115200);
 }
@@ -198,22 +197,19 @@ void loop()
         now = millis();
 
         read_mavlink();
-        //read_cli();
+        read_cli();
 
 
         // Clear actual write page (not the one that is displayed)
         OSD256_clear_screen(PTH_X, OSD256_wr_page);
         
+		//OSD256_displayscratch();
 		
 		
-		g.visible_osd_page = 0x08;
-        g.pip_page = 0x01;
+		//g.visible_osd_page = 0x01;
+        //g.pip_page = 0x01;
 
-
-
-
-
-        // Render OSD elements
+		// Render OSD elements
         osd_boxes_render();
         
 
@@ -307,7 +303,7 @@ void loop()
         find_launch_heading();
         if ((osd.batt1_cap.max_capacity == 0) && (millis() > (g.last_capacity_query + 5000))) request_mavlink_battery_capacity();
 
-        g.debug_looptime = true;
+        g.debug_looptime = false;
         if (g.debug_looptime) debug("Looptime : %lu\r\n", millis() - now);
     }
 }

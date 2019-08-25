@@ -287,7 +287,7 @@ void default_settings()
 	osd.msg_widget.y = 435;
 	osd.msg_widget.visible = 0x01;
 
-	osd.msg_list_widget.x = 4;
+	osd.msg_list_widget.x = 30;
 	osd.msg_list_widget.y = 20;
 	osd.msg_list_widget.visible = 0x04;
 
@@ -330,14 +330,14 @@ void default_settings()
     osd.pt_widget.y = 150;
     osd.pt_widget.visible = 0x01;
 
-	osd.ekf_detail.x = 100;
-    osd.ekf_detail.y = 100;
+	osd.ekf_detail.x = 140;
+    osd.ekf_detail.y = 50;
     osd.ekf_detail.w = 40;
     osd.ekf_detail.h = 200;
     osd.ekf_detail.visible = 0x08;
 
-	osd.vibe_detail.x = 380;
-    osd.vibe_detail.y = 100;
+	osd.vibe_detail.x = 420;
+    osd.vibe_detail.y = 50;
     osd.vibe_detail.w = 40;
     osd.vibe_detail.h = 200;
     osd.vibe_detail.visible = 0x08;

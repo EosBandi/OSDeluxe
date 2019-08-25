@@ -168,6 +168,10 @@ struct param_def parameters[] = {
 	PARAM("MESSAGE_POSX", MAV_PARAM_TYPE_UINT16, &osd.msg_widget.x, NULL),
 	PARAM("MESSAGE_POSY", MAV_PARAM_TYPE_UINT16, &osd.msg_widget.y, NULL),
 
+	PARAM("MSG_LIST_POSX", MAV_PARAM_TYPE_UINT16, &osd.msg_list_widget.x, NULL), 
+	PARAM("MSG_LIST_POSY", MAV_PARAM_TYPE_UINT16, &osd.msg_list_widget.y, NULL),
+
+
 	PARAM("GS_POSX", MAV_PARAM_TYPE_UINT16, &osd.gs.x, NULL),
 	PARAM("GS_POSY", MAV_PARAM_TYPE_UINT16, &osd.gs.y, NULL),
 
@@ -232,7 +236,7 @@ struct param_def parameters[] = {
     PARAM("PAGE_RSSI",MAV_PARAM_TYPE_UINT8, &osd.rssi.visible, &do_update_pthy),
 	PARAM("PAGE_EKF", MAV_PARAM_TYPE_UINT8, &osd.ekf_detail.visible, NULL), 
 	PARAM("PAGE_VIBE", MAV_PARAM_TYPE_UINT8, &osd.vibe_detail.visible, NULL),
-
+	PARAM("PAGE_MSG_LIST", MAV_PARAM_TYPE_UINT8, &osd.msg_list_widget.visible, NULL),
 
 	PARAM("PAGE_BOX_1", MAV_PARAM_TYPE_INT16, &osd.boxes[0].visible, &do_update_pthy),
 	PARAM("PAGE_BOX_2", MAV_PARAM_TYPE_INT16, &osd.boxes[1].visible, &do_update_pthy),

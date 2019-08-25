@@ -379,18 +379,25 @@ void osd_render_ekf_detail(ekf_detail_t *w)
 
 }
 
-
 void osd_render_vibe_detail(vibe_detail_t *w)
 {
     uint16_t x;
     x = w->x;
 
-    osd_vertical_bar(x, w->y, w->h, w->w, g.vibex, 50, 80, "X");
+    osd_vertical_bar(x, w->y, w->h, w->w, g.vibex, 30, 60, "X");
     x = x + w->w + 20;
-    osd_vertical_bar(x, w->y, w->h, w->w, g.vibey, 50, 80, "Y");
+    osd_vertical_bar(x, w->y, w->h, w->w, g.vibey, 30, 60, "Y");
     x = x + w->w + 20;
-    osd_vertical_bar(x, w->y, w->h, w->w, g.vibez, 50, 80, "Z");
+    osd_vertical_bar(x, w->y, w->h, w->w, g.vibez, 30, 60, "Z");
+
+	OSD256_printf(w->x, w->y + w->h + 22, OSD256_FONT_WHITE, 1, "   C:%d/%d/%d", g.clip0, g.clip1, g.clip2);
+
+
+
 }
+
+
+
 
 
 
@@ -774,23 +781,27 @@ void rc_control() {}
 // line 0 is a display line
 void message_buffer_add_line(const char *message, char severity)
 {
-    // Check if we are standing at the last line of the buffer.
-    if (g.message_buffer_line == MESSAGE_BUFFER_LINES - 1)
+    // Do not display messages with 6 or above severity (informational only)
+    if (severity < 6)
     {
-        for (int i = 2; i < MESSAGE_BUFFER_LINES; i++)
+        // Check if we are standing at the last line of the buffer.
+        if (g.message_buffer_line == MESSAGE_BUFFER_LINES - 1)
         {
-            strcpy(g.message_buffer[i - 1], g.message_buffer[i]); // roll to 1
-            g.message_severity[i - 1] = g.message_severity[i];
+            for (int i = 2; i < MESSAGE_BUFFER_LINES; i++)
+            {
+                strcpy(g.message_buffer[i - 1], g.message_buffer[i]); // roll to 1
+                g.message_severity[i - 1] = g.message_severity[i];
+            }
         }
-    }
-    else
-    {
-        g.message_buffer_line++;
-    }
+        else
+        {
+            g.message_buffer_line++;
+        }
 
-    strcpy(g.message_buffer[g.message_buffer_line], message);
-    g.message_severity[g.message_buffer_line] = severity;
-
+        strcpy(g.message_buffer[g.message_buffer_line], message);
+        g.message_severity[g.message_buffer_line] = severity;
+    }
+	// but add messages to the archive, regardless of severity...
     // Add line to the archive as well, so we can always display the last 20 messages if needed
     if (g.message_archive_line == MESSAGE_BUFFER_LINES - 1)
     {
@@ -848,16 +859,22 @@ void osd_render_message_buffer()
         color = OSD256_FONT_WHITE;
         if (g.message_severity[0] <= 3) color = OSD256_FONT_RED;
 
-        OSD256_printf(osd.msg_widget.x, osd.msg_widget.y, color, 1, "%s", g.message_buffer[0]);
+        OSD256_printf(osd.msg_widget.x, osd.msg_widget.y, color, 1, "%s", g.message_severity[0], g.message_buffer[0]);
     }
 }
 
 void osd_render_message_list()
 {
+    uint8_t color;
+
+	OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y, OSD256_FONT_YELLOW, 0, "Message history");
 
     for (uint8_t i = 0; i < MESSAGE_BUFFER_LINES; i++)
     {
-        OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + i * 24, OSD256_FONT_WHITE, 1, "%s", g.message_archive[i]);
+        color = OSD256_FONT_WHITE;
+        if (g.message_archive_severity[i] <= 3) color = OSD256_FONT_RED;
+
+        OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + ((i+1) * 24), color, 1, "%s", g.message_archive[i]);
     }
 }
 

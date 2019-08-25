@@ -67,6 +67,9 @@ struct global_variables_t
     int vibey;
     int vibez;
 
+	uint32_t clip0;
+    uint32_t clip1;
+    uint32_t clip2;
 
     float vx;               // X speed in m/s
     float vy;               // Y speed in m/s
