@@ -26,7 +26,7 @@ Brain FPV Flight Controller(https://github.com/BrainFPV/TauLabs) by Tau Labs
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
-#define EEPROM_VERSION 0x0f
+#define EEPROM_VERSION 0x10
 
 #define MESSAGE_BUFFER_LINES 20
 #define NO_HEADING 0xfff
@@ -62,6 +62,11 @@ struct global_variables_t
     int ekfposv;
     int ekfcompass;
     int ekfterrain;
+
+	int vibex;
+    int vibey;
+    int vibez;
+
 
     float vx;               // X speed in m/s
     float vy;               // Y speed in m/s

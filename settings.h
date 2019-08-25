@@ -96,6 +96,7 @@ struct osd_settings {
     pt_widget_t pt_widget;
 
 	ekf_detail_t ekf_detail;
+    vibe_detail_t vibe_detail;
 
 	box_t boxes[8];
 

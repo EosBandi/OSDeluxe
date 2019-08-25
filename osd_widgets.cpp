@@ -379,6 +379,21 @@ void osd_render_ekf_detail(ekf_detail_t *w)
 
 }
 
+
+void osd_render_vibe_detail(vibe_detail_t *w)
+{
+    uint16_t x;
+    x = w->x;
+
+    osd_vertical_bar(x, w->y, w->h, w->w, g.vibex, 50, 80, "X");
+    x = x + w->w + 20;
+    osd_vertical_bar(x, w->y, w->h, w->w, g.vibey, 50, 80, "Y");
+    x = x + w->w + 20;
+    osd_vertical_bar(x, w->y, w->h, w->w, g.vibez, 50, 80, "Z");
+}
+
+
+
 // Draws a vertical bar
 // x,y - left upper position
 // h - height, w - width

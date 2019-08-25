@@ -203,7 +203,10 @@ void loop()
 
         // Clear actual write page (not the one that is displayed)
         OSD256_clear_screen(PTH_X, OSD256_wr_page);
-        g.visible_osd_page = 0x01;
+        
+		
+		
+		g.visible_osd_page = 0x08;
         g.pip_page = 0x01;
 
 
@@ -213,7 +216,7 @@ void loop()
         // Render OSD elements
         osd_boxes_render();
         
-		/*
+
 		if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
         if (osd.radar2.visible & g.visible_osd_page) osd_render_radar(&osd.radar2);
         if (osd.radar3.visible & g.visible_osd_page) osd_render_radar(&osd.radar3);
@@ -242,10 +245,8 @@ void loop()
         if (osd.msg_list_widget.visible & g.visible_osd_page) osd_render_message_list();
         if (osd.rssi.visible & g.visible_osd_page) osd_render_rssi(&osd.rssi);
         if (osd.pt_widget.visible & g.visible_osd_page) osd_render_pt_indicator(&osd.pt_widget);
-		*/
-
-		osd_render_ekf_detail(&osd.ekf_detail);
-
+        if (osd.ekf_detail.visible & g.visible_osd_page) osd_render_ekf_detail(&osd.ekf_detail);
+        if (osd.vibe_detail.visible & g.visible_osd_page) osd_render_vibe_detail(&osd.vibe_detail);
 
         // Renders done, switch working page for smooth redraw
         OSD256_set_display_page(OSD256_wr_page);

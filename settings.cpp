@@ -334,5 +334,13 @@ void default_settings()
     osd.ekf_detail.y = 100;
     osd.ekf_detail.w = 40;
     osd.ekf_detail.h = 200;
-    osd.ekf_detail.visible = 0x01;
+    osd.ekf_detail.visible = 0x08;
+
+	osd.vibe_detail.x = 380;
+    osd.vibe_detail.y = 100;
+    osd.vibe_detail.w = 40;
+    osd.vibe_detail.h = 200;
+    osd.vibe_detail.visible = 0x08;
+
+
 }

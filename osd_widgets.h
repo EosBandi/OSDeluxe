@@ -314,6 +314,16 @@ struct ekf_detail_t
 
     uint8_t visible;
 };
+struct vibe_detail_t
+{
+    uint16_t x;
+    uint16_t y;
+    uint16_t h;
+    uint8_t w;
+
+    uint8_t visible;
+};
+
 
 void osd_bar_render(struct bar *b);
 void osd_render_gps(struct gps_widget_t *g);
@@ -348,6 +358,7 @@ void osd_render_radar(radar_widget_t *w);
 void osd_render_rssi(struct rssi_widget_t *r);
 void osd_render_pt_indicator(pt_widget_t *w);
 void osd_render_ekf_detail(ekf_detail_t *w);
+void osd_render_vibe_detail(vibe_detail_t *w);
 
 
 

@@ -354,13 +354,13 @@ void read_mavlink()
 
             case MAVLINK_MSG_ID_VIBRATION:
             {
-                vibex = mavlink_msg_vibration_get_vibration_x(&msg);
-                vibey = mavlink_msg_vibration_get_vibration_y(&msg);
-                vibez = mavlink_msg_vibration_get_vibration_z(&msg);
+                g.vibex = mavlink_msg_vibration_get_vibration_x(&msg);
+                g.vibey = mavlink_msg_vibration_get_vibration_y(&msg);
+                g.vibez = mavlink_msg_vibration_get_vibration_z(&msg);
 
                 osd.stat.vibe_status = STATUS_OK;
-                if (vibex > 20 || vibey > 20 || vibez > 20) osd.stat.vibe_status = STATUS_WARNING;
-                if (vibex >= 30 || vibey >= 30 || vibez >= 30) osd.stat.vibe_status = STATUS_CRITICAL;
+                if (g.vibex > 20 || g.vibey > 20 || g.vibez > 20) osd.stat.vibe_status = STATUS_WARNING;
+                if (g.vibex >= 30 || g.vibey >= 30 || g.vibez >= 30) osd.stat.vibe_status = STATUS_CRITICAL;
             }
             break;
 
