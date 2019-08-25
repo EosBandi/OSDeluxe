@@ -365,18 +365,17 @@ void osd_render_rssi(struct rssi_widget_t *r)
 
 void osd_render_ekf_detail(ekf_detail_t *w)
 {
-	
-	uint16_t x;
+
+    uint16_t x;
     x = w->x;
 
-	osd_vertical_bar(x, w->y, w->h, w->w, g.ekfvel, 50, 80, "Vel");
+    osd_vertical_bar(x, w->y, w->h, w->w, g.ekfvel, 50, 80, "Vel");
     x = x + w->w + 20;
     osd_vertical_bar(x, w->y, w->h, w->w, g.ekfposh, 50, 80, "PsH");
     x = x + w->w + 20;
     osd_vertical_bar(x, w->y, w->h, w->w, g.ekfposv, 50, 80, "PsV");
     x = x + w->w + 20;
     osd_vertical_bar(x, w->y, w->h, w->w, g.ekfcompass, 50, 80, "CmP");
-
 }
 
 void osd_render_vibe_detail(vibe_detail_t *w)
@@ -390,16 +389,33 @@ void osd_render_vibe_detail(vibe_detail_t *w)
     x = x + w->w + 20;
     osd_vertical_bar(x, w->y, w->h, w->w, g.vibez, 30, 60, "Z");
 
-	OSD256_printf(w->x, w->y + w->h + 22, OSD256_FONT_WHITE, 1, "   C:%d/%d/%d", g.clip0, g.clip1, g.clip2);
-
-
-
+    OSD256_printf(w->x, w->y + w->h + 22, OSD256_FONT_WHITE, 1, "   C:%d/%d/%d", g.clip0, g.clip1, g.clip2);
 }
 
+void osd_render_rcout(rc_out_t *w)
+{
+	bar b;
+
+	b.x = w->x;
+    b.y = w->y;
+    b.h = 15;
+    b.w = 150;
+    b.min = 1000;
+    b.max = 2000;
+    b.format = "%.0f";
+    b.bar_type = BAR_SINGLE_COLOR;
+    b.warn_red = 0;
+    b.warn_yellow = 0;
 
 
-
-
+	for (int i = 1; i <= w->chnum; i++)
+	{
+        b.val = g.rcout[i];
+        osd_bar_render(&b);
+        OSD256_printf(b.x - 48, b.y, OSD256_FONT_YELLOW, 0, "Ch%d", i);
+        b.y = b.y + 40;
+    }
+}
 
 // Draws a vertical bar
 // x,y - left upper position
@@ -413,9 +429,9 @@ void osd_vertical_bar(uint16_t x, uint16_t y, uint16_t h, int8_t w, uint16_t val
 {
 
     uint16_t limit1_pos, limit2_pos; // y position of the limit lines
-    char str[5];					 // String to hold valuen number
-		
-	limit1_pos = h - ((h / 100.0) * limit1);
+    char str[5];                     // String to hold valuen number
+
+    limit1_pos = h - ((h / 100.0) * limit1);
     limit2_pos = h - ((h / 100.0) * limit2);
 
     OSD256_box(PTH_X, x, y, w, h, COLOR_WHITE | MIX);
@@ -434,9 +450,9 @@ void osd_vertical_bar(uint16_t x, uint16_t y, uint16_t h, int8_t w, uint16_t val
     OSD256_drawline(PTH_X, COLOR_WHITE, x, y + limit1_pos, x + w, y + limit1_pos);
     OSD256_drawline(PTH_X, COLOR_WHITE, x, y + limit2_pos, x + w, y + limit2_pos);
     sprintf(str, "%d", value);
-    OSD256_printf(x + (w/2) + 1 - (strlen(str) * 14/2), y - 25, OSD256_FONT_YELLOW, 1, str);
-    OSD256_printf(x + (w/2) + 1 - ((strlen(title)*14)/2), y + h + 2, OSD256_FONT_WHITE, 1, title);
-    //OSD256_printf(x , y + h + 2, OSD256_FONT_WHITE, 1, title);
+    OSD256_printf(x + (w / 2) + 1 - (strlen(str) * 14 / 2), y - 25, OSD256_FONT_YELLOW, 1, str);
+    OSD256_printf(x + (w / 2) + 1 - ((strlen(title) * 14) / 2), y + h + 2, OSD256_FONT_WHITE, 1, title);
+    // OSD256_printf(x , y + h + 2, OSD256_FONT_WHITE, 1, title);
 }
 
 void osd_render_vario(struct vario_widget_t *vw)
@@ -801,7 +817,7 @@ void message_buffer_add_line(const char *message, char severity)
         strcpy(g.message_buffer[g.message_buffer_line], message);
         g.message_severity[g.message_buffer_line] = severity;
     }
-	// but add messages to the archive, regardless of severity...
+    // but add messages to the archive, regardless of severity...
     // Add line to the archive as well, so we can always display the last 20 messages if needed
     if (g.message_archive_line == MESSAGE_BUFFER_LINES - 1)
     {
@@ -867,14 +883,14 @@ void osd_render_message_list()
 {
     uint8_t color;
 
-	OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y, OSD256_FONT_YELLOW, 0, "Message history");
+    OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y, OSD256_FONT_YELLOW, 0, "Message history");
 
     for (uint8_t i = 0; i < MESSAGE_BUFFER_LINES; i++)
     {
         color = OSD256_FONT_WHITE;
         if (g.message_archive_severity[i] <= 3) color = OSD256_FONT_RED;
 
-        OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + ((i+1) * 24), color, 1, "%s", g.message_archive[i]);
+        OSD256_printf(osd.msg_list_widget.x, osd.msg_list_widget.y + ((i + 1) * 24), color, 1, "%s", g.message_archive[i]);
     }
 }
 

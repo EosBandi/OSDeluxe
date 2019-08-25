@@ -236,8 +236,11 @@ struct param_def parameters[] = {
     PARAM("PAGE_RSSI",MAV_PARAM_TYPE_UINT8, &osd.rssi.visible, &do_update_pthy),
 	PARAM("PAGE_EKF", MAV_PARAM_TYPE_UINT8, &osd.ekf_detail.visible, NULL), 
 	PARAM("PAGE_VIBE", MAV_PARAM_TYPE_UINT8, &osd.vibe_detail.visible, NULL),
-	PARAM("PAGE_MSG_LIST", MAV_PARAM_TYPE_UINT8, &osd.msg_list_widget.visible, NULL),
+	PARAM("PAGE_MSG_LIST", MAV_PARAM_TYPE_UINT8, &osd.msg_list_widget.visible, NULL), 
+	PARAM("PAGE_RCOUT", MAV_PARAM_TYPE_UINT8, &osd.rc_out.visible, NULL),
 
+
+		
 	PARAM("PAGE_BOX_1", MAV_PARAM_TYPE_INT16, &osd.boxes[0].visible, &do_update_pthy),
 	PARAM("PAGE_BOX_2", MAV_PARAM_TYPE_INT16, &osd.boxes[1].visible, &do_update_pthy),
 	PARAM("PAGE_BOX_3", MAV_PARAM_TYPE_INT16, &osd.boxes[2].visible, &do_update_pthy),
@@ -493,6 +496,9 @@ struct param_def parameters[] = {
     PARAM("VIBE_DET_W", MAV_PARAM_TYPE_INT8, &osd.vibe_detail.w, NULL),
 	PARAM("VIBE_DET_H", MAV_PARAM_TYPE_INT16, &osd.vibe_detail.h, NULL), 
 
+	PARAM("RCOUT_X", MAV_PARAM_TYPE_INT16, &osd.rc_out.x, NULL),
+	PARAM("RCOUT_Y", MAV_PARAM_TYPE_INT16, &osd.rc_out.y, NULL),
+    PARAM("RCOUT_CHNUM", MAV_PARAM_TYPE_INT8, &osd.rc_out.chnum, NULL),
 
 
 	PARAM("TEST_PIP_PAGE",MAV_PARAM_TYPE_UINT8, &g.pip_page, &update_pip),

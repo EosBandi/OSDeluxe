@@ -342,5 +342,9 @@ void default_settings()
     osd.vibe_detail.h = 200;
     osd.vibe_detail.visible = 0x08;
 
+	osd.rc_out.x = 100;
+    osd.rc_out.y = 300;
+    osd.rc_out.chnum = 4;
+    osd.rc_out.visible = 0x08;
 
 }

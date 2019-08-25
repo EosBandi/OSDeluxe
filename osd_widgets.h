@@ -324,6 +324,14 @@ struct vibe_detail_t
     uint8_t visible;
 };
 
+struct rc_out_t
+{
+    uint16_t x;
+    uint16_t y;
+    uint8_t chnum;
+
+	uint8_t visible;
+};
 
 void osd_bar_render(struct bar *b);
 void osd_render_gps(struct gps_widget_t *g);
@@ -360,7 +368,7 @@ void osd_render_pt_indicator(pt_widget_t *w);
 void osd_render_ekf_detail(ekf_detail_t *w);
 void osd_render_vibe_detail(vibe_detail_t *w);
 
-
+void osd_render_rcout(rc_out_t *w);
 
 void osd_vertical_bar(uint16_t x, uint16_t y, uint16_t h, int8_t w, uint16_t value, uint8_t limit1, uint8_t limit2, const char *title);
 

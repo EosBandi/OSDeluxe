@@ -37,9 +37,9 @@
 
 #define TW_RESET 23
 
-#define TW_CS  22
-#define TW_WR  12
-#define TW_RD  11
+#define TW_CS 22
+#define TW_WR 12
+#define TW_RD 11
 #define TW_AEN 15
 
 #endif
@@ -60,16 +60,13 @@ void setup()
     pinMode(TW_RD, OUTPUT);
     pinMode(TW_AEN, OUTPUT);
 
-	digitalWriteFast(TW_CS, 1);
+    digitalWriteFast(TW_CS, 1);
     digitalWriteFast(TW_WR, 1);
     digitalWriteFast(TW_RD, 1);
     digitalWriteFast(TW_AEN, 0);
 
-
-	setWriteDirInline();
+    setWriteDirInline();
 #endif
-
-
 
     // Reset TW2837
     delay(1000);
@@ -84,12 +81,12 @@ void setup()
 #ifndef TW2837_I2C
     Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, 4000000, I2C_OP_MODE_IMM);
     Wire.setDefaultTimeout(1000); // 10ms
-#endif 
+#endif
 
     // Open USB serial port for debug and UI
     Serial.begin(115200);
 
-	// Open Serial1 port for MavLink communication
+    // Open Serial1 port for MavLink communication
     // TODO: make it configurable
     Serial1.begin(115200);
 }
@@ -181,15 +178,12 @@ void loop()
 
     unsigned long now;
 
-	int a = 0;
-
-
     // As start we display page 0 and write to page 1 (to enusure flicker free display refresh)
     // OSD256_wr_page and set_display_page only influence PTH_X display path
     OSD256_wr_page = 1;
     OSD256_set_display_page(0);
 
-	init_cli();
+    init_cli();
 
     // Main loop
     while (1)
@@ -199,21 +193,18 @@ void loop()
         read_mavlink();
         read_cli();
 
-
         // Clear actual write page (not the one that is displayed)
         OSD256_clear_screen(PTH_X, OSD256_wr_page);
-        
-		//OSD256_displayscratch();
-		
-		
-		//g.visible_osd_page = 0x01;
-        //g.pip_page = 0x01;
 
-		// Render OSD elements
+        // OSD256_displayscratch();
+
+        // g.visible_osd_page = 0x01;
+        // g.pip_page = 0x01;
+
+        // Render OSD elements
         osd_boxes_render();
-        
 
-		if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
+        if (osd.radar1.visible & g.visible_osd_page) osd_render_radar(&osd.radar1);
         if (osd.radar2.visible & g.visible_osd_page) osd_render_radar(&osd.radar2);
         if (osd.radar3.visible & g.visible_osd_page) osd_render_radar(&osd.radar3);
         if (osd.vgraph.visible & g.visible_osd_page) osd_render_vgraph(&osd.vgraph);
@@ -243,6 +234,7 @@ void loop()
         if (osd.pt_widget.visible & g.visible_osd_page) osd_render_pt_indicator(&osd.pt_widget);
         if (osd.ekf_detail.visible & g.visible_osd_page) osd_render_ekf_detail(&osd.ekf_detail);
         if (osd.vibe_detail.visible & g.visible_osd_page) osd_render_vibe_detail(&osd.vibe_detail);
+		if (osd.rc_out.visible & g.visible_osd_page) osd_render_rcout(&osd.rc_out);
 
         // Renders done, switch working page for smooth redraw
         OSD256_set_display_page(OSD256_wr_page);

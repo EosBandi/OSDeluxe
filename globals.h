@@ -106,6 +106,8 @@ struct global_variables_t
     unsigned int rcin[17];
     unsigned int rc_rssi;
 
+	uint16_t rcout[9];
+
     char system_status; // Se MAVLINK_STATE enum
 
     char message_buffer[MESSAGE_BUFFER_LINES][52]; // 20 line of 52 character message_buffer

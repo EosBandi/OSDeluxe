@@ -277,6 +277,20 @@ void read_mavlink()
             }
             break;
 
+			case MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
+			{
+                g.rcout[1] = mavlink_msg_servo_output_raw_get_servo1_raw(&msg);
+                g.rcout[2] = mavlink_msg_servo_output_raw_get_servo2_raw(&msg);
+                g.rcout[3] = mavlink_msg_servo_output_raw_get_servo3_raw(&msg);
+                g.rcout[4] = mavlink_msg_servo_output_raw_get_servo4_raw(&msg);
+                g.rcout[5] = mavlink_msg_servo_output_raw_get_servo5_raw(&msg);
+                g.rcout[6] = mavlink_msg_servo_output_raw_get_servo6_raw(&msg);
+                g.rcout[7] = mavlink_msg_servo_output_raw_get_servo7_raw(&msg);
+                g.rcout[8] = mavlink_msg_servo_output_raw_get_servo8_raw(&msg);
+
+
+			}
+            break;
             case MAVLINK_MSG_ID_RC_CHANNELS:
             {
 
@@ -297,6 +311,7 @@ void read_mavlink()
                 g.rcin[15] = mavlink_msg_rc_channels_get_chan15_raw(&msg);
                 g.rcin[16] = mavlink_msg_rc_channels_get_chan16_raw(&msg);
                 g.rc_rssi = mavlink_msg_rc_channels_get_rssi(&msg);
+
 
                 // ctr_state[] contains the actual switch state of a given control channel
                 // ctr_chp[]   contains the rc channel id for pip and osd_page channels
