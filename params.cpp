@@ -224,12 +224,15 @@ struct param_def parameters[] = {
 	PARAM("PAGE_GS", MAV_PARAM_TYPE_UINT8, &osd.gs.visible, NULL),
 	PARAM("PAGE_THROTTLE", MAV_PARAM_TYPE_UINT8, &osd.thr.visible, NULL),
     PARAM("PAGE_MOVE", MAV_PARAM_TYPE_UINT8, &osd.move.visible, NULL), 
-	PARAM("PAGE_PT", MAV_PARAM_EXT_TYPE_UINT8, &osd.pt_widget.visible, NULL),
+	PARAM("PAGE_PT", MAV_PARAM_TYPE_UINT8, &osd.pt_widget.visible, NULL),
 	PARAM("PAGE_CENTER_M", MAV_PARAM_TYPE_UINT8, &osd.center_cross_visible , &do_update_pthy),
 	PARAM("PAGE_RADAR1", MAV_PARAM_TYPE_UINT8, &osd.radar1.visible, &do_update_pthy),
 	PARAM("PAGE_RADAR2", MAV_PARAM_TYPE_UINT8, &osd.radar2.visible, &do_update_pthy),
 	PARAM("PAGE_RADAR3", MAV_PARAM_TYPE_UINT8, &osd.radar3.visible, &do_update_pthy),
     PARAM("PAGE_RSSI",MAV_PARAM_TYPE_UINT8, &osd.rssi.visible, &do_update_pthy),
+	PARAM("PAGE_EKF", MAV_PARAM_TYPE_UINT8, &osd.ekf_detail.visible, NULL), 
+	PARAM("PAGE_VIBE", MAV_PARAM_TYPE_UINT8, &osd.vibe_detail.visible, NULL),
+
 
 	PARAM("PAGE_BOX_1", MAV_PARAM_TYPE_INT16, &osd.boxes[0].visible, &do_update_pthy),
 	PARAM("PAGE_BOX_2", MAV_PARAM_TYPE_INT16, &osd.boxes[1].visible, &do_update_pthy),
@@ -475,6 +478,16 @@ struct param_def parameters[] = {
 
 	PARAM("PT_IND_X", MAV_PARAM_TYPE_INT16, &osd.pt_widget.x, NULL), 
 	PARAM("PT_IND_Y", MAV_PARAM_TYPE_INT16, &osd.pt_widget.y, NULL),
+
+	PARAM("EKF_DET_X", MAV_PARAM_TYPE_INT16, &osd.ekf_detail.x, NULL), 
+	PARAM("EKF_DET_Y", MAV_PARAM_TYPE_INT16, &osd.ekf_detail.y, NULL), 
+	PARAM("EKF_DET_W", MAV_PARAM_TYPE_INT8, &osd.ekf_detail.w, NULL), 
+	PARAM("EKF_DET_H", MAV_PARAM_TYPE_INT16, &osd.ekf_detail.h, NULL), 
+
+	PARAM("VIBE_DET_X", MAV_PARAM_TYPE_INT16, &osd.vibe_detail.x, NULL),
+	PARAM("VIBE_DET_Y", MAV_PARAM_TYPE_INT16, &osd.vibe_detail.y, NULL),
+    PARAM("VIBE_DET_W", MAV_PARAM_TYPE_INT8, &osd.vibe_detail.w, NULL),
+	PARAM("VIBE_DET_H", MAV_PARAM_TYPE_INT16, &osd.vibe_detail.h, NULL), 
 
 
 
